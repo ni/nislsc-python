@@ -1,33 +1,38 @@
-# Contributing to \<reponame\> 
+# Contributing to nislsc
 
-Contributions to \<reponame\> are welcome from all!
+Contributions to **nislsc** are welcome from all!
 
-\<reponame\> is managed via [git](https://git-scm.com), with the canonical upstream
-repository hosted on [GitHub](https://github.com/ni/<reponame>/).
+**nislsc** is managed via [git](https://git-scm.com), with the canonical upstream repository hosted on [GitHub](https://github.com/ni/<reponame>/).
 
-\<reponame\> follows a pull-request model for development.  If you wish to
-contribute, you will need to create a GitHub account, fork this project, push a
-branch with your changes to your project, and then submit a pull request.
+**nislsc** follows a pull-request model for development.  If you wish to contribute, you will need to create a GitHub account, fork this project, push a branch with your changes to your project, and then submit a pull request.
 
-Please remember to sign off your commits (e.g., by using `git commit -s` if you
-are using the command line client). This amends your git commit message with a line
-of the form `Signed-off-by: Name Lastname <name.lastmail@emailaddress.com>`. Please
-include all authors of any given commit into the commit message with a
-`Signed-off-by` line. This indicates that you have read and signed the Developer
-Certificate of Origin (see below) and are able to legally submit your code to
-this repository.
+Please remember to sign off your commits (e.g., by using `git commit -s` if you are using the command line client). This amends your git commit message with a line of the form `Signed-off-by: Name Lastname <name.lastmail@emailaddress.com>`. Please include all authors of any given commit into the commit message with a `Signed-off-by` line. This indicates that you have read and signed the Developer Certificate of Origin (see below) and are able to legally submit your code to this repository.
 
 See [GitHub's official documentation](https://help.github.com/articles/using-pull-requests/) for more details.
 
-# Getting Started
+## Getting Started
 
 - TODO: include build steps here.
 
-# Testing
+## Testing
 
 - TODO: include testing steps here.
 
-# Developer Certificate of Origin (DCO)
+## Building Documentation
+
+- TODO: include documentation steps here.
+
+## Branching Policy
+
+Active development for the next release occurs on the `master` branch.
+
+During finalization, we create a release branch (e.g. `releases/1.2`) in order to control which changes target the imminent release vs. the next release after that. Changes that are intended for both the imminent release and subsequent releases should be made in the `master` branch and cherry-picked into the release branch. Changes that only apply to the imminent release (such as version numbers) may be made directly in the release branch.
+
+## Release Process
+
+- TODO: include release process steps here.
+
+## Developer Certificate of Origin (DCO)
 
    Developer's Certificate of Origin 1.1
 
@@ -57,5 +62,5 @@ See [GitHub's official documentation](https://help.github.com/articles/using-pul
 
 (taken from [developercertificate.org](https://developercertificate.org/))
 
-See [LICENSE](https://github.com/ni/<reponame>/blob/main/LICENSE)
-for details about how \<reponame\> is licensed.
+See [LICENSE](https://github.com/ni/nislsc-python/blob/main/LICENSE)
+for details about how **nislsc** is licensed.

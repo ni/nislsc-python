@@ -2,7 +2,8 @@
 import copy
 import re
 import sys
-from utilities.interpreter_helpers import arg_placeholder, param_placeholder, c_func_name, convert
+from utilities.interpreter_helpers import c_func_name
+from utilities.declaration_helpers import arg_placeholder
 %>\
 import ctypes
 lib = ctypes.CDLL('nislsc.dll')

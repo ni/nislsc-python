@@ -1,94 +1,19 @@
-import copy
-import re
-import sys
-from utilities.enum_helpers import NAME_EXPANSION, DIR_MAPPING, CHAR_LIST, IN_DIR_MAPPING, OUT_DIR_MAPPING, VOID_LIST
+from utilities.interpreter_helpers import is_capi, is_dir_in, is_dir_out, std_var_name, var_mapping
 
-INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES = [
-    re.compile("([^_\n])([A-Z][a-z]+)"),
-    re.compile("([a-z])([A-Z])"),
-    re.compile("([0-9])([^_0-9])"),
-]
-    
 ARRAY_VAR = [
     "int64[]", "uint64[]", "int32[]", "uint32[]", "bool[]", "double[]"
 ]
 
-# Previous used to list all the parameters when pythonic is not being considered
-def list_all_variable(param):
-    name = std_var_name(param)
-    if 'out' in param['dir']:
-        if param['dataType'] == 'string' or param['dataType'] == 'Device':
-            name = f"{name}, {name}Size, {name}ActualSize"
-        elif param['dataType'] == 'string[]':
-                name = f"{name}, numberOf_{name}, buffer, bufferSize, requiredBufferSize"
-        elif param['dataType'] in ARRAY_VAR:
-            name = f"{name}, {name}ArraySize, {name}ArrayActualSize"
-        elif param['dataType'] == 'uint8[]':
-            name = f"{name}, {name}ArraySize"
-    elif 'in' in param['dir']:
-        if param['dataType'] == 'string[]':
-            if name == 'namesIn':
-                name = f"{name}, {name}Size"
-            else:
-                name = f"{name}, {name}ArraySize"
-        elif param['dataType'] in ARRAY_VAR or param['dataType'] == 'uint8[]':
-            name = f"{name}, {name}ArraySize"
+CHAR_LIST = {
+    "string": "ctypes.c_char_p",
+    "Device": "ctypes.c_char_p",
+    "PhysChan": "ctypes.c_char_p",
+    "NvmemArea": "ctypes.c_char_p",
+    "Property": "ctypes.c_char_p",
+    "Command": "ctypes.c_char_p",
+}
 
-    return convert(name)
-
-# convert name to snake casing
-def convert(name):
-    for regex in INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES:
-        name = regex.sub(r"\1_\2", name)
-    return name.lower().replace("_u_int", "_uint")
-
-# in direction checker
-def is_dir_in(param):
-    return 'in' in param['dir']
-
-# out direction checker
-def is_dir_out(param):
-    return 'out' in param['dir']
-
-# capi checker
-def is_capi(param):
-    return 'targets' not in param or 'capi' in param['targets']
-
-# standard variable name
-def std_var_name(param):
-    return convert(NAME_EXPANSION.get(param['name'], param['name']))
-
-# variable mapping to ctypes
-def var_mapping(param):
-    return DIR_MAPPING.get(param['dataType'], "Error_in_datatype")
-
-# argument parameter placeholder
-def arg_placeholder(function):
-    arg_list = []
-    if 'capi' in function['targets']:
-        for parameter in function['params']:
-            if is_capi(parameter) and is_dir_in(parameter):
-                arg_list.append(IN_DIR_MAPPING.get(parameter['dataType'], "Error_in_INPUT"))
-            elif is_capi(parameter) and is_dir_out(parameter):
-                arg_list.append(OUT_DIR_MAPPING.get(parameter['dataType'], "Error_in_OUTPUT"))
-    return arg_list
-
-# standard function name
-def std_func_name(function):
-    if 'capi' in function["targets"]:
-        if 'capiname' in function:
-            return convert(function['capiname'])
-    return convert(function['name'])
-
-# C function name
-def c_func_name(function):
-    if 'capi' in function["targets"]:
-        if 'capiname' in function:
-            return function['capiname']
-    return function['name']
-
-
-# parameter placeholder
+# function header argument placeholder
 def param_placeholder(function):
     param_list = []
     if 'capi'in function['targets']:
@@ -102,7 +27,7 @@ def param_placeholder(function):
                 param_list.append(f"num_{std_var_name(parameter)}")  
     return param_list
 
-# variable specification
+# specifies the variable declaration for the function
 def var_spec(function):
     var_list = []
     for parameter in function['params']:
@@ -138,10 +63,9 @@ def var_spec(function):
                     var_list.append(f"{std_var_name(parameter)} = {std_var_name(parameter)}.encode('utf-8')")
                 else:
                     var_list.append(f"{std_var_name(parameter)} = {var_mapping(parameter)}({std_var_name(parameter)})")
-
     return var_list
 
-# function parameter to find the size value           
+# call this function to get the size needed for the return value    
 def size_call(function):
     var_list = []
     for parameter in function['params']:
@@ -175,7 +99,22 @@ def size_call(function):
 
     return var_list
 
-# function call parameter
+# additional variable declaration to create buffers
+def add_decl(function):
+    decl_list = []
+    for parameter in function['params']:
+        if is_capi(parameter) and is_dir_out(parameter):
+            if '[]' in parameter['dataType']:
+                if parameter['dataType'] == 'string[]':
+                    decl_list.append(f"buffer = ctypes.create_string_buffer(required_buffer_size.value)")
+                else:
+                    decl_list.append(f"{std_var_name(parameter)} = ({var_mapping(parameter)} * {std_var_name(parameter)}_actual_size.value)()")
+            elif parameter['dataType'] in CHAR_LIST:
+                decl_list.append(f"buffer = ctypes.create_string_buffer({std_var_name(parameter)}_actual_size.value)")
+
+    return decl_list
+
+# call function with complete parameters
 def func_call(function):
     var_list = []
     for parameter in function['params']:
@@ -218,22 +157,7 @@ def func_call(function):
 
     return var_list
 
-# additional declaration between function calls
-def add_decl(function):
-    decl_list = []
-    for parameter in function['params']:
-        if is_capi(parameter) and is_dir_out(parameter):
-            if '[]' in parameter['dataType']:
-                if parameter['dataType'] == 'string[]':
-                    decl_list.append(f"buffer = ctypes.create_string_buffer(required_buffer_size.value)")
-                else:
-                    decl_list.append(f"{std_var_name(parameter)} = ({var_mapping(parameter)} * {std_var_name(parameter)}_actual_size.value)()")
-            elif parameter['dataType'] in CHAR_LIST:
-                decl_list.append(f"buffer = ctypes.create_string_buffer({std_var_name(parameter)}_actual_size.value)")
-
-    return decl_list
-
-# required size checker
+# checks if the function needs additional function call to determine size of the return value
 def req_size(function):
     for parameter in function['params']:
         if is_capi(parameter) and is_dir_out(parameter):
@@ -241,7 +165,7 @@ def req_size(function):
                 return True
     return False
 
-# convert result to pythonic format
+# produce conversion method for return values
 def convert_res(function):
     conv_list = []
     for parameter in function['params']:
@@ -258,7 +182,7 @@ def convert_res(function):
                     conv_list.append(f"{std_var_name(parameter)}_value = buffer.value.decode('utf-8')")
     return conv_list
 
-# return parameter for function
+# create the return parameter for the function
 def return_param(function):
     ret_list = []
     for parameter in function['params']:
@@ -275,4 +199,3 @@ def return_param(function):
                     ret_list.append(f"{std_var_name(parameter)}.value")
 
     return ret_list
-    

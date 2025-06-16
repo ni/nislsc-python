@@ -2,7 +2,8 @@
 import copy
 import re
 import sys
-from utilities.interpreter_helpers import var_spec, std_func_name, param_placeholder, size_call, c_func_name, req_size, add_decl, func_call, convert_res, return_param
+from utilities.interpreter_helpers import std_func_name, c_func_name
+from utilities.function_helpers import param_placeholder, size_call, req_size, add_decl, func_call, convert_res, return_param, var_spec
 %>\
 import ctypes
 from nislscpyapi import lib

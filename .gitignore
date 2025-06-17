@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
@@ -19,3 +20,6 @@ docs/_build/
 
 # Common editor metadata
 .vscode/
+=======
+*pyc
+>>>>>>> ec5be24 (Completed base interpreter)

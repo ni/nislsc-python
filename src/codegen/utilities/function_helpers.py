@@ -1,4 +1,4 @@
-from utilities.interpreter_helpers import is_capi, is_dir_in, is_dir_out, std_var_name, var_mapping
+from .interpreter_helpers import is_capi, is_dir_in, is_dir_out, std_var_name, var_mapping
 
 ARRAY_VAR = [
     "int64[]", "uint64[]", "int32[]", "uint32[]", "bool[]", "double[]"
@@ -12,6 +12,39 @@ CHAR_LIST = {
     "Property": "ctypes.c_char_p",
     "Command": "ctypes.c_char_p",
 }
+
+TYPING_LIST = {
+    "uint8": "int",
+    "uint16": "int",
+    "uint32": "int",
+    "int32": "int",
+    "uint64": "int",
+    "int64": "int",
+    "double": "float",
+    "bool": "bool",
+    "string": "str",
+    "Library": "int",
+    "Session": "int",
+    "Device": "str",
+    "PhysChan": "str",
+    "NvmemArea": "str",
+    "Property": "str",
+    "Command": "str",
+    "CommandReference": "int",
+    "TimeoutSeconds": "float",
+    "Status": "int",
+    "PropertyReference": "int",
+    "string[]": "List[str]",
+    "double[]": "List[float]",
+    "int64[]": "List[int]",
+    "uint64[]": "List[int]",
+    "int32[]": "List[int]",
+    "uint32[]": "List[int]",
+    "uint8[]": "bytes",
+    "bool[]": "List[bool]",
+    "enum": "int"
+}
+
 
 IN_DIR_MAPPING = {
     "uint8": "ctypes.c_uint8",
@@ -88,13 +121,29 @@ def param_placeholder(function):
     if 'capi'in function['targets']:
         for parameter in function['params']:
             if is_capi(parameter) and is_dir_in(parameter) and 'Size' not in parameter['name']: 
-                if parameter['dataType'] == 'uint8[]' and parameter['name'] == 'byte':
-                    param_list.append(f"{std_var_name(parameter)}s_data")
+                if parameter['dataType'] == 'uint8[]':
+                    param_list.append(f"{std_var_name(parameter)}s_data: bytes")
                 else:
-                    param_list.append(std_var_name(parameter))
+                    param_list.append(f"{std_var_name(parameter)}: {TYPING_LIST.get(parameter['dataType'])}")
             elif is_capi(parameter) and is_dir_out(parameter) and parameter['dataType'] == 'uint8[]':
-                param_list.append(f"num_{std_var_name(parameter)}")  
+                param_list.append(f"num_{std_var_name(parameter)}: int") 
     return param_list
+
+def param_types(function):
+    if 'capi' in function['targets']:
+        param_list = []
+        num = 0
+        for parameter in function['params']:
+            if is_capi(parameter) and is_dir_out(parameter):
+                param_list.append(f"{TYPING_LIST.get(parameter['dataType'])}")
+                num += 1
+    if num == 0:
+        return ""
+    elif num == 1:
+        return f" -> {param_list[0]}"
+    else:
+        return f" -> Tuple[{', '.join(param_list)}]"
+                
 
 # specifies the variable declaration for the function
 def var_spec(function):

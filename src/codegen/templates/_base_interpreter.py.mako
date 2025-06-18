@@ -2,8 +2,8 @@
 import copy
 import re
 import sys
-from utilities.interpreter_helpers import std_func_name, c_func_name
-from utilities.function_helpers import param_placeholder, size_call, req_size, add_decl, func_call, convert_res, return_param, var_spec, arg_placeholder
+from src.codegen.utilities.interpreter_helpers import std_func_name, c_func_name
+from src.codegen.utilities.function_helpers import param_placeholder, size_call, req_size, add_decl, func_call, convert_res, return_param, var_spec, arg_placeholder
 %>\
 import abc
 class BaseInterpreter(abc.ABC):

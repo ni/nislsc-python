@@ -2,11 +2,14 @@
 import copy
 import re
 import sys
-from utilities.interpreter_helpers import std_func_name, c_func_name
-from utilities.function_helpers import param_placeholder, size_call, req_size, add_decl, func_call, convert_res, return_param, var_spec, arg_placeholder
+from src.codegen.utilities.interpreter_helpers import std_func_name, c_func_name
+from src.codegen.utilities.function_helpers import param_placeholder, size_call, req_size, add_decl, func_call, convert_res, return_param, var_spec, arg_placeholder, param_types
 %>\
 import ctypes
+from typing import bytes, Tuple, List
 from ._base_interpreter import BaseInterpreter
+from src.handwritten.error import SLSCError, SLSCWarning
+from src.codegen.utilities.interpreter_helpers import status_message
 lib = ctypes.CDLL('nislsc.dll')
 % for function in functions:
 % if 'capi' in function['targets']:
@@ -17,26 +20,34 @@ lib.niSLSC_${c_func_name(function)}.argtypes = [${", ".join([param for param in 
 class LibraryInterpreter(BaseInterpreter):
 % for function in functions:
 % if 'capi' in function["targets"]:
-    def ${std_func_name(function)}(${", ".join([param for param in param_placeholder(function)])}):
+    def ${std_func_name(function)}(${", ".join([param for param in param_placeholder(function)])})${param_types(function)}:
 % for line in var_spec(function):
         ${line}
 % endfor
 % if req_size(function):
         status = lib.niSLSC_${c_func_name(function)}(${", ".join(size_call(function))})
+        if status < 0:
+                raise SLSCError("C API error occurred", status)
+        elif status > 0:
+                warnings.warn(SLSCWarning(status_message(status), status))
 % for add_param in add_decl(function):
         ${add_param}
 % endfor
         status = lib.niSLSC_${c_func_name(function)}(${", ".join(func_call(function))})
+        if status < 0:
+                raise SLSCError(status_message(status), status)
+        elif status > 0:
+                warnings.warn(SLSCWarning(status_message(status), status))
 % else:
         status = lib.niSLSC_${c_func_name(function)}(${", ".join(func_call(function))})
+        if status < 0:
+                raise SLSCError(status_message(status), status)
+        elif status > 0:
+                warnings.warn(SLSCWarning(status_message(status), status))
 % endif
 % for result in convert_res(function):
         ${result}
 % endfor
-% if return_param(function):
-        return status, ${", ".join(return_param(function))}
-% else:
-        return status
-% endif
+        return ${", ".join(return_param(function))}
 % endif
 % endfor

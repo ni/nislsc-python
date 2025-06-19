@@ -144,7 +144,6 @@ def param_types(function):
     else:
         return f" -> Tuple[{', '.join(param_list)}]"
                 
-
 # specifies the variable declaration for the function
 def var_spec(function):
     var_list = []

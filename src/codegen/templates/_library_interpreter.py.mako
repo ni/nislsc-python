@@ -6,7 +6,7 @@ from src.codegen.utilities.interpreter_helpers import std_func_name, c_func_name
 from src.codegen.utilities.function_helpers import param_placeholder, size_call, req_size, add_decl, func_call, convert_res, return_param, var_spec, arg_placeholder, param_types
 %>\
 import ctypes
-from typing import bytes, Tuple, List
+from typing import Tuple, List
 from ._base_interpreter import BaseInterpreter
 from src.handwritten.error import SLSCError, SLSCWarning
 from src.codegen.utilities.interpreter_helpers import status_message

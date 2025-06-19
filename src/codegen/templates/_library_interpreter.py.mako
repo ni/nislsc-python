@@ -26,10 +26,6 @@ class LibraryInterpreter(BaseInterpreter):
 % endfor
 % if req_size(function):
         status = lib.niSLSC_${c_func_name(function)}(${", ".join(size_call(function))})
-        if status < 0:
-                raise SLSCError("C API error occurred", status)
-        elif status > 0:
-                warnings.warn(SLSCWarning(status_message(status), status))
 % for add_param in add_decl(function):
         ${add_param}
 % endfor

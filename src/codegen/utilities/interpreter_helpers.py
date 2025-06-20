@@ -1,7 +1,6 @@
 import copy
 import re
 import sys
-from .enum_helpers import STATUS_CODE
 
 INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES = [
     re.compile("([^_\n])([A-Z][a-z]+)"),
@@ -99,13 +98,6 @@ def std_func_name(function):
         if 'capiname' in function:
             return convert(function['capiname'])
     return convert(function['name'])
-
-def status_message(status):
-    for name, value in STATUS_CODE.items():
-        if value == status:
-            return name
-    return f"Unknown status code: {status}"
-
 
 
 

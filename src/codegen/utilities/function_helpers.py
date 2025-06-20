@@ -1,4 +1,4 @@
-from .interpreter_helpers import is_capi, is_dir_in, is_dir_out, std_var_name, var_mapping
+from utilities.interpreter_helpers import is_capi, is_dir_in, is_dir_out, std_var_name, var_mapping
 
 ARRAY_VAR = [
     "int64[]", "uint64[]", "int32[]", "uint32[]", "bool[]", "double[]"

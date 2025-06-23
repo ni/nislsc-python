@@ -63,7 +63,7 @@ DIR_MAPPING = {
 def convert(name):
     for regex in INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES:
         name = regex.sub(r"\1_\2", name)
-    return name.lower().replace("_u_int", "_uint")
+    return name.lower().replace("u_int", "uint")
 
 # in direction checker
 def is_dir_in(param):

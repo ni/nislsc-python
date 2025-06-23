@@ -15,12 +15,18 @@ def _copy_handwritten_files(dest):
     source_path = parent_dir / "handwritten"
     shutil.copytree(source_path, dest, dirs_exist_ok=True)
 
-def generate_from_template(api, template_path, output_path):
+def generate_from_template(api, template_path, output_path, context):
     if not os.path.exists(template_path):
         raise FileNotFoundError(f"Template not found: {template_path}")
 
     tpl = Template(filename=template_path)
-    kwargs = dict(functions=api['functions'], trim_blocks=True, lstrip_blocks=True)
+    kwargs = dict(trim_blocks=True, lstrip_blocks=True)
+
+    if context == 'functions':
+        kwargs['functions'] = api['functions']
+    elif context == 'enums':
+        kwargs['enums'] = api['enums']
+
     rendered = tpl.render(**kwargs)
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -41,16 +47,23 @@ def main():
         {
             "template": os.path.join(base_dir, 'templates', '_base_interpreter.py.mako'),
             "output": os.path.join(base_dir, '..', '..', 'generated', 'nislsc', '_base_interpreter.py'),
+            "context": "functions",
         },
         {
             "template": os.path.join(base_dir, 'templates', '_library_interpreter.py.mako'),
             "output": os.path.join(base_dir, '..', '..', 'generated', 'nislsc', '_library_interpreter.py'),
+            "context": "functions",
+        },
+        {
+            "template": os.path.join(base_dir, 'templates', 'constants.py.mako'),
+            "output": os.path.join(base_dir, '..', '..', 'generated', 'nislsc', 'constants.py'),
+            "context": "enums",
         }
     ]
 
     for target in targets:
         try:
-            generate_from_template(api, target["template"], target["output"])
+            generate_from_template(api, target["template"], target["output"], target["context"])
         except Exception as e:
             print(f"Error generating {target['output']}: {e}")
 

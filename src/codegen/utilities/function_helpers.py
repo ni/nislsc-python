@@ -216,6 +216,17 @@ def size_call(function):
 
     return var_list
 
+# call this function to generate validation  
+def gen_val(function):
+    var_list = []
+    for parameter in function['params']:
+        if is_capi(parameter) and is_dir_out(parameter):
+            if parameter['dataType'] == 'string[]':
+                var_list.append("required_buffer_size.value < 0")
+            else:
+                var_list.append(f"{std_var_name(parameter)}_actual_size.value < 0")
+    return " or ".join(var_list)
+
 # additional variable declaration to create buffers
 def add_decl(function):
     decl_list = []

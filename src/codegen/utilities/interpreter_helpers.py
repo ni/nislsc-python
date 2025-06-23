@@ -1,6 +1,10 @@
 import copy
 import re
 import sys
+<<<<<<< HEAD
+=======
+from .enum_helpers import STATUS_CODE
+>>>>>>> 168e9ca8d84a4e2b7038150811b9de9ae95d5d4e
 
 INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES = [
     re.compile("([^_\n])([A-Z][a-z]+)"),
@@ -63,7 +67,11 @@ DIR_MAPPING = {
 def convert(name):
     for regex in INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES:
         name = regex.sub(r"\1_\2", name)
+<<<<<<< HEAD
     return name.lower().replace("u_int", "uint")
+=======
+    return name.lower().replace("_u_int", "_uint")
+>>>>>>> 168e9ca8d84a4e2b7038150811b9de9ae95d5d4e
 
 # in direction checker
 def is_dir_in(param):
@@ -99,6 +107,16 @@ def std_func_name(function):
             return convert(function['capiname'])
     return convert(function['name'])
 
+<<<<<<< HEAD
+=======
+def status_message(status):
+    for name, value in STATUS_CODE.items():
+        if value == status:
+            return name
+    return f"Unknown status code: {status}"
+
+
+>>>>>>> 168e9ca8d84a4e2b7038150811b9de9ae95d5d4e
 
 
     

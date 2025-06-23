@@ -16,6 +16,7 @@ class BaseInterpreter(abc.ABC):
     @abc.abstractmethod
     def ${std_func_name(function)}(${", ".join([param for param in param_placeholder(function)])}):
         pass
+        
 % endif
 % endfor
 

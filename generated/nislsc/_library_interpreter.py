@@ -2,6 +2,7 @@ import ctypes
 
 from typing import Tuple, List
 from _base_interpreter import BaseInterpreter
+from error import SLSCError, SLSCWarning
 
 lib = ctypes.CDLL('nislsc.dll')
 

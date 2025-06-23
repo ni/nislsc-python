@@ -5,691 +5,691 @@ from typing import Tuple, List
 class BaseInterpreter(abc.ABC):
 
     @abc.abstractmethod
-    def initialize_library(self, version: int):
+    def initialize_library(self, version: int) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def finalize_library(self, library_handle: int):
+    def finalize_library(self, library_handle: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_library_version(self):
+    def get_library_version(self) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_extended_error_info(self, library_handle: int, language: int):
+    def get_extended_error_info(self, library_handle: int, language: int) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def get_error_description(self, library_handle: int, status_code: int, language: int):
+    def get_error_description(self, library_handle: int, status_code: int, language: int) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def flatten_names(self, names_in: List[str]):
+    def flatten_names(self, names_in: List[str]) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def unflatten_names(self, names_in: int):
+    def unflatten_names(self, names_in: int) -> List[str]:
         pass
-        
+
     @abc.abstractmethod
-    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float):
+    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float):
+    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float):
+    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def initialize_session_without_resources(self, library_handle: int):
+    def initialize_session_without_resources(self, library_handle: int) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def close_session(self, session_handle: int):
+    def close_session(self, session_handle: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def abort_session(self, session_handle: int):
+    def abort_session(self, session_handle: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def log_in(self, session_handle: int, chassis_name: str, username: str, password: str, connection_timeout: float, save_credentials_to_disk: bool):
+    def log_in(self, session_handle: int, chassis_name: str, username: str, password: str, connection_timeout: float, save_credentials_to_disk: bool)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def log_out(self, session_handle: int, chassis_name: str):
+    def log_out(self, session_handle: int, chassis_name: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def connect_to_devices(self, session_handle: int, device_names: str, connection_timeout: float):
+    def connect_to_devices(self, session_handle: int, device_names: str, connection_timeout: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def disconnect_from_devices(self, session_handle: int, device_names: str):
+    def disconnect_from_devices(self, session_handle: int, device_names: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def connect_to_chassis_by_address(self, session_handle: int, address: str, username: str, password: str, connection_timeout: float):
+    def connect_to_chassis_by_address(self, session_handle: int, address: str, username: str, password: str, connection_timeout: float) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def reserve_devices(self, session_handle: int, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float):
+    def reserve_devices(self, session_handle: int, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def unreserve_devices(self, session_handle: int, device_names: str):
+    def unreserve_devices(self, session_handle: int, device_names: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def reset_devices(self, session_handle: int, device_names: str):
+    def reset_devices(self, session_handle: int, device_names: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def rename_device(self, session_handle: int, device_name: str, new_device_name: str):
+    def rename_device(self, session_handle: int, device_name: str, new_device_name: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def update_system_configuration_file(self, session_handle: int, chassis_name: str, connection_timeout: float):
+    def update_system_configuration_file(self, session_handle: int, chassis_name: str, connection_timeout: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def add_network_chassis(self, session_handle: int, address: str, username: str, password: str, connection_timeout: float):
+    def add_network_chassis(self, session_handle: int, address: str, username: str, password: str, connection_timeout: float) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def remove_chassis(self, session_handle: int, chassis_name: str):
+    def remove_chassis(self, session_handle: int, chassis_name: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_bool(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_bool(self, session_handle: int, device_names: str, property_name: str) -> bool:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_bool_array(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_bool_array(self, session_handle: int, device_names: str, property_name: str) -> List[bool]:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_double(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_double(self, session_handle: int, device_names: str, property_name: str) -> float:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_double_array(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_double_array(self, session_handle: int, device_names: str, property_name: str) -> List[float]:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_int32(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_int32(self, session_handle: int, device_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_int32_array(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_int32_array(self, session_handle: int, device_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_int64(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_int64(self, session_handle: int, device_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_int64_array(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_int64_array(self, session_handle: int, device_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_string(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_string(self, session_handle: int, device_names: str, property_name: str) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_string_array(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_string_array(self, session_handle: int, device_names: str, property_name: str) -> List[str]:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_uint32(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_uint32(self, session_handle: int, device_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_uint32_array(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_uint32_array(self, session_handle: int, device_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_uint64(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_uint64(self, session_handle: int, device_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_device_property_uint64_array(self, session_handle: int, device_names: str, property_name: str):
+    def get_device_property_uint64_array(self, session_handle: int, device_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_bool(self, session_handle: int, device_names: str, property_name: str, property_value: bool):
+    def set_device_property_bool(self, session_handle: int, device_names: str, property_name: str, property_value: bool)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_bool_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[bool]):
+    def set_device_property_bool_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[bool])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_double(self, session_handle: int, device_names: str, property_name: str, property_value: float):
+    def set_device_property_double(self, session_handle: int, device_names: str, property_name: str, property_value: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_double_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[float]):
+    def set_device_property_double_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[float])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_int32(self, session_handle: int, device_names: str, property_name: str, property_value: int):
+    def set_device_property_int32(self, session_handle: int, device_names: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_int32_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int]):
+    def set_device_property_int32_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_int64(self, session_handle: int, device_names: str, property_name: str, property_value: int):
+    def set_device_property_int64(self, session_handle: int, device_names: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_int64_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int]):
+    def set_device_property_int64_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_string(self, session_handle: int, device_names: str, property_name: str, property_value: str):
+    def set_device_property_string(self, session_handle: int, device_names: str, property_name: str, property_value: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_string_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[str]):
+    def set_device_property_string_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[str])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_uint32(self, session_handle: int, device_names: str, property_name: str, property_value: int):
+    def set_device_property_uint32(self, session_handle: int, device_names: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_uint32_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int]):
+    def set_device_property_uint32_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_uint64(self, session_handle: int, device_names: str, property_name: str, property_value: int):
+    def set_device_property_uint64(self, session_handle: int, device_names: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_device_property_uint64_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int]):
+    def set_device_property_uint64_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_bool(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_bool(self, session_handle: int, physical_channel_names: str, property_name: str) -> bool:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_bool_array(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_bool_array(self, session_handle: int, physical_channel_names: str, property_name: str) -> List[bool]:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_double(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_double(self, session_handle: int, physical_channel_names: str, property_name: str) -> float:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_double_array(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_double_array(self, session_handle: int, physical_channel_names: str, property_name: str) -> List[float]:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_int32(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_int32(self, session_handle: int, physical_channel_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_int32_array(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_int32_array(self, session_handle: int, physical_channel_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_int64(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_int64(self, session_handle: int, physical_channel_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_int64_array(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_int64_array(self, session_handle: int, physical_channel_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_string(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_string(self, session_handle: int, physical_channel_names: str, property_name: str) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_string_array(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_string_array(self, session_handle: int, physical_channel_names: str, property_name: str) -> List[str]:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_uint32(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_uint32(self, session_handle: int, physical_channel_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_uint32_array(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_uint32_array(self, session_handle: int, physical_channel_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_uint64(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_uint64(self, session_handle: int, physical_channel_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_physical_channel_property_uint64_array(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def get_physical_channel_property_uint64_array(self, session_handle: int, physical_channel_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_bool(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: bool):
+    def set_physical_channel_property_bool(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: bool)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_bool_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[bool]):
+    def set_physical_channel_property_bool_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[bool])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_double(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: float):
+    def set_physical_channel_property_double(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_double_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[float]):
+    def set_physical_channel_property_double_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[float])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_int32(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int):
+    def set_physical_channel_property_int32(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_int32_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int]):
+    def set_physical_channel_property_int32_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_int64(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int):
+    def set_physical_channel_property_int64(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_int64_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int]):
+    def set_physical_channel_property_int64_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_string(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: str):
+    def set_physical_channel_property_string(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_string_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[str]):
+    def set_physical_channel_property_string_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[str])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_uint32(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int):
+    def set_physical_channel_property_uint32(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_uint32_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int]):
+    def set_physical_channel_property_uint32_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_uint64(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int):
+    def set_physical_channel_property_uint64(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_physical_channel_property_uint64_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int]):
+    def set_physical_channel_property_uint64_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_properties_for_devices(self, session_handle: int, device_names: str):
+    def commit_properties_for_devices(self, session_handle: int, device_names: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_properties_for_physical_channels(self, session_handle: int, physical_channel_names: str):
+    def commit_properties_for_physical_channels(self, session_handle: int, physical_channel_names: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_properties_for_session(self, session_handle: int):
+    def commit_properties_for_session(self, session_handle: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_properties_generic(self, session_handle: int, resources: str):
+    def commit_properties_generic(self, session_handle: int, resources: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_nvmem_area_property_bool(self, session_handle: int, nvmem_area_names: str, property_name: str):
+    def get_nvmem_area_property_bool(self, session_handle: int, nvmem_area_names: str, property_name: str) -> bool:
         pass
-        
+
     @abc.abstractmethod
-    def get_nvmem_area_property_bool_array(self, session_handle: int, nvmem_area_names: str, property_name: str):
+    def get_nvmem_area_property_bool_array(self, session_handle: int, nvmem_area_names: str, property_name: str) -> List[bool]:
         pass
-        
+
     @abc.abstractmethod
-    def get_nvmem_area_property_string(self, session_handle: int, nvmem_area_names: str, property_name: str):
+    def get_nvmem_area_property_string(self, session_handle: int, nvmem_area_names: str, property_name: str) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def get_nvmem_area_property_string_array(self, session_handle: int, nvmem_area_names: str, property_name: str):
+    def get_nvmem_area_property_string_array(self, session_handle: int, nvmem_area_names: str, property_name: str) -> List[str]:
         pass
-        
+
     @abc.abstractmethod
-    def get_nvmem_area_property_uint32(self, session_handle: int, nvmem_area_names: str, property_name: str):
+    def get_nvmem_area_property_uint32(self, session_handle: int, nvmem_area_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_nvmem_area_property_uint32_array(self, session_handle: int, nvmem_area_names: str, property_name: str):
+    def get_nvmem_area_property_uint32_array(self, session_handle: int, nvmem_area_names: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_session_property_double(self, session_handle: int, property_name: str):
+    def get_session_property_double(self, session_handle: int, property_name: str) -> float:
         pass
-        
+
     @abc.abstractmethod
-    def get_session_property_string(self, session_handle: int, property_name: str):
+    def get_session_property_string(self, session_handle: int, property_name: str) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def get_session_property_string_array(self, session_handle: int, property_name: str):
+    def get_session_property_string_array(self, session_handle: int, property_name: str) -> List[str]:
         pass
-        
+
     @abc.abstractmethod
-    def set_session_property_double(self, session_handle: int, property_name: str, property_value: float):
+    def set_session_property_double(self, session_handle: int, property_name: str, property_value: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_session_property_string(self, session_handle: int, property_name: str, property_value: str):
+    def set_session_property_string(self, session_handle: int, property_name: str, property_value: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_session_property_string_array(self, session_handle: int, property_name: str, property_value: List[str]):
+    def set_session_property_string_array(self, session_handle: int, property_name: str, property_value: List[str])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_system_property_double(self, session_handle: int, property_name: str):
+    def get_system_property_double(self, session_handle: int, property_name: str) -> float:
         pass
-        
+
     @abc.abstractmethod
-    def get_system_property_string_array(self, session_handle: int, property_name: str):
+    def get_system_property_string_array(self, session_handle: int, property_name: str) -> List[str]:
         pass
-        
+
     @abc.abstractmethod
-    def get_system_property_uint64(self, session_handle: int, property_name: str):
+    def get_system_property_uint64(self, session_handle: int, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def set_system_property_double(self, session_handle: int, property_name: str, property_value: float):
+    def set_system_property_double(self, session_handle: int, property_name: str, property_value: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_bool(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_bool(self, session_handle: int, resources: str, property_name: str) -> bool:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_bool_array(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_bool_array(self, session_handle: int, resources: str, property_name: str) -> List[bool]:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_double(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_double(self, session_handle: int, resources: str, property_name: str) -> float:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_double_array(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_double_array(self, session_handle: int, resources: str, property_name: str) -> List[float]:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_int32(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_int32(self, session_handle: int, resources: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_int32_array(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_int32_array(self, session_handle: int, resources: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_int64(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_int64(self, session_handle: int, resources: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_int64_array(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_int64_array(self, session_handle: int, resources: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_string(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_string(self, session_handle: int, resources: str, property_name: str) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_string_array(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_string_array(self, session_handle: int, resources: str, property_name: str) -> List[str]:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_uint32(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_uint32(self, session_handle: int, resources: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_uint32_array(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_uint32_array(self, session_handle: int, resources: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_uint64(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_uint64(self, session_handle: int, resources: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_generic_property_uint64_array(self, session_handle: int, resources: str, property_name: str):
+    def get_generic_property_uint64_array(self, session_handle: int, resources: str, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_bool(self, session_handle: int, resources: str, property_name: str, property_value: bool):
+    def set_generic_property_bool(self, session_handle: int, resources: str, property_name: str, property_value: bool)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_bool_array(self, session_handle: int, resources: str, property_name: str, property_value: List[bool]):
+    def set_generic_property_bool_array(self, session_handle: int, resources: str, property_name: str, property_value: List[bool])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_double(self, session_handle: int, resources: str, property_name: str, property_value: float):
+    def set_generic_property_double(self, session_handle: int, resources: str, property_name: str, property_value: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_double_array(self, session_handle: int, resources: str, property_name: str, property_value: List[float]):
+    def set_generic_property_double_array(self, session_handle: int, resources: str, property_name: str, property_value: List[float])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_int32(self, session_handle: int, resources: str, property_name: str, property_value: int):
+    def set_generic_property_int32(self, session_handle: int, resources: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_int32_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int]):
+    def set_generic_property_int32_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_int64(self, session_handle: int, resources: str, property_name: str, property_value: int):
+    def set_generic_property_int64(self, session_handle: int, resources: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_int64_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int]):
+    def set_generic_property_int64_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_string(self, session_handle: int, resources: str, property_name: str, property_value: str):
+    def set_generic_property_string(self, session_handle: int, resources: str, property_name: str, property_value: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_string_array(self, session_handle: int, resources: str, property_name: str, property_value: List[str]):
+    def set_generic_property_string_array(self, session_handle: int, resources: str, property_name: str, property_value: List[str])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_uint32(self, session_handle: int, resources: str, property_name: str, property_value: int):
+    def set_generic_property_uint32(self, session_handle: int, resources: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_uint32_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int]):
+    def set_generic_property_uint32_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_uint64(self, session_handle: int, resources: str, property_name: str, property_value: int):
+    def set_generic_property_uint64(self, session_handle: int, resources: str, property_name: str, property_value: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_generic_property_uint64_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int]):
+    def set_generic_property_uint64_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int])-> None:
         pass
-        
+
     @abc.abstractmethod
-    def execute_device_command(self, session_handle: int, device_names: str, command_name: str, timeout: float):
+    def execute_device_command(self, session_handle: int, device_names: str, command_name: str, timeout: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def execute_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str, timeout: float):
+    def execute_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str, timeout: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def execute_generic_command(self, session_handle: int, resources: str, command_name: str, timeout: float):
+    def execute_generic_command(self, session_handle: int, resources: str, command_name: str, timeout: float)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def read_register_uint8(self, session_handle: int, device_name: str, register_address: int):
+    def read_register_uint8(self, session_handle: int, device_name: str, register_address: int) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def read_register_uint16(self, session_handle: int, device_name: str, register_address: int):
+    def read_register_uint16(self, session_handle: int, device_name: str, register_address: int) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def read_register_uint32(self, session_handle: int, device_name: str, register_address: int):
+    def read_register_uint32(self, session_handle: int, device_name: str, register_address: int) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def read_register_uint64(self, session_handle: int, device_name: str, register_address: int):
+    def read_register_uint64(self, session_handle: int, device_name: str, register_address: int) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def write_register_uint8(self, session_handle: int, device_name: str, register_address: int, data: int):
+    def write_register_uint8(self, session_handle: int, device_name: str, register_address: int, data: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def write_register_uint16(self, session_handle: int, device_name: str, register_address: int, data: int):
+    def write_register_uint16(self, session_handle: int, device_name: str, register_address: int, data: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def write_register_uint32(self, session_handle: int, device_name: str, register_address: int, data: int):
+    def write_register_uint32(self, session_handle: int, device_name: str, register_address: int, data: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def write_register_uint64(self, session_handle: int, device_name: str, register_address: int, data: int):
+    def write_register_uint64(self, session_handle: int, device_name: str, register_address: int, data: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_nvmem_bytes(self, session_handle: int, nvmem_area: str, nvmem_address: int, num_byte: int):
+    def get_nvmem_bytes(self, session_handle: int, nvmem_area: str, nvmem_address: int, num_byte: int) -> bytes:
         pass
-        
+
     @abc.abstractmethod
-    def set_nvmem_bytes(self, session_handle: int, nvmem_area: str, nvmem_address: int, bytes_data: bytes, serial_number: str, password: str):
+    def set_nvmem_bytes(self, session_handle: int, nvmem_area: str, nvmem_address: int, bytes_data: bytes, serial_number: str, password: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_nvmem_areas(self, session_handle: int, nvmem_area_names: str):
+    def commit_nvmem_areas(self, session_handle: int, nvmem_area_names: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_nvmem_for_devices(self, session_handle: int, device_names: str):
+    def commit_nvmem_for_devices(self, session_handle: int, device_names: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_nvmem_for_session(self, session_handle: int):
+    def commit_nvmem_for_session(self, session_handle: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_nvmem_generic(self, session_handle: int, resources: str):
+    def commit_nvmem_generic(self, session_handle: int, resources: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_linear_scaling_parameters(self, session_handle: int, physical_channel_names: str):
+    def get_linear_scaling_parameters(self, session_handle: int, physical_channel_names: str) -> Tuple[float, float]:
         pass
-        
+
     @abc.abstractmethod
-    def get_polynomial_scaling_parameters(self, session_handle: int, physical_channel_names: str):
+    def get_polynomial_scaling_parameters(self, session_handle: int, physical_channel_names: str) -> Tuple[List[float], List[float]]:
         pass
-        
+
     @abc.abstractmethod
-    def get_table_scaling_parameters(self, session_handle: int, physical_channel_names: str):
+    def get_table_scaling_parameters(self, session_handle: int, physical_channel_names: str) -> Tuple[List[float], List[float], int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_user_defined_scaling_parameters(self, session_handle: int, physical_channel_names: str):
+    def get_user_defined_scaling_parameters(self, session_handle: int, physical_channel_names: str) -> Tuple[List[str], List[float]]:
         pass
-        
+
     @abc.abstractmethod
-    def get_user_defined_scaling_equation(self, session_handle: int, physical_channel_names: str):
+    def get_user_defined_scaling_equation(self, session_handle: int, physical_channel_names: str) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def set_linear_scaling_parameters(self, session_handle: int, physical_channel_names: str, slope: float, intercept: float, serial_number: str, password: str):
+    def set_linear_scaling_parameters(self, session_handle: int, physical_channel_names: str, slope: float, intercept: float, serial_number: str, password: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_polynomial_scaling_parameters(self, session_handle: int, physical_channel_names: str, forward_coefficient: List[float], reverse_coefficient: List[float], serial_number: str, password: str):
+    def set_polynomial_scaling_parameters(self, session_handle: int, physical_channel_names: str, forward_coefficient: List[float], reverse_coefficient: List[float], serial_number: str, password: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_table_scaling_parameters(self, session_handle: int, physical_channel_names: str, scaled_value: List[float], prescale_value: List[float], coercion: int, serial_number: str, password: str):
+    def set_table_scaling_parameters(self, session_handle: int, physical_channel_names: str, scaled_value: List[float], prescale_value: List[float], coercion: int, serial_number: str, password: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_user_defined_scaling_parameters(self, session_handle: int, physical_channel_names: str, user_defined_parameter_name: List[str], user_defined_parameter_value: List[float], serial_number: str, password: str):
+    def set_user_defined_scaling_parameters(self, session_handle: int, physical_channel_names: str, user_defined_parameter_name: List[str], user_defined_parameter_value: List[float], serial_number: str, password: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def set_user_defined_scaling_equation(self, session_handle: int, physical_channel_names: str, user_defined_equation: str, serial_number: str, password: str):
+    def set_user_defined_scaling_equation(self, session_handle: int, physical_channel_names: str, user_defined_equation: str, serial_number: str, password: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def commit_scaling_for_devices(self, session_handle: int, device_names: str):
+    def commit_scaling_for_devices(self, session_handle: int, device_names: str)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def open_device_command(self, session_handle: int, device_name: str, command_name: str):
+    def open_device_command(self, session_handle: int, device_name: str, command_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def open_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str):
+    def open_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def open_generic_command(self, session_handle: int, resource: str, command_name: str):
+    def open_generic_command(self, session_handle: int, resource: str, command_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def close_command(self, command_handle: int):
+    def close_command(self, command_handle: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_command_property_string(self, command_handle: int, property_name: str):
+    def get_command_property_string(self, command_handle: int, property_name: str) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def open_device_property(self, session_handle: int, device_name: str, property_name: str):
+    def open_device_property(self, session_handle: int, device_name: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def open_physical_channel_property(self, session_handle: int, physical_channel_names: str, property_name: str):
+    def open_physical_channel_property(self, session_handle: int, physical_channel_names: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def open_driver_defined_property(self, session_handle: int, property_name: str):
+    def open_driver_defined_property(self, session_handle: int, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def open_generic_property(self, session_handle: int, resource: str, property_name: str):
+    def open_generic_property(self, session_handle: int, resource: str, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def close_property(self, property_handle: int):
+    def close_property(self, property_handle: int)-> None:
         pass
-        
+
     @abc.abstractmethod
-    def get_property_property_bool(self, property_handle: int, property_name: str):
+    def get_property_property_bool(self, property_handle: int, property_name: str) -> bool:
         pass
-        
+
     @abc.abstractmethod
-    def get_property_property_int32(self, property_handle: int, property_name: str):
+    def get_property_property_int32(self, property_handle: int, property_name: str) -> int:
         pass
-        
+
     @abc.abstractmethod
-    def get_property_property_int32_array(self, property_handle: int, property_name: str):
+    def get_property_property_int32_array(self, property_handle: int, property_name: str) -> List[int]:
         pass
-        
+
     @abc.abstractmethod
-    def get_property_property_string(self, property_handle: int, property_name: str):
+    def get_property_property_string(self, property_handle: int, property_name: str) -> str:
         pass
-        
+
     @abc.abstractmethod
-    def get_property_property_string_array(self, property_handle: int, property_name: str):
+    def get_property_property_string_array(self, property_handle: int, property_name: str) -> List[str]:
         pass
-        
+
 

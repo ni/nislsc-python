@@ -523,15 +523,16 @@ lib.niSLSC_GetPropertyPropertyStringArray.restype = ctypes.c_int32
 lib.niSLSC_GetPropertyPropertyStringArray.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(ctypes.POINTER(ctypes.c_char_p)), ctypes.POINTER(ctypes.c_size_t), ctypes.c_void_p, ctypes.c_size_t, ctypes.POINTER(ctypes.c_size_t)]
 
 class LibraryInterpreter(BaseInterpreter):
-    def __init__():
+
+    def __init__(self) -> None:
         self._language = 0
 
     @property
-    def language(self):
+    def language(self) -> int:
         return self._language
 
     @language.setter
-    def language(self, value: int):
+    def language(self, value: int) -> None:
         self._language = value
 
     def initialize_library(self, version: int) -> int:
@@ -541,7 +542,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return library_handle.value
 
-    def finalize_library(self, library_handle: int):
+    def finalize_library(self, library_handle: int)-> None:
         library_handle = ctypes.c_void_p(library_handle)
         status = lib.niSLSC_FinalizeLibrary(library_handle)
         self.check_for_error(status, library_handle.value)
@@ -653,19 +654,19 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return session_handle.value
 
-    def close_session(self, session_handle: int):
+    def close_session(self, session_handle: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         status = lib.niSLSC_CloseSession(session_handle)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def abort_session(self, session_handle: int):
+    def abort_session(self, session_handle: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         status = lib.niSLSC_AbortSession(session_handle)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def log_in(self, session_handle: int, chassis_name: str, username: str, password: str, connection_timeout: float, save_credentials_to_disk: bool):
+    def log_in(self, session_handle: int, chassis_name: str, username: str, password: str, connection_timeout: float, save_credentials_to_disk: bool)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         chassis_name = chassis_name.encode('utf-8')
         username = username.encode('utf-8')
@@ -676,14 +677,14 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def log_out(self, session_handle: int, chassis_name: str):
+    def log_out(self, session_handle: int, chassis_name: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         chassis_name = chassis_name.encode('utf-8')
         status = lib.niSLSC_LogOut(session_handle, chassis_name)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def connect_to_devices(self, session_handle: int, device_names: str, connection_timeout: float):
+    def connect_to_devices(self, session_handle: int, device_names: str, connection_timeout: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         connection_timeout = ctypes.c_double(connection_timeout)
@@ -691,7 +692,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def disconnect_from_devices(self, session_handle: int, device_names: str):
+    def disconnect_from_devices(self, session_handle: int, device_names: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         status = lib.niSLSC_DisconnectFromDevices(session_handle, device_names)
@@ -714,7 +715,7 @@ class LibraryInterpreter(BaseInterpreter):
         chassis_name_value = buffer.value.decode('utf-8')
         return chassis_name_value
 
-    def reserve_devices(self, session_handle: int, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float):
+    def reserve_devices(self, session_handle: int, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         reservation_access = ctypes.c_int32(reservation_access)
@@ -724,21 +725,21 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def unreserve_devices(self, session_handle: int, device_names: str):
+    def unreserve_devices(self, session_handle: int, device_names: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         status = lib.niSLSC_UnreserveDevices(session_handle, device_names)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def reset_devices(self, session_handle: int, device_names: str):
+    def reset_devices(self, session_handle: int, device_names: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         status = lib.niSLSC_ResetDevices(session_handle, device_names)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def rename_device(self, session_handle: int, device_name: str, new_device_name: str):
+    def rename_device(self, session_handle: int, device_name: str, new_device_name: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_name = device_name.encode('utf-8')
         new_device_name = new_device_name.encode('utf-8')
@@ -746,7 +747,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def update_system_configuration_file(self, session_handle: int, chassis_name: str, connection_timeout: float):
+    def update_system_configuration_file(self, session_handle: int, chassis_name: str, connection_timeout: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         chassis_name = chassis_name.encode('utf-8')
         connection_timeout = ctypes.c_double(connection_timeout)
@@ -770,7 +771,7 @@ class LibraryInterpreter(BaseInterpreter):
         chassis_name_value = buffer.value.decode('utf-8')
         return chassis_name_value
 
-    def remove_chassis(self, session_handle: int, chassis_name: str):
+    def remove_chassis(self, session_handle: int, chassis_name: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         chassis_name = chassis_name.encode('utf-8')
         status = lib.niSLSC_RemoveChassis(session_handle, chassis_name)
@@ -947,7 +948,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_value_array = [property_value[i] for i in range(property_value_actual_size.value)]
         return property_value_array
 
-    def set_device_property_bool(self, session_handle: int, device_names: str, property_name: str, property_value: bool):
+    def set_device_property_bool(self, session_handle: int, device_names: str, property_name: str, property_value: bool)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -956,7 +957,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_bool_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[bool]):
+    def set_device_property_bool_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[bool])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -966,7 +967,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_double(self, session_handle: int, device_names: str, property_name: str, property_value: float):
+    def set_device_property_double(self, session_handle: int, device_names: str, property_name: str, property_value: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -975,7 +976,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_double_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[float]):
+    def set_device_property_double_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[float])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -985,7 +986,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_int32(self, session_handle: int, device_names: str, property_name: str, property_value: int):
+    def set_device_property_int32(self, session_handle: int, device_names: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -994,7 +995,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_int32_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int]):
+    def set_device_property_int32_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1004,7 +1005,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_int64(self, session_handle: int, device_names: str, property_name: str, property_value: int):
+    def set_device_property_int64(self, session_handle: int, device_names: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1013,7 +1014,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_int64_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int]):
+    def set_device_property_int64_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1023,7 +1024,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_string(self, session_handle: int, device_names: str, property_name: str, property_value: str):
+    def set_device_property_string(self, session_handle: int, device_names: str, property_name: str, property_value: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1032,7 +1033,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_string_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[str]):
+    def set_device_property_string_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[str])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1043,7 +1044,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_uint32(self, session_handle: int, device_names: str, property_name: str, property_value: int):
+    def set_device_property_uint32(self, session_handle: int, device_names: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1052,7 +1053,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_uint32_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int]):
+    def set_device_property_uint32_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1062,7 +1063,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_uint64(self, session_handle: int, device_names: str, property_name: str, property_value: int):
+    def set_device_property_uint64(self, session_handle: int, device_names: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1071,7 +1072,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_device_property_uint64_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int]):
+    def set_device_property_uint64_array(self, session_handle: int, device_names: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1251,7 +1252,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_value_array = [property_value[i] for i in range(property_value_actual_size.value)]
         return property_value_array
 
-    def set_physical_channel_property_bool(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: bool):
+    def set_physical_channel_property_bool(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: bool)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1260,7 +1261,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_bool_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[bool]):
+    def set_physical_channel_property_bool_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[bool])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1270,7 +1271,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_double(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: float):
+    def set_physical_channel_property_double(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1279,7 +1280,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_double_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[float]):
+    def set_physical_channel_property_double_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[float])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1289,7 +1290,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_int32(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int):
+    def set_physical_channel_property_int32(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1298,7 +1299,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_int32_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int]):
+    def set_physical_channel_property_int32_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1308,7 +1309,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_int64(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int):
+    def set_physical_channel_property_int64(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1317,7 +1318,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_int64_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int]):
+    def set_physical_channel_property_int64_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1327,7 +1328,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_string(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: str):
+    def set_physical_channel_property_string(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1336,7 +1337,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_string_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[str]):
+    def set_physical_channel_property_string_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[str])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1347,7 +1348,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_uint32(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int):
+    def set_physical_channel_property_uint32(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1356,7 +1357,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_uint32_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int]):
+    def set_physical_channel_property_uint32_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1366,7 +1367,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_uint64(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int):
+    def set_physical_channel_property_uint64(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1375,7 +1376,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_physical_channel_property_uint64_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int]):
+    def set_physical_channel_property_uint64_array(self, session_handle: int, physical_channel_names: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1385,27 +1386,27 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_properties_for_devices(self, session_handle: int, device_names: str):
+    def commit_properties_for_devices(self, session_handle: int, device_names: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         status = lib.niSLSC_CommitPropertiesForDevices(session_handle, device_names)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_properties_for_physical_channels(self, session_handle: int, physical_channel_names: str):
+    def commit_properties_for_physical_channels(self, session_handle: int, physical_channel_names: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         status = lib.niSLSC_CommitPropertiesForPhysicalChannels(session_handle, physical_channel_names)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_properties_for_session(self, session_handle: int):
+    def commit_properties_for_session(self, session_handle: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         status = lib.niSLSC_CommitPropertiesForSession(session_handle)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_properties_generic(self, session_handle: int, resources: str):
+    def commit_properties_generic(self, session_handle: int, resources: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         status = lib.niSLSC_CommitPropertiesGeneric(session_handle, resources)
@@ -1528,7 +1529,7 @@ class LibraryInterpreter(BaseInterpreter):
             property_value_array.append(ctypes.string_at(property_value[i]).decode('utf-8'))
         return property_value_array
 
-    def set_session_property_double(self, session_handle: int, property_name: str, property_value: float):
+    def set_session_property_double(self, session_handle: int, property_name: str, property_value: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         property_name = property_name.encode('utf-8')
         property_value = ctypes.c_double(property_value)
@@ -1536,7 +1537,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_session_property_string(self, session_handle: int, property_name: str, property_value: str):
+    def set_session_property_string(self, session_handle: int, property_name: str, property_value: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         property_name = property_name.encode('utf-8')
         property_value = property_value.encode('utf-8')
@@ -1544,7 +1545,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_session_property_string_array(self, session_handle: int, property_name: str, property_value: List[str]):
+    def set_session_property_string_array(self, session_handle: int, property_name: str, property_value: List[str])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         property_name = property_name.encode('utf-8')
         property_value = [string.encode('utf-8') for string in property_value]
@@ -1587,7 +1588,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return property_value.value
 
-    def set_system_property_double(self, session_handle: int, property_name: str, property_value: float):
+    def set_system_property_double(self, session_handle: int, property_name: str, property_value: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         property_name = property_name.encode('utf-8')
         property_value = ctypes.c_double(property_value)
@@ -1765,7 +1766,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_value_array = [property_value[i] for i in range(property_value_actual_size.value)]
         return property_value_array
 
-    def set_generic_property_bool(self, session_handle: int, resources: str, property_name: str, property_value: bool):
+    def set_generic_property_bool(self, session_handle: int, resources: str, property_name: str, property_value: bool)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1774,7 +1775,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_bool_array(self, session_handle: int, resources: str, property_name: str, property_value: List[bool]):
+    def set_generic_property_bool_array(self, session_handle: int, resources: str, property_name: str, property_value: List[bool])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1784,7 +1785,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_double(self, session_handle: int, resources: str, property_name: str, property_value: float):
+    def set_generic_property_double(self, session_handle: int, resources: str, property_name: str, property_value: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1793,7 +1794,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_double_array(self, session_handle: int, resources: str, property_name: str, property_value: List[float]):
+    def set_generic_property_double_array(self, session_handle: int, resources: str, property_name: str, property_value: List[float])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1803,7 +1804,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_int32(self, session_handle: int, resources: str, property_name: str, property_value: int):
+    def set_generic_property_int32(self, session_handle: int, resources: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1812,7 +1813,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_int32_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int]):
+    def set_generic_property_int32_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1822,7 +1823,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_int64(self, session_handle: int, resources: str, property_name: str, property_value: int):
+    def set_generic_property_int64(self, session_handle: int, resources: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1831,7 +1832,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_int64_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int]):
+    def set_generic_property_int64_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1841,7 +1842,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_string(self, session_handle: int, resources: str, property_name: str, property_value: str):
+    def set_generic_property_string(self, session_handle: int, resources: str, property_name: str, property_value: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1850,7 +1851,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_string_array(self, session_handle: int, resources: str, property_name: str, property_value: List[str]):
+    def set_generic_property_string_array(self, session_handle: int, resources: str, property_name: str, property_value: List[str])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1861,7 +1862,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_uint32(self, session_handle: int, resources: str, property_name: str, property_value: int):
+    def set_generic_property_uint32(self, session_handle: int, resources: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1870,7 +1871,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_uint32_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int]):
+    def set_generic_property_uint32_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1880,7 +1881,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_uint64(self, session_handle: int, resources: str, property_name: str, property_value: int):
+    def set_generic_property_uint64(self, session_handle: int, resources: str, property_name: str, property_value: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1889,7 +1890,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_generic_property_uint64_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int]):
+    def set_generic_property_uint64_array(self, session_handle: int, resources: str, property_name: str, property_value: List[int])-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         property_name = property_name.encode('utf-8')
@@ -1899,7 +1900,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def execute_device_command(self, session_handle: int, device_names: str, command_name: str, timeout: float):
+    def execute_device_command(self, session_handle: int, device_names: str, command_name: str, timeout: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         command_name = command_name.encode('utf-8')
@@ -1908,7 +1909,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def execute_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str, timeout: float):
+    def execute_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str, timeout: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         command_name = command_name.encode('utf-8')
@@ -1917,7 +1918,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def execute_generic_command(self, session_handle: int, resources: str, command_name: str, timeout: float):
+    def execute_generic_command(self, session_handle: int, resources: str, command_name: str, timeout: float)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         command_name = command_name.encode('utf-8')
@@ -1962,7 +1963,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return data.value
 
-    def write_register_uint8(self, session_handle: int, device_name: str, register_address: int, data: int):
+    def write_register_uint8(self, session_handle: int, device_name: str, register_address: int, data: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_name = device_name.encode('utf-8')
         register_address = ctypes.c_uint32(register_address)
@@ -1971,7 +1972,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def write_register_uint16(self, session_handle: int, device_name: str, register_address: int, data: int):
+    def write_register_uint16(self, session_handle: int, device_name: str, register_address: int, data: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_name = device_name.encode('utf-8')
         register_address = ctypes.c_uint32(register_address)
@@ -1980,7 +1981,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def write_register_uint32(self, session_handle: int, device_name: str, register_address: int, data: int):
+    def write_register_uint32(self, session_handle: int, device_name: str, register_address: int, data: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_name = device_name.encode('utf-8')
         register_address = ctypes.c_uint32(register_address)
@@ -1989,7 +1990,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def write_register_uint64(self, session_handle: int, device_name: str, register_address: int, data: int):
+    def write_register_uint64(self, session_handle: int, device_name: str, register_address: int, data: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_name = device_name.encode('utf-8')
         register_address = ctypes.c_uint32(register_address)
@@ -2007,7 +2008,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return bytes(byte_array)
 
-    def set_nvmem_bytes(self, session_handle: int, nvmem_area: str, nvmem_address: int, bytes_data: bytes, serial_number: str, password: str):
+    def set_nvmem_bytes(self, session_handle: int, nvmem_area: str, nvmem_address: int, bytes_data: bytes, serial_number: str, password: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         nvmem_area = nvmem_area.encode('utf-8')
         nvmem_address = ctypes.c_uint32(nvmem_address)
@@ -2019,27 +2020,27 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_nvmem_areas(self, session_handle: int, nvmem_area_names: str):
+    def commit_nvmem_areas(self, session_handle: int, nvmem_area_names: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         nvmem_area_names = nvmem_area_names.encode('utf-8')
         status = lib.niSLSC_CommitNVMEMAreas(session_handle, nvmem_area_names)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_nvmem_for_devices(self, session_handle: int, device_names: str):
+    def commit_nvmem_for_devices(self, session_handle: int, device_names: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         status = lib.niSLSC_CommitNVMEMForDevices(session_handle, device_names)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_nvmem_for_session(self, session_handle: int):
+    def commit_nvmem_for_session(self, session_handle: int)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         status = lib.niSLSC_CommitNVMEMForSession(session_handle)
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_nvmem_generic(self, session_handle: int, resources: str):
+    def commit_nvmem_generic(self, session_handle: int, resources: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         resources = resources.encode('utf-8')
         status = lib.niSLSC_CommitNVMEMGeneric(session_handle, resources)
@@ -2121,7 +2122,7 @@ class LibraryInterpreter(BaseInterpreter):
         user_defined_equation_value = buffer.value.decode('utf-8')
         return user_defined_equation_value
 
-    def set_linear_scaling_parameters(self, session_handle: int, physical_channel_names: str, slope: float, intercept: float, serial_number: str, password: str):
+    def set_linear_scaling_parameters(self, session_handle: int, physical_channel_names: str, slope: float, intercept: float, serial_number: str, password: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         slope = ctypes.c_double(slope)
@@ -2132,7 +2133,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_polynomial_scaling_parameters(self, session_handle: int, physical_channel_names: str, forward_coefficient: List[float], reverse_coefficient: List[float], serial_number: str, password: str):
+    def set_polynomial_scaling_parameters(self, session_handle: int, physical_channel_names: str, forward_coefficient: List[float], reverse_coefficient: List[float], serial_number: str, password: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         forward_coefficient_array = (ctypes.c_double * len(forward_coefficient))(*forward_coefficient)
@@ -2145,7 +2146,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_table_scaling_parameters(self, session_handle: int, physical_channel_names: str, scaled_value: List[float], prescale_value: List[float], coercion: int, serial_number: str, password: str):
+    def set_table_scaling_parameters(self, session_handle: int, physical_channel_names: str, scaled_value: List[float], prescale_value: List[float], coercion: int, serial_number: str, password: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         scaled_value_array = (ctypes.c_double * len(scaled_value))(*scaled_value)
@@ -2159,7 +2160,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_user_defined_scaling_parameters(self, session_handle: int, physical_channel_names: str, user_defined_parameter_name: List[str], user_defined_parameter_value: List[float], serial_number: str, password: str):
+    def set_user_defined_scaling_parameters(self, session_handle: int, physical_channel_names: str, user_defined_parameter_name: List[str], user_defined_parameter_value: List[float], serial_number: str, password: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         user_defined_parameter_name = [string.encode('utf-8') for string in user_defined_parameter_name]
@@ -2173,7 +2174,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def set_user_defined_scaling_equation(self, session_handle: int, physical_channel_names: str, user_defined_equation: str, serial_number: str, password: str):
+    def set_user_defined_scaling_equation(self, session_handle: int, physical_channel_names: str, user_defined_equation: str, serial_number: str, password: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         physical_channel_names = physical_channel_names.encode('utf-8')
         user_defined_equation = user_defined_equation.encode('utf-8')
@@ -2183,7 +2184,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return 
 
-    def commit_scaling_for_devices(self, session_handle: int, device_names: str):
+    def commit_scaling_for_devices(self, session_handle: int, device_names: str)-> None:
         session_handle = ctypes.c_void_p(session_handle)
         device_names = device_names.encode('utf-8')
         status = lib.niSLSC_CommitScalingForDevices(session_handle, device_names)
@@ -2217,7 +2218,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return command_handle.value
 
-    def close_command(self, command_handle: int):
+    def close_command(self, command_handle: int)-> None:
         command_handle = ctypes.c_void_p(command_handle)
         status = lib.niSLSC_CloseCommand(command_handle)
         self.check_for_error(status, library_handle.value)
@@ -2271,7 +2272,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(status, library_handle.value)
         return property_handle.value
 
-    def close_property(self, property_handle: int):
+    def close_property(self, property_handle: int)-> None:
         property_handle = ctypes.c_void_p(property_handle)
         status = lib.niSLSC_CloseProperty(property_handle)
         self.check_for_error(status, library_handle.value)
@@ -2336,10 +2337,11 @@ class LibraryInterpreter(BaseInterpreter):
             property_value_array.append(ctypes.string_at(property_value[i]).decode('utf-8'))
         return property_value_array
 
-    def check_for_error(self, error_code: int, library_handle: int = None):
+    def check_for_error(self, error_code: int, library_handle: int = None) -> None:
         if library_handle is None:
             extended_error_info = "Library Handle is not provided"
             warnings.warn(SLSCWarning(extended_error_info, -1))
+            return
         library_handle = ctypes.c_void_p(library_handle)
         if error_code == 0:
             return

@@ -21,15 +21,16 @@ lib.niSLSC_${c_func_name(function)}.argtypes = [${", ".join([param for param in 
 % endif
 % endfor
 class LibraryInterpreter(BaseInterpreter):
-    def __init__():
+
+    def __init__(self) -> None:
         self._language = 0
 
     @property
-    def language(self):
+    def language(self) -> int:
         return self._language
 
     @language.setter
-    def language(self, value: int):
+    def language(self, value: int) -> None:
         self._language = value
 
 % for function in functions:
@@ -58,10 +59,11 @@ class LibraryInterpreter(BaseInterpreter):
 
 % endif
 % endfor
-    def check_for_error(self, error_code: int, library_handle: int = None):
+    def check_for_error(self, error_code: int, library_handle: int = None) -> None:
         if library_handle is None:
             extended_error_info = "Library Handle is not provided"
             warnings.warn(SLSCWarning(extended_error_info, -1))
+            return
         library_handle = ctypes.c_void_p(library_handle)
         if error_code == 0:
             return

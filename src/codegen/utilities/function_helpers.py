@@ -138,7 +138,7 @@ def param_types(function):
                 param_list.append(f"{TYPING_LIST.get(parameter['dataType'])}")
                 num += 1
     if num == 0:
-        return ""
+        return "-> None"
     elif num == 1:
         return f" -> {param_list[0]}"
     else:

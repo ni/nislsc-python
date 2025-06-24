@@ -3,6 +3,7 @@ import ctypes
 from typing import Tuple, List
 from _base_interpreter import BaseInterpreter
 from error import SLSCError, SLSCWarning
+import warnings
 
 lib = ctypes.CDLL('nislsc.dll')
 
@@ -25,7 +26,7 @@ lib.niSLSC_FlattenNames.restype = ctypes.c_int32
 lib.niSLSC_FlattenNames.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.c_size_t, ctypes.c_char_p, ctypes.c_size_t, ctypes.POINTER(ctypes.c_size_t)]
 
 lib.niSLSC_UnflattenNames.restype = ctypes.c_int32
-lib.niSLSC_UnflattenNames.argtypes = [ctypes.c_int32, ctypes.POINTER(ctypes.POINTER(ctypes.c_char_p)), ctypes.POINTER(ctypes.c_size_t), ctypes.c_void_p, ctypes.c_size_t, ctypes.POINTER(ctypes.c_size_t)]
+lib.niSLSC_UnflattenNames.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.POINTER(ctypes.c_char_p)), ctypes.POINTER(ctypes.c_size_t), ctypes.c_void_p, ctypes.c_size_t, ctypes.POINTER(ctypes.c_size_t)]
 
 lib.niSLSC_InitializeSessionWithDevices.restype = ctypes.c_int32
 lib.niSLSC_InitializeSessionWithDevices.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p), ctypes.c_char_p, ctypes.c_double, ctypes.c_int32, ctypes.c_char_p, ctypes.c_double]
@@ -595,8 +596,8 @@ class LibraryInterpreter(BaseInterpreter):
         names_out_value = buffer.value.decode('utf-8')
         return names_out_value
 
-    def unflatten_names(self, names_in: int) -> List[str]:
-        names_in = ctypes.c_int32(names_in)
+    def unflatten_names(self, names_in: str) -> List[str]:
+        names_in = names_in.encode('utf-8')
         names_out = ctypes.POINTER(ctypes.c_char_p)()
         num_names_out = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()

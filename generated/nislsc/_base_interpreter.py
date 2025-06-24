@@ -29,7 +29,7 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def unflatten_names(self, names_in: int) -> List[str]:
+    def unflatten_names(self, names_in: str) -> List[str]:
         pass
 
     @abc.abstractmethod

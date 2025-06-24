@@ -1131,7 +1131,7 @@
             "name": "UnflattenNames",
             "params": [
                 {
-                    "dataType": "enum",
+                    "dataType": "string",
                     "dir": [
                         "in"
                     ],

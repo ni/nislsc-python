@@ -1,6 +1,4 @@
-import copy
 import re
-import sys
 
 INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES = [
     re.compile("([^_\n])([A-Z][a-z]+)"),
@@ -27,7 +25,7 @@ NAME_EXPANSION = {
     "propertyRefOut": "propertyHandle",
 }
 
-DIR_MAPPING = {
+DATATYPE_MAP = {
     "uint8": "ctypes.c_uint8",
     "uint16": "ctypes.c_uint16",
     "uint32": "ctypes.c_uint32",
@@ -59,46 +57,36 @@ DIR_MAPPING = {
     "enum": "ctypes.c_int32"
 }
 
-# convert name to snake casing
-def convert(name):
+def convert_to_snake_case(name: str) -> str:
     for regex in INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES:
         name = regex.sub(r"\1_\2", name)
     return name.lower().replace("u_int", "uint")
 
-# in direction checker
-def is_dir_in(param):
+def is_param_input(param: dict) -> bool:
     return 'in' in param['dir']
 
-# out direction checker
-def is_dir_out(param):
+def is_param_output(param: dict) -> bool:
     return 'out' in param['dir']
 
-# capi checker
-def is_capi(param):
+def is_capi(param: dict) -> bool:
     return 'targets' not in param or 'capi' in param['targets']
 
-# standard variable name
-def std_var_name(param):
-    return convert(NAME_EXPANSION.get(param['name'], param['name']))
+def get_standardized_param_name(param: dict) -> str:
+    return convert_to_snake_case(NAME_EXPANSION.get(param['name'], param['name']))
 
-# variable mapping to ctypes
-def var_mapping(param):
-    return DIR_MAPPING.get(param['dataType'], "Error_in_datatype")
+def get_param_datatype_in_ctypes(param: dict) -> str:
+    if param['dataType'] not in DATATYPE_MAP:
+        raise ValueError(f"Unknown dataType: {param['dataType']}")
+    return DATATYPE_MAP[param['dataType']]
 
-# returns c library's function name
-def c_func_name(function):
+def get_capi_function_name(function: dict) -> str:
     if 'capi' in function["targets"]:
         if 'capiname' in function:
             return function['capiname']
     return function['name']
 
-# standard function name
-def std_func_name(function):
+def get_python_function_name(function: dict) -> str:
     if 'capi' in function["targets"]:
         if 'capiname' in function:
-            return convert(function['capiname'])
-    return convert(function['name'])
-
-
-
-    
+            return convert_to_snake_case(function['capiname'])
+    return convert_to_snake_case(function['name'])

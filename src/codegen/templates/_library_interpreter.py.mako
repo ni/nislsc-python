@@ -1,13 +1,9 @@
 <%!
-import copy
-import re
-import sys
-from utilities.interpreter_helpers import std_func_name, c_func_name, std_var_name
-from utilities.function_helpers import param_placeholder, size_call, req_size, add_decl, func_call, convert_res, return_param, var_spec, arg_placeholder, param_types, gen_val
+from utilities.interpreter_helpers import get_python_function_name, get_capi_function_name, get_standardized_param_name
+from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, get_additional_variable_declaration, generate_function_call_for_result, get_result, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_function_call_validation
 %>\
 import ctypes
 
-from typing import Tuple, List
 from _base_interpreter import BaseInterpreter
 from error import SLSCError, SLSCWarning
 import warnings
@@ -16,8 +12,8 @@ lib = ctypes.CDLL('nislsc.dll')
 
 % for function in functions:
 % if 'capi' in function['targets']:
-lib.niSLSC_${c_func_name(function)}.restype = ctypes.c_int32
-lib.niSLSC_${c_func_name(function)}.argtypes = [${", ".join([param for param in arg_placeholder(function)])}]
+lib.niSLSC_${get_capi_function_name(function)}.restype = ctypes.c_int32
+lib.niSLSC_${get_capi_function_name(function)}.argtypes = [${", ".join([param for param in get_ctypes_argtypes(function)])}]
 
 % endif
 % endfor
@@ -36,35 +32,33 @@ class LibraryInterpreter(BaseInterpreter):
 
 % for function in functions:
 % if 'capi' in function["targets"]:
-    def ${std_func_name(function)}(${", ".join([param for param in param_placeholder(function)])})${param_types(function)}:
-% for line in var_spec(function):
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function)])})${get_function_return_type(function)}:
+% for line in generate_variable_declaration(function):
         ${line}
 % endfor
-% if req_size(function):
-        status = lib.niSLSC_${c_func_name(function)}(${", ".join(size_call(function))})
-        if ${gen_val(function)}:
-            self.check_for_error(status, library_handle.value)
-% for add_param in add_decl(function):
+% if is_size_unknown(function):
+        status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_size(function))})
+        if ${generate_function_call_validation(function)}:
+            check_for_error(None, status)
+% for add_param in get_additional_variable_declaration(function):
         ${add_param}
 % endfor
-        status = lib.niSLSC_${c_func_name(function)}(${", ".join(func_call(function))})
-        self.check_for_error(status, library_handle.value)
+        status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
+        check_for_error(None, status)
 % else:
-        status = lib.niSLSC_${c_func_name(function)}(${", ".join(func_call(function))})
-        self.check_for_error(status, library_handle.value)
+        status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
+        check_for_error(None, status)
 % endif
-% for result in convert_res(function):
+% for result in get_result(function):
         ${result}
 % endfor
-        return ${", ".join(return_param(function))}
+        return ${", ".join(generate_return_parameter(function))}
 
 % endif
 % endfor
-    def check_for_error(self, error_code: int, library_handle: int = None) -> None:
+    def check_for_error(self, library_handle: int, error_code: int) -> None:
         if library_handle is None:
-            extended_error_info = "Library Handle is not provided"
-            warnings.warn(SLSCWarning(extended_error_info, -1))
-            return
+            raise SLSCError("", error_code)
         library_handle = ctypes.c_void_p(library_handle)
         if error_code == 0:
             return

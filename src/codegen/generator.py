@@ -5,69 +5,49 @@ import shutil
 from mako.template import Template
 from pathlib import Path
 
-def parse_api(api_path):
-    """Parse the API JSON file."""
-    with open(api_path, 'r') as api_file:
-        return json.load(api_file)
+def _parse_json(json_path: Path) -> dict:
+    with open(json_path, 'r') as json_file:
+        return json.load(json_file)
 
-def _copy_handwritten_files(dest):
-    parent_dir = Path(__file__).parent.parent
-    source_path = parent_dir / "handwritten"
-    shutil.copytree(source_path, dest, dirs_exist_ok=True)
+def _copy_handwritten_files(source: Path, dest: Path) -> None:
+    shutil.copytree(source, dest, dirs_exist_ok=True)
 
-def generate_from_template(api, template_path, output_path, context):
+def _generate_code(json: dict, source: Path, dest: Path) -> None:
+    for template_file in source.iterdir():
+        if template_file.suffix == '.mako':
+            template_path = template_file
+            new_dest = dest / template_file.stem
+
+            with open(template_path, "r", encoding="utf-8") as f:
+                template_content = f.read()
+
+            template = Template(template_content)
+            rendered = template.render(**json)
+            
+            with open(new_dest, "w", encoding="utf-8") as f:
+                f.write(rendered)
+
+def main() -> None:
+    parent_dir = Path(__file__).parent.parent.parent
+    json_file = parent_dir / "src" / "codegen" / "metadata" / "nislscapi_full.json"
+    template_path = parent_dir / "src" / "codegen" / "templates"
+    handwritten_path = parent_dir / "src" / "handwritten"
+    destination_path = parent_dir / "generated" / "nislsc"
+
+    if not os.path.exists(json_file):
+        raise FileNotFoundError(f"JSON file not found: {json_file}")
+
     if not os.path.exists(template_path):
-        raise FileNotFoundError(f"Template not found: {template_path}")
+        raise FileNotFoundError(f"Template directory not found: {source_path}")
 
-    tpl = Template(filename=template_path)
-    kwargs = dict(trim_blocks=True, lstrip_blocks=True)
+    if not os.path.exists(handwritten_path):
+        raise FileNotFoundError(f"Handwritten directory not found: {handwritten_path}")
 
-    if context == 'functions':
-        kwargs['functions'] = api['functions']
-    elif context == 'enums':
-        kwargs['enums'] = api['enums']
+    json_data = _parse_json(json_file)
 
-    rendered = tpl.render(**kwargs)
+    _generate_code(json_data, template_path, destination_path)
 
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, 'wb') as out_file:
-        out_file.write(rendered.encode())
-    print(f"Generated Python binding written to {output_path}")
-
-def main():
-    base_dir = os.path.dirname(__file__)
-    api_path = os.path.normpath(os.path.join(base_dir, 'metadata', 'nislscapi_full.json'))
-
-    if not os.path.exists(api_path):
-        raise FileNotFoundError(f"API file not found: {api_path}")
-
-    api = parse_api(api_path)
-
-    targets = [
-        {
-            "template": os.path.join(base_dir, 'templates', '_base_interpreter.py.mako'),
-            "output": os.path.join(base_dir, '..', '..', 'generated', 'nislsc', '_base_interpreter.py'),
-            "context": "functions",
-        },
-        {
-            "template": os.path.join(base_dir, 'templates', '_library_interpreter.py.mako'),
-            "output": os.path.join(base_dir, '..', '..', 'generated', 'nislsc', '_library_interpreter.py'),
-            "context": "functions",
-        },
-        {
-            "template": os.path.join(base_dir, 'templates', 'constants.py.mako'),
-            "output": os.path.join(base_dir, '..', '..', 'generated', 'nislsc', 'constants.py'),
-            "context": "enums",
-        }
-    ]
-
-    for target in targets:
-        try:
-            generate_from_template(api, target["template"], target["output"], target["context"])
-        except Exception as e:
-            print(f"Error generating {target['output']}: {e}")
-
-    _copy_handwritten_files(os.path.join(base_dir, '..', '..', 'generated', 'nislsc'))
+    _copy_handwritten_files(handwritten_path,  destination_path)
 
 if __name__ == "__main__":
     main()

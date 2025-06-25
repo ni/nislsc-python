@@ -1,14 +1,14 @@
 <%!
-    from utilities.interpreter_helpers import convert
+    from utilities.interpreter_helpers import convert_to_snake_case
 %>\
-from enum import IntEnum
+from enum import Enum
 
 % for enum in enums:
 % if 'capi' in enum['targets']:
-class ${enum['name']}(IntEnum):
+class ${enum['name']}(Enum):
 % for value in enum['values']:
 % if 'internal' not in value:
-    NISLSC_${convert(enum['name']).upper()}_${convert(value['name']).upper()} = ${value['value']}
+   ${convert_to_snake_case(value['name']).upper()} = ${value['value']}
 % endif
 % endfor
 

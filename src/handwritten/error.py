@@ -1,5 +1,3 @@
-import warnings
-
 from error_codes import ErrorCode
 
 __all__ = ['SLSCError', 'SLSCWarning']
@@ -8,7 +6,7 @@ class Error(Exception):
     pass
 
 class SLSCError(Error):
-    def __init__(self, message, error_code):
+    def __init__(self, message: str, error_code: int) -> None:
         self._error_code = int(error_code)
 
         try:
@@ -22,15 +20,15 @@ class SLSCError(Error):
         super().__init__(message)
 
     @property
-    def error_code(self):
+    def error_code(self) -> int:
         return self._error_code
 
     @property
-    def error_type(self):
+    def error_type(self) -> str:
         return self._error_type
 
 class SLSCWarning(Warning):
-    def __init__(self, message, error_code):
+    def __init__(self, message: str, error_code: int) -> None:
         super().__init__(
             f'\nWarning {error_code} occurred.\n\n{message}')
 
@@ -42,9 +40,9 @@ class SLSCWarning(Warning):
             self._error_type = ErrorCode.UNKNOWN
 
     @property
-    def error_code(self):
+    def error_code(self) -> int:
         return self._error_code
 
     @property
-    def error_type(self):
+    def error_type(self) -> str:
         return self._error_type

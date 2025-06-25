@@ -39,15 +39,15 @@ class LibraryInterpreter(BaseInterpreter):
 % if is_size_unknown(function):
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_size(function))})
         if ${generate_function_call_validation(function)}:
-            check_for_error(None, status)
+            self.check_for_error(None, status)
 % for add_param in get_additional_variable_declaration(function):
         ${add_param}
 % endfor
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
-        check_for_error(None, status)
+        self.check_for_error(None, status)
 % else:
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
-        check_for_error(None, status)
+        self.check_for_error(None, status)
 % endif
 % for result in get_result(function):
         ${result}

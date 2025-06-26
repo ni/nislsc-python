@@ -534,7 +534,7 @@ class LibraryInterpreter(BaseInterpreter):
     def finalize_library(self, library_handle: int) -> None:
         library_handle = ctypes.c_void_p(library_handle)
         status = lib.niSLSC_FinalizeLibrary(library_handle)
-        self.check_for_error(None, status)
+        self.check_for_error(library_handle.value, status)
         return 
 
     def get_library_version(self) -> int:
@@ -549,10 +549,10 @@ class LibraryInterpreter(BaseInterpreter):
         extended_error_info_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetExtendedErrorInfo(library_handle, language, None, 0, ctypes.byref(extended_error_info_actual_size))
         if extended_error_info_actual_size.value <= 0:
-            self.check_for_error(None, status)
+            self.check_for_error(library_handle.value, status)
         buffer = ctypes.create_string_buffer(extended_error_info_actual_size.value)
         status = lib.niSLSC_GetExtendedErrorInfo(library_handle, language, buffer, extended_error_info_actual_size.value, None)
-        self.check_for_error(None, status)
+        self.check_for_error(library_handle.value, status)
         extended_error_info_value = buffer.value.decode('utf-8')
         return extended_error_info_value
 
@@ -563,10 +563,10 @@ class LibraryInterpreter(BaseInterpreter):
         error_description_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetErrorDescription(library_handle, status_code, language, None, 0, ctypes.byref(error_description_actual_size))
         if error_description_actual_size.value <= 0:
-            self.check_for_error(None, status)
+            self.check_for_error(library_handle.value, status)
         buffer = ctypes.create_string_buffer(error_description_actual_size.value)
         status = lib.niSLSC_GetErrorDescription(library_handle, status_code, language, buffer, error_description_actual_size.value, None)
-        self.check_for_error(None, status)
+        self.check_for_error(library_handle.value, status)
         error_description_value = buffer.value.decode('utf-8')
         return error_description_value
 
@@ -609,7 +609,7 @@ class LibraryInterpreter(BaseInterpreter):
         reservation_group = reservation_group.encode('utf-8')
         reservation_timeout = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithDevices(library_handle, ctypes.byref(session_handle), device_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
-        self.check_for_error(None, status)
+        self.check_for_error(library_handle.value, status)
         return session_handle.value
 
     def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
@@ -621,7 +621,7 @@ class LibraryInterpreter(BaseInterpreter):
         reservation_group = reservation_group.encode('utf-8')
         reservation_timeout = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithNVMEMAreas(library_handle, ctypes.byref(session_handle), nvmem_area_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
-        self.check_for_error(None, status)
+        self.check_for_error(library_handle.value, status)
         return session_handle.value
 
     def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
@@ -633,14 +633,14 @@ class LibraryInterpreter(BaseInterpreter):
         reservation_group = reservation_group.encode('utf-8')
         reservation_timeout = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithPhysicalChannels(library_handle, ctypes.byref(session_handle), physical_channel_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
-        self.check_for_error(None, status)
+        self.check_for_error(library_handle.value, status)
         return session_handle.value
 
     def initialize_session_without_resources(self, library_handle: int) -> int:
         library_handle = ctypes.c_void_p(library_handle)
         session_handle = ctypes.c_void_p()
         status = lib.niSLSC_InitializeSessionWithoutResources(library_handle, ctypes.byref(session_handle))
-        self.check_for_error(None, status)
+        self.check_for_error(library_handle.value, status)
         return session_handle.value
 
     def close_session(self, session_handle: int) -> None:
@@ -2327,16 +2327,10 @@ class LibraryInterpreter(BaseInterpreter):
         return property_value_array
 
     def check_for_error(self, library_handle: int, error_code: int) -> None:
-        if error_code == 0:
-            return
-        if library_handle is None:
-            if error_code < 0:
-                raise SLSCError("", error_code)
-            elif error_code > 0:
-                warnings.warn(SLSCWarning("", error_code))
-            return
-        library_handle = ctypes.c_void_p(library_handle)
-        extended_error_info = self.get_extended_error_info(library_handle, language=0)
+        extended_error_info = ""
+        if library_handle is not None:
+            library_handle = ctypes.c_void_p(library_handle)
+            extended_error_info = self.get_extended_error_info(library_handle, language=0)
         if error_code < 0:
             raise SLSCError(extended_error_info, error_code)
         elif error_code > 0:

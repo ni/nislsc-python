@@ -330,8 +330,8 @@ def generate_return_parameter(function: dict) -> list[str]:
 
     return ret_list
 
-def has_library_handle(function: dict) -> bool:
+def has_library_handle(function: dict) -> str:
     for parameter in function['params']:
         if is_capi(parameter) and is_param_input(parameter) and parameter['dataType'] == 'Library':
-            return True
-    return False
+            return "library_handle.value"
+    return "None"

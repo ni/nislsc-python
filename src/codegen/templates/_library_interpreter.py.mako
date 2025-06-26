@@ -1,6 +1,6 @@
 <%!
 from utilities.interpreter_helpers import get_python_function_name, get_capi_function_name, get_standardized_param_name
-from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_function_call_validation
+from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_function_call_validation, has_library_handle
 %>\
 import ctypes
 
@@ -28,15 +28,15 @@ class LibraryInterpreter(BaseInterpreter):
 % if is_size_unknown(function):
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_size(function))})
         if ${generate_function_call_validation(function)}:
-            self.check_for_error(None, status)
+            self.check_for_error(${has_library_handle(function)}, status)
 % for add_param in generate_additional_variable_declaration(function):
         ${add_param}
 % endfor
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
-        self.check_for_error(None, status)
+        self.check_for_error(${has_library_handle(function)}, status)
 % else:
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
-        self.check_for_error(None, status)
+        self.check_for_error(${has_library_handle(function)}, status)
 % endif
 % for result in generate_result_parser(function):
         ${result}
@@ -46,16 +46,10 @@ class LibraryInterpreter(BaseInterpreter):
 % endif
 % endfor
     def check_for_error(self, library_handle: int, error_code: int) -> None:
-        if error_code == 0:
-            return
-        if library_handle is None:
-            if error_code < 0:
-                raise SLSCError("", error_code)
-            elif error_code > 0:
-                warnings.warn(SLSCWarning("", error_code))
-            return
-        library_handle = ctypes.c_void_p(library_handle)
-        extended_error_info = self.get_extended_error_info(library_handle, language=0)
+        extended_error_info = ""
+        if library_handle is not None:
+            library_handle = ctypes.c_void_p(library_handle)
+            extended_error_info = self.get_extended_error_info(library_handle, language=0)
         if error_code < 0:
             raise SLSCError(extended_error_info, error_code)
         elif error_code > 0:

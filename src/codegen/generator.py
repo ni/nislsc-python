@@ -12,24 +12,23 @@ def _parse_json(json_path: Path) -> dict:
         return json.load(json_file)
 
 def _parse_errors(errors_path: Path) -> dict:
-   """Parse the errors XML file."""
-   errors = []
-   errors_xml = ETree.parse(errors_path)
-   code_set = set()
-   for error in errors_xml.findall('./descriptions/error'):
-      code_element = error.find('code')
-      code = int(code_element.get('code'))
-      symbol = code_element.get('symbol')
-      if code in code_set:
-         raise RuntimeError('Duplicate error code {0} for symbol {1}'.format(code, symbol))
-      code_set.add(code)
-      assert re.match(r'^kError|^kWarning', symbol)
-      errors.append({
-         'symbol': symbol,
-         'code': code
-      })
-
-   return errors
+    """Parse the errors XML file."""
+    errors = []
+    errors_xml = ETree.parse(errors_path)
+    code_set = set()
+    for error in errors_xml.findall('./descriptions/error'):
+        code_element = error.find('code')
+        code = int(code_element.get('code'))
+        symbol = code_element.get('symbol')
+        if code in code_set:
+            raise RuntimeError('Duplicate error code {0} for symbol {1}'.format(code, symbol))
+        code_set.add(code)
+        assert re.match(r'^kError|^kWarning', symbol)
+        errors.append({
+            'symbol': symbol,
+            'code': code
+        })
+    return errors
 
 def _copy_handwritten_files(source: Path, dest: Path) -> None:
     shutil.copytree(source, dest, dirs_exist_ok=True)

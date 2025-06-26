@@ -13,7 +13,7 @@ STRING_LIST = {
     "Command": "ctypes.c_char_p",
 }
 
-PYTHON_TYPING_MAP = {
+PYTHON_DATATYPE_MAP= {
     "uint8": "int",
     "uint16": "int",
     "uint32": "int",
@@ -46,7 +46,7 @@ PYTHON_TYPING_MAP = {
 }
 
 
-INPUT_VARIABLE_MAP = {
+INPUT_DATATYPE_MAP = {
     "uint8": "ctypes.c_uint8",
     "uint16": "ctypes.c_uint16",
     "uint32": "ctypes.c_uint32",
@@ -78,7 +78,7 @@ INPUT_VARIABLE_MAP = {
     "enum": "ctypes.c_int32"
 }
 
-OUTPUT_VARIABLE_MAP = {
+OUTPUT_DATATYPE_MAP = {
     "uint8": "ctypes.POINTER(ctypes.c_uint8)",
     "uint16": "ctypes.POINTER(ctypes.c_uint16)",
     "uint32": "ctypes.POINTER(ctypes.c_uint32)",
@@ -109,12 +109,15 @@ def get_ctypes_argtypes(function: dict) -> list[str]:
     if 'capi' in function['targets']:
         for parameter in function['params']:
             if is_capi(parameter) and is_param_input(parameter):
-                arg_list.append(INPUT_VARIABLE_MAP.get(parameter['dataType'], "Error_in_INPUT"))
+                if parameter['dataType'] not in INPUT_DATATYPE_MAP:
+                    raise ValueError(f"Unknown input dataType: {parameter['dataType']}")
+                arg_list.append(INPUT_DATATYPE_MAP[parameter['dataType']])
             elif is_capi(parameter) and is_param_output(parameter):
-                arg_list.append(OUTPUT_VARIABLE_MAP.get(parameter['dataType'], "Error_in_OUTPUT"))
+                if parameter['dataType'] not in OUTPUT_DATATYPE_MAP:
+                    raise ValueError(f"Unknown output dataType: {parameter['dataType']}")
+                arg_list.append(OUTPUT_DATATYPE_MAP[parameter['dataType']])
     return arg_list
 
-# function header argument placeholder
 def get_function_parameter_list(function: dict) -> list[str]:
     param_list = ['self']
     if 'capi'in function['targets']:
@@ -123,7 +126,7 @@ def get_function_parameter_list(function: dict) -> list[str]:
                 if parameter['dataType'] == 'uint8[]':
                     param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
                 else:
-                    param_list.append(f"{get_standardized_param_name(parameter)}: {PYTHON_TYPING_MAP.get(parameter['dataType'])}")
+                    param_list.append(f"{get_standardized_param_name(parameter)}: {PYTHON_DATATYPE_MAP.get(parameter['dataType'])}")
             elif is_capi(parameter) and is_param_output(parameter) and parameter['dataType'] == 'uint8[]':
                 param_list.append(f"num_{get_standardized_param_name(parameter)}: int") 
     return param_list
@@ -134,7 +137,7 @@ def get_function_return_type(function: dict) -> str:
         num = 0
         for parameter in function['params']:
             if is_capi(parameter) and is_param_output(parameter):
-                param_list.append(f"{PYTHON_TYPING_MAP.get(parameter['dataType'])}")
+                param_list.append(f"{PYTHON_DATATYPE_MAP.get(parameter['dataType'])}")
                 num += 1
     if num == 0:
         return " -> None"
@@ -221,13 +224,13 @@ def generate_function_call_validation(function: dict) -> str:
     for parameter in function['params']:
         if is_capi(parameter) and is_param_output(parameter):
             if parameter['dataType'] == 'string[]':
-                var_list.append("required_buffer_size.value < 0")
+                var_list.append("required_buffer_size.value <= 0")
             else:
-                var_list.append(f"{get_standardized_param_name(parameter)}_actual_size.value < 0")
+                var_list.append(f"{get_standardized_param_name(parameter)}_actual_size.value <= 0")
     return " or ".join(var_list)
 
 # additional variable declaration to create buffers
-def get_additional_variable_declaration(function: dict) ->  list[str]:
+def generate_additional_variable_declaration(function: dict) ->  list[str]:
     decl_list = []
     for parameter in function['params']:
         if is_capi(parameter) and is_param_output(parameter):
@@ -293,7 +296,7 @@ def is_size_unknown(function: dict) -> bool:
     return False
 
 # produce conversion method for return values
-def get_result(function: dict) -> list[str]:
+def generate_result_parser(function: dict) -> list[str]:
     conv_list = []
     for parameter in function['params']:
         if is_capi(parameter) and is_param_output(parameter):

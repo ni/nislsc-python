@@ -524,17 +524,6 @@ lib.niSLSC_GetPropertyPropertyStringArray.argtypes = [ctypes.c_void_p, ctypes.c_
 
 class LibraryInterpreter(BaseInterpreter):
 
-    def __init__(self) -> None:
-        self._language = 0
-
-    @property
-    def language(self) -> int:
-        return self._language
-
-    @language.setter
-    def language(self, value: int) -> None:
-        self._language = value
-
     def initialize_library(self, version: int) -> int:
         version = ctypes.c_uint32(version)
         library_handle = ctypes.c_void_p()
@@ -559,7 +548,7 @@ class LibraryInterpreter(BaseInterpreter):
         language = ctypes.c_int32(language)
         extended_error_info_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetExtendedErrorInfo(library_handle, language, None, 0, ctypes.byref(extended_error_info_actual_size))
-        if extended_error_info_actual_size.value < 0:
+        if extended_error_info_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(extended_error_info_actual_size.value)
         status = lib.niSLSC_GetExtendedErrorInfo(library_handle, language, buffer, extended_error_info_actual_size.value, None)
@@ -573,7 +562,7 @@ class LibraryInterpreter(BaseInterpreter):
         language = ctypes.c_int32(language)
         error_description_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetErrorDescription(library_handle, status_code, language, None, 0, ctypes.byref(error_description_actual_size))
-        if error_description_actual_size.value < 0:
+        if error_description_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(error_description_actual_size.value)
         status = lib.niSLSC_GetErrorDescription(library_handle, status_code, language, buffer, error_description_actual_size.value, None)
@@ -587,7 +576,7 @@ class LibraryInterpreter(BaseInterpreter):
         names_in_array = array_type(*names_in)
         names_out_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_FlattenNames(names_in_array, ctypes.c_size_t(len(names_in)), None, 0, ctypes.byref(names_out_actual_size))
-        if names_out_actual_size.value < 0:
+        if names_out_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(names_out_actual_size.value)
         status = lib.niSLSC_FlattenNames(names_in_array, ctypes.c_size_t(len(names_in)), buffer, names_out_actual_size.value, None)
@@ -601,7 +590,7 @@ class LibraryInterpreter(BaseInterpreter):
         num_names_out = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
         status = lib.niSLSC_UnflattenNames(names_in, ctypes.byref(names_out), ctypes.byref(num_names_out), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value < 0:
+        if required_buffer_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         status = lib.niSLSC_UnflattenNames(names_in, ctypes.byref(names_out), ctypes.byref(num_names_out), buffer, required_buffer_size.value, None)
@@ -707,7 +696,7 @@ class LibraryInterpreter(BaseInterpreter):
         connection_timeout = ctypes.c_double(connection_timeout)
         chassis_name_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_ConnectToChassisByAddress(session_handle, address, username, password, connection_timeout, None, 0, ctypes.byref(chassis_name_actual_size))
-        if chassis_name_actual_size.value < 0:
+        if chassis_name_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(chassis_name_actual_size.value)
         status = lib.niSLSC_ConnectToChassisByAddress(session_handle, address, username, password, connection_timeout, buffer, chassis_name_actual_size.value, None)
@@ -763,7 +752,7 @@ class LibraryInterpreter(BaseInterpreter):
         connection_timeout = ctypes.c_double(connection_timeout)
         chassis_name_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_AddNetworkChassis(session_handle, address, username, password, connection_timeout, None, 0, ctypes.byref(chassis_name_actual_size))
-        if chassis_name_actual_size.value < 0:
+        if chassis_name_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(chassis_name_actual_size.value)
         status = lib.niSLSC_AddNetworkChassis(session_handle, address, username, password, connection_timeout, buffer, chassis_name_actual_size.value, None)
@@ -793,7 +782,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetDevicePropertyBoolArray(session_handle, device_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_bool * property_value_actual_size.value)()
         status = lib.niSLSC_GetDevicePropertyBoolArray(session_handle, device_names, property_name, property_value, property_value_actual_size.value, None)
@@ -816,7 +805,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetDevicePropertyDoubleArray(session_handle, device_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_double * property_value_actual_size.value)()
         status = lib.niSLSC_GetDevicePropertyDoubleArray(session_handle, device_names, property_name, property_value, property_value_actual_size.value, None)
@@ -839,7 +828,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetDevicePropertyInt32Array(session_handle, device_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_int32 * property_value_actual_size.value)()
         status = lib.niSLSC_GetDevicePropertyInt32Array(session_handle, device_names, property_name, property_value, property_value_actual_size.value, None)
@@ -862,7 +851,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetDevicePropertyInt64Array(session_handle, device_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_int64 * property_value_actual_size.value)()
         status = lib.niSLSC_GetDevicePropertyInt64Array(session_handle, device_names, property_name, property_value, property_value_actual_size.value, None)
@@ -876,7 +865,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetDevicePropertyString(session_handle, device_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(property_value_actual_size.value)
         status = lib.niSLSC_GetDevicePropertyString(session_handle, device_names, property_name, buffer, property_value_actual_size.value, None)
@@ -892,7 +881,7 @@ class LibraryInterpreter(BaseInterpreter):
         num_property_value = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
         status = lib.niSLSC_GetDevicePropertyStringArray(session_handle, device_names, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value < 0:
+        if required_buffer_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         status = lib.niSLSC_GetDevicePropertyStringArray(session_handle, device_names, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), buffer, required_buffer_size.value, None)
@@ -917,7 +906,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetDevicePropertyUInt32Array(session_handle, device_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_uint32 * property_value_actual_size.value)()
         status = lib.niSLSC_GetDevicePropertyUInt32Array(session_handle, device_names, property_name, property_value, property_value_actual_size.value, None)
@@ -940,7 +929,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetDevicePropertyUInt64Array(session_handle, device_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_uint64 * property_value_actual_size.value)()
         status = lib.niSLSC_GetDevicePropertyUInt64Array(session_handle, device_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1097,7 +1086,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPhysicalChannelPropertyBoolArray(session_handle, physical_channel_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_bool * property_value_actual_size.value)()
         status = lib.niSLSC_GetPhysicalChannelPropertyBoolArray(session_handle, physical_channel_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1120,7 +1109,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPhysicalChannelPropertyDoubleArray(session_handle, physical_channel_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_double * property_value_actual_size.value)()
         status = lib.niSLSC_GetPhysicalChannelPropertyDoubleArray(session_handle, physical_channel_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1143,7 +1132,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPhysicalChannelPropertyInt32Array(session_handle, physical_channel_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_int32 * property_value_actual_size.value)()
         status = lib.niSLSC_GetPhysicalChannelPropertyInt32Array(session_handle, physical_channel_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1166,7 +1155,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPhysicalChannelPropertyInt64Array(session_handle, physical_channel_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_int64 * property_value_actual_size.value)()
         status = lib.niSLSC_GetPhysicalChannelPropertyInt64Array(session_handle, physical_channel_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1180,7 +1169,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPhysicalChannelPropertyString(session_handle, physical_channel_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(property_value_actual_size.value)
         status = lib.niSLSC_GetPhysicalChannelPropertyString(session_handle, physical_channel_names, property_name, buffer, property_value_actual_size.value, None)
@@ -1196,7 +1185,7 @@ class LibraryInterpreter(BaseInterpreter):
         num_property_value = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPhysicalChannelPropertyStringArray(session_handle, physical_channel_names, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value < 0:
+        if required_buffer_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         status = lib.niSLSC_GetPhysicalChannelPropertyStringArray(session_handle, physical_channel_names, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), buffer, required_buffer_size.value, None)
@@ -1221,7 +1210,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPhysicalChannelPropertyUInt32Array(session_handle, physical_channel_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_uint32 * property_value_actual_size.value)()
         status = lib.niSLSC_GetPhysicalChannelPropertyUInt32Array(session_handle, physical_channel_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1244,7 +1233,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPhysicalChannelPropertyUInt64Array(session_handle, physical_channel_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_uint64 * property_value_actual_size.value)()
         status = lib.niSLSC_GetPhysicalChannelPropertyUInt64Array(session_handle, physical_channel_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1428,7 +1417,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetNVMEMAreaPropertyBoolArray(session_handle, nvmem_area_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_bool * property_value_actual_size.value)()
         status = lib.niSLSC_GetNVMEMAreaPropertyBoolArray(session_handle, nvmem_area_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1442,7 +1431,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetNVMEMAreaPropertyString(session_handle, nvmem_area_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(property_value_actual_size.value)
         status = lib.niSLSC_GetNVMEMAreaPropertyString(session_handle, nvmem_area_names, property_name, buffer, property_value_actual_size.value, None)
@@ -1458,7 +1447,7 @@ class LibraryInterpreter(BaseInterpreter):
         num_property_value = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
         status = lib.niSLSC_GetNVMEMAreaPropertyStringArray(session_handle, nvmem_area_names, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value < 0:
+        if required_buffer_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         status = lib.niSLSC_GetNVMEMAreaPropertyStringArray(session_handle, nvmem_area_names, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), buffer, required_buffer_size.value, None)
@@ -1483,7 +1472,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetNVMEMAreaPropertyUInt32Array(session_handle, nvmem_area_names, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_uint32 * property_value_actual_size.value)()
         status = lib.niSLSC_GetNVMEMAreaPropertyUInt32Array(session_handle, nvmem_area_names, property_name, property_value, property_value_actual_size.value, None)
@@ -1504,7 +1493,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetSessionPropertyString(session_handle, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(property_value_actual_size.value)
         status = lib.niSLSC_GetSessionPropertyString(session_handle, property_name, buffer, property_value_actual_size.value, None)
@@ -1519,7 +1508,7 @@ class LibraryInterpreter(BaseInterpreter):
         num_property_value = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
         status = lib.niSLSC_GetSessionPropertyStringArray(session_handle, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value < 0:
+        if required_buffer_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         status = lib.niSLSC_GetSessionPropertyStringArray(session_handle, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), buffer, required_buffer_size.value, None)
@@ -1570,7 +1559,7 @@ class LibraryInterpreter(BaseInterpreter):
         num_property_value = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
         status = lib.niSLSC_GetSystemPropertyStringArray(session_handle, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value < 0:
+        if required_buffer_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         status = lib.niSLSC_GetSystemPropertyStringArray(session_handle, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), buffer, required_buffer_size.value, None)
@@ -1611,7 +1600,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetGenericPropertyBoolArray(session_handle, resources, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_bool * property_value_actual_size.value)()
         status = lib.niSLSC_GetGenericPropertyBoolArray(session_handle, resources, property_name, property_value, property_value_actual_size.value, None)
@@ -1634,7 +1623,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetGenericPropertyDoubleArray(session_handle, resources, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_double * property_value_actual_size.value)()
         status = lib.niSLSC_GetGenericPropertyDoubleArray(session_handle, resources, property_name, property_value, property_value_actual_size.value, None)
@@ -1657,7 +1646,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetGenericPropertyInt32Array(session_handle, resources, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_int32 * property_value_actual_size.value)()
         status = lib.niSLSC_GetGenericPropertyInt32Array(session_handle, resources, property_name, property_value, property_value_actual_size.value, None)
@@ -1680,7 +1669,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetGenericPropertyInt64Array(session_handle, resources, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_int64 * property_value_actual_size.value)()
         status = lib.niSLSC_GetGenericPropertyInt64Array(session_handle, resources, property_name, property_value, property_value_actual_size.value, None)
@@ -1694,7 +1683,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetGenericPropertyString(session_handle, resources, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(property_value_actual_size.value)
         status = lib.niSLSC_GetGenericPropertyString(session_handle, resources, property_name, buffer, property_value_actual_size.value, None)
@@ -1710,7 +1699,7 @@ class LibraryInterpreter(BaseInterpreter):
         num_property_value = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
         status = lib.niSLSC_GetGenericPropertyStringArray(session_handle, resources, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value < 0:
+        if required_buffer_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         status = lib.niSLSC_GetGenericPropertyStringArray(session_handle, resources, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), buffer, required_buffer_size.value, None)
@@ -1735,7 +1724,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetGenericPropertyUInt32Array(session_handle, resources, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_uint32 * property_value_actual_size.value)()
         status = lib.niSLSC_GetGenericPropertyUInt32Array(session_handle, resources, property_name, property_value, property_value_actual_size.value, None)
@@ -1758,7 +1747,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetGenericPropertyUInt64Array(session_handle, resources, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_uint64 * property_value_actual_size.value)()
         status = lib.niSLSC_GetGenericPropertyUInt64Array(session_handle, resources, property_name, property_value, property_value_actual_size.value, None)
@@ -2062,7 +2051,7 @@ class LibraryInterpreter(BaseInterpreter):
         forward_coefficient_actual_size = ctypes.c_size_t()
         reverse_coefficient_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPolynomialScalingParameters(session_handle, physical_channel_names, None, 0, ctypes.byref(forward_coefficient_actual_size), None, 0, ctypes.byref(reverse_coefficient_actual_size))
-        if forward_coefficient_actual_size.value < 0 or reverse_coefficient_actual_size.value < 0:
+        if forward_coefficient_actual_size.value <= 0 or reverse_coefficient_actual_size.value <= 0:
             self.check_for_error(None, status)
         forward_coefficient = (ctypes.c_double * forward_coefficient_actual_size.value)()
         reverse_coefficient = (ctypes.c_double * reverse_coefficient_actual_size.value)()
@@ -2079,7 +2068,7 @@ class LibraryInterpreter(BaseInterpreter):
         prescale_value_actual_size = ctypes.c_size_t()
         coercion = ctypes.c_int32()
         status = lib.niSLSC_GetTableScalingParameters(session_handle, physical_channel_names, None, 0, ctypes.byref(scaled_value_actual_size), None, 0, ctypes.byref(prescale_value_actual_size))
-        if scaled_value_actual_size.value < 0 or prescale_value_actual_size.value < 0 or coercion_actual_size.value < 0:
+        if scaled_value_actual_size.value <= 0 or prescale_value_actual_size.value <= 0 or coercion_actual_size.value <= 0:
             self.check_for_error(None, status)
         scaled_value = (ctypes.c_double * scaled_value_actual_size.value)()
         prescale_value = (ctypes.c_double * prescale_value_actual_size.value)()
@@ -2097,7 +2086,7 @@ class LibraryInterpreter(BaseInterpreter):
         required_buffer_size = ctypes.c_size_t()
         user_defined_parameter_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetUserDefinedScalingParameters(session_handle, physical_channel_names, ctypes.byref(user_defined_parameter_names), ctypes.byref(num_user_defined_parameter_names), None, 0, ctypes.byref(required_buffer_size), None, 0, ctypes.byref(user_defined_parameter_value_actual_size))
-        if required_buffer_size.value < 0 or user_defined_parameter_value_actual_size.value < 0:
+        if required_buffer_size.value <= 0 or user_defined_parameter_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         user_defined_parameter_value = (ctypes.c_double * user_defined_parameter_value_actual_size.value)()
@@ -2114,7 +2103,7 @@ class LibraryInterpreter(BaseInterpreter):
         physical_channel_names = physical_channel_names.encode('utf-8')
         user_defined_equation_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetUserDefinedScalingEquation(session_handle, physical_channel_names, None, 0, ctypes.byref(user_defined_equation_actual_size))
-        if user_defined_equation_actual_size.value < 0:
+        if user_defined_equation_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(user_defined_equation_actual_size.value)
         status = lib.niSLSC_GetUserDefinedScalingEquation(session_handle, physical_channel_names, buffer, user_defined_equation_actual_size.value, None)
@@ -2229,7 +2218,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetCommandPropertyString(command_handle, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(property_value_actual_size.value)
         status = lib.niSLSC_GetCommandPropertyString(command_handle, property_name, buffer, property_value_actual_size.value, None)
@@ -2299,7 +2288,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPropertyPropertyInt32Array(property_handle, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         property_value = (ctypes.c_int32 * property_value_actual_size.value)()
         status = lib.niSLSC_GetPropertyPropertyInt32Array(property_handle, property_name, property_value, property_value_actual_size.value, None)
@@ -2312,7 +2301,7 @@ class LibraryInterpreter(BaseInterpreter):
         property_name = property_name.encode('utf-8')
         property_value_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPropertyPropertyString(property_handle, property_name, None, 0, ctypes.byref(property_value_actual_size))
-        if property_value_actual_size.value < 0:
+        if property_value_actual_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(property_value_actual_size.value)
         status = lib.niSLSC_GetPropertyPropertyString(property_handle, property_name, buffer, property_value_actual_size.value, None)
@@ -2327,7 +2316,7 @@ class LibraryInterpreter(BaseInterpreter):
         num_property_value = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
         status = lib.niSLSC_GetPropertyPropertyStringArray(property_handle, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value < 0:
+        if required_buffer_size.value <= 0:
             self.check_for_error(None, status)
         buffer = ctypes.create_string_buffer(required_buffer_size.value)
         status = lib.niSLSC_GetPropertyPropertyStringArray(property_handle, property_name, ctypes.byref(property_value), ctypes.byref(num_property_value), buffer, required_buffer_size.value, None)
@@ -2338,14 +2327,17 @@ class LibraryInterpreter(BaseInterpreter):
         return property_value_array
 
     def check_for_error(self, library_handle: int, error_code: int) -> None:
-        if library_handle is None:
-            raise SLSCError("", error_code)
-        library_handle = ctypes.c_void_p(library_handle)
         if error_code == 0:
             return
+        if library_handle is None:
+            if error_code < 0:
+                raise SLSCError("", error_code)
+            elif error_code > 0:
+                warnings.warn(SLSCWarning("", error_code))
+            return
+        library_handle = ctypes.c_void_p(library_handle)
+        extended_error_info = self.get_extended_error_info(library_handle, language=0)
         if error_code < 0:
-            extended_error_info = self.get_extended_error_info(library_handle, self._language)
             raise SLSCError(extended_error_info, error_code)
         elif error_code > 0:
-            extended_error_info = self.get_extended_error_info(library_handle, self._language)
             warnings.warn(SLSCWarning(extended_error_info, error_code))

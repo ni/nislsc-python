@@ -1,0 +1,530 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dict>
+  <metadata>
+    <product>NI SLSC</product>
+    <comment>Errors for SLSC</comment>
+    <fra>0</fra>
+    <jpn>0</jpn>
+    <eng>1</eng>
+    <deu>0</deu>
+    <chs>0</chs>
+    <kor>0</kor>
+  </metadata>
+  <configuration>
+    <range>
+      <!-- Errors -->
+      <minimum>-250999</minimum>
+      <maximum>-250800</maximum>
+    </range>
+    <range>
+      <!-- Warnings -->
+      <minimum>250800</minimum>
+      <maximum>250999</maximum>
+    </range>
+  </configuration>
+  <descriptions>
+    <error>
+      <code category="NI SLSC Warning" code="250800" needsReview="no" symbol="kWarningScalingTimestampOutdated"/>
+      <desc><![CDATA[Current scaling change timestamp is earlier than previously stored Last Scaling Change. Possible reason: the time of specified SLSC chassis is not accurate. Use the Get and Set Chassis Time and Time zone VI, available at labview\examples\slsc, to synchronize the time between the SLSC chassis and the host.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250800" needsReview="no" symbol="kErrorInternal"/>
+      <desc><![CDATA[An internal software error occurred in NI-SLSC. Contact National Instruments Technical Support at ni.com/support.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250801" needsReview="no" symbol="kErrorOutOfMemory"/>
+      <desc><![CDATA[The requested memory could not be allocated.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250802" needsReview="no" symbol="kErrorInvalidParameter"/>
+      <desc><![CDATA[The operation failed because a parameter value is invalid.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250803" needsReview="no" symbol="kErrorInvalidPointer"/>
+      <desc><![CDATA[The operation failed because a pointer-type parameter is invalid.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250804" needsReview="no" symbol="kErrorOSFault"/>
+      <desc><![CDATA[An unexpected operating system error occurred.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250805" needsReview="no" symbol="kErrorBufferTooSmall"/>
+      <desc><![CDATA[The specified buffer size is too small for the result.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250806" needsReview="no" symbol="kErrorDeviceNotFound"/>
+      <desc><![CDATA[The specified SLSC device was not found.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250807" needsReview="no" symbol="kErrorInvalidDeviceName"/>
+      <desc><![CDATA[The specified SLSC device name is invalid. Device names cannot be empty and length cannot exceed 63 characters. Device names may consist of the letters 'a'-'z' (case-insensitive), the digits '0'-'9', and the hyphen ('-'). Device names must contain at least one non-numeric character, and may not begin or end with a hyphen.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250808" needsReview="no" symbol="kErrorDeviceNameConflict"/>
+      <desc><![CDATA[The specified SLSC device name conflicts with another device name.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250809" needsReview="no" symbol="kErrorDeviceNotConnected"/>
+      <desc><![CDATA[The session does not have a network connection for the specified SLSC device.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250810" needsReview="no" symbol="kErrorDeviceNotReserved"/>
+      <desc><![CDATA[The specified SLSC device is not reserved by this session.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250811" needsReview="no" symbol="kErrorDeviceReservedByAnotherSession"/>
+      <desc><![CDATA[The operation cannot be performed because the SLSC device is reserved by another session.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250812" needsReview="no" symbol="kErrorDeviceNotSlscChassis"/>
+      <desc><![CDATA[The specified device is not an SLSC chassis.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250813" needsReview="no" symbol="kErrorDeviceNotSlscModule"/>
+      <desc><![CDATA[The specified device is not an SLSC module.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250814" needsReview="no" symbol="kErrorPropertyNotFound"/>
+      <desc><![CDATA[The specified property was not found. This usually indicates that the property is not supported by the SLSC device or physical channel.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250815" needsReview="no" symbol="kErrorInvalidPropertyName"/>
+      <desc><![CDATA[The specified property name is invalid. Property names may consist of multiple identifiers separated by periods. For example, "SomeVendor.Load.Resistance" is a valid property name.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250816" needsReview="no" symbol="kErrorInvalidPropertyValue"/>
+      <desc><![CDATA[The specified property value is invalid.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250817" needsReview="no" symbol="kErrorPropertyNotReadable"/>
+      <desc><![CDATA[The specified property is not readable.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250818" needsReview="no" symbol="kErrorPropertyNotWritable"/>
+      <desc><![CDATA[The specified property is not writable.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250819" needsReview="no" symbol="kErrorPropertyDataTypeMismatch"/>
+      <desc><![CDATA[The data type of the specified property does not match the data type of the property value.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250820" needsReview="no" symbol="kErrorPropertyArrayLength"/>
+      <desc><![CDATA[The number of property values does not match the number of resource names.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250821" needsReview="no" symbol="kErrorReadingPropertyWithUncommittedChange"/>
+      <desc><![CDATA[The specified property cannot be read because it has an uncommitted change that needs to be committed or reverted.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250822" needsReview="no" symbol="kErrorInvalidPropertyForNonEnum"/>
+      <desc><![CDATA[The specified property is valid only for enum properties.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250823" needsReview="no" symbol="kErrorInvalidConfigFile"/>
+      <desc><![CDATA[The contents of the configuration file are invalid.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250824" needsReview="no" symbol="kErrorFileIOFailure"/>
+      <desc><![CDATA[The operation failed due to a file I/O error.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250825" needsReview="no" symbol="kErrorFileNotFound"/>
+      <desc><![CDATA[The operation failed because a required file was not found.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250826" needsReview="no" symbol="kErrorFileAccessDenied"/>
+      <desc><![CDATA[The operation failed because the user login does not have sufficient permissions to access a required file. Consider running as an administrator.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250827" needsReview="no" symbol="kErrorResourceNotFound"/>
+      <desc><![CDATA[The specified resource was not found.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250828" needsReview="no" symbol="kErrorInvalidResourceName"/>
+      <desc><![CDATA[The specified resource name is invalid.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250829" needsReview="no" symbol="kErrorTooManyNames"/>
+      <desc><![CDATA[A single name is required, but multiple names were specified. Please specify a single name, not a comma-delimited list or colon-delimited range.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250830" needsReview="no" symbol="kErrorRepeatedName"/>
+      <desc><![CDATA[A name was specified more than once in the same comma-delimited list. Please specify each name only once.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250831" needsReview="no" symbol="kErrorEmptyName"/>
+      <desc><![CDATA[A name is required, but an empty string was specified.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250832" needsReview="no" symbol="kErrorInvalidUTF8String"/>
+      <desc><![CDATA[The specified string is not valid UTF-8.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250833" needsReview="no" symbol="kErrorInvalidSessionHandle"/>
+      <desc><![CDATA[The specified session handle is invalid.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250834" needsReview="no" symbol="kErrorSPICommunicationFault"/>
+      <desc><![CDATA[An SPI communication fault on the SLSC backplane occurred.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250835" needsReview="no" symbol="kErrorDllLoadFailure"/>
+      <desc><![CDATA[A required DLL failed to load.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250836" needsReview="no" symbol="kErrorDllImportMissing"/>
+      <desc><![CDATA[A required DLL import is missing.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250837" needsReview="no" symbol="kErrorNetworkFailure"/>
+      <desc><![CDATA[An unexpected network error occurred.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250838" needsReview="no" symbol="kErrorNetworkHostNotFound"/>
+      <desc><![CDATA[The IP address for the specified network host could not be found.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250839" needsReview="no" symbol="kErrorNetworkHostUnreachable"/>
+      <desc><![CDATA[The specified network host is unreachable.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250840" needsReview="no" symbol="kErrorNetworkStatusConnectionLost"/>
+      <desc><![CDATA[The network connection has been lost.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250841" needsReview="no" symbol="kErrorNetworkStatusTimedOut"/>
+      <desc><![CDATA[The network operation timed out.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250842" needsReview="no" symbol="kErrorInvalidNetworkPathSyntax"/>
+      <desc><![CDATA[The specified network address has invalid syntax.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250843" needsReview="no" symbol="kErrorUnsupportedNetworkAddressFamily"/>
+      <desc><![CDATA[The specified network address uses an unsupported network address family.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250844" needsReview="no" symbol="kErrorNetworkProtocolFailure"/>
+      <desc><![CDATA[A malformed packet was encountered while communicating with the SLSC chassis.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250845" needsReview="no" symbol="kErrorInvalidHostname"/>
+      <desc><![CDATA[The specified hostname is invalid.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250846" needsReview="no" symbol="kErrorNetworkOperationAborted"/>
+      <desc><![CDATA[The network operation has been aborted.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250847" needsReview="no" symbol="kErrorMdnsServiceNameConflict"/>
+      <desc><![CDATA[mDNS service name conflict]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250848" needsReview="no" symbol="kErrorMdnsDiscoveryInProgress"/>
+      <desc><![CDATA[mDNS discovery is in progress, but it is not complete. Try again later.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250849" needsReview="no" symbol="kErrorMdnsFailure"/>
+      <desc><![CDATA[Failed to connect to the mDNS service. Ensure the NI mDNS Responder Service is running.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250850" needsReview="no" symbol="kErrorPhysicalChannelNotFound"/>
+      <desc><![CDATA[The specified physical channel was not found. This usually indicates that the physical channel is not supported by the SLSC device.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250851" needsReview="no" symbol="kErrorInvalidPhysicalChannelName"/>
+      <desc><![CDATA[The specified physical channel name is invalid. Physical channel names are of the form <device name>/<physical channel name>. For example, "Mod1/load0" is a valid physical channel name.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250852" needsReview="no" symbol="kErrorAuthenticationFailure"/>
+      <desc><![CDATA[The operation failed due to an authentication failure. Check that you are using the correct login credentials for this SLSC device.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250853" needsReview="no" symbol="kErrorInvalidLoginCredentials"/>
+      <desc><![CDATA[The specified login credentials are invalid.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250854" needsReview="no" symbol="kErrorNoPermissionForOperation"/>
+      <desc><![CDATA[The operation requires permissions that the current logged in user does not have.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250855" needsReview="no" symbol="kErrorIncorrectAccessForOperation"/>
+      <desc><![CDATA[The SLSC device was reserved with the incorrect access to perform this operation.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250856" needsReview="no" symbol="kErrorUndefinedEnumValue"/>
+      <desc><![CDATA[The specified enum value is not one of the values defined by the enum.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250857" needsReview="no" symbol="kErrorRegisterNotFound"/>
+      <desc><![CDATA[The specified register was not found. This usually indicates that the register is not supported by the SLSC device.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250858" needsReview="no" symbol="kErrorRegisterNotReadable"/>
+      <desc><![CDATA[The specified register is not readable.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250859" needsReview="no" symbol="kErrorRegisterNotWritable"/>
+      <desc><![CDATA[The specified register is not writable.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250860" needsReview="no" symbol="kErrorRegisterSizeMismatch"/>
+      <desc><![CDATA[The size of the specified register does not match the size of the data.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250861" needsReview="no" symbol="kErrorNvmemAreaUnprogrammed"/>
+      <desc><![CDATA[The specified NVMEM area is unprogrammed.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250862" needsReview="no" symbol="kErrorNvmemWriteValidationFailure"/>
+      <desc><![CDATA[NVMEM write validation failed.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250863" needsReview="no" symbol="kErrorNvmemAreaNotFound"/>
+      <desc><![CDATA[The specified NVMEM area does not exist.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250864" needsReview="no" symbol="kErrorInvalidNvmemAreaName"/>
+      <desc><![CDATA[The specified NVMEM area name is invalid. NVMEM area names are of the form <device name>/<NVMEM area name>. For example, "Mod1/capabilities" is a valid NVMEM area name.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250865" needsReview="no" symbol="kErrorNvmemExceedsSize"/>
+      <desc><![CDATA[The request exceeds the size of the NVMEM area.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250866" needsReview="no" symbol="kErrorNvmemAreaInvalidFormat"/>
+      <desc><![CDATA[The contents of this NVMEM area do not meet the required format.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250867" needsReview="no" symbol="kErrorMissingRequiredNvmemArea"/>
+      <desc><![CDATA[The area descriptor of the SLSC module is missing a required NVMEM area.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250868" needsReview="no" symbol="kErrorReadingNvmemWithUncommittedChange"/>
+      <desc><![CDATA[The specified NVMEM area cannot be read because it has an uncommitted change that needs to be committed or reverted.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250869" needsReview="no" symbol="kErrorCommandNotFound"/>
+      <desc><![CDATA[The specified command was not found. This usually indicates that the command is not supported by the device or physical channel.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250870" needsReview="no" symbol="kErrorInvalidCommandName"/>
+      <desc><![CDATA[The specified command name is invalid. Command names may consist of multiple identifiers separated by periods. For example, "SomeVendor.Load.Update" is a valid command name.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250871" needsReview="no" symbol="kErrorCommandTimedOut"/>
+      <desc><![CDATA[The command did not complete prior to the supplied timeout value.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250872" needsReview="no" symbol="kErrorCommandHardwareError"/>
+      <desc><![CDATA[The command did not complete within the vendor-specified time.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250873" needsReview="no" symbol="kErrorCommandInsufficientTimeout"/>
+      <desc><![CDATA[The provided timeout value is less than the vendor-specified timeout for this command.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250874" needsReview="no" symbol="kErrorAbortedDueToPriorFailure"/>
+      <desc><![CDATA[The request was aborted due to to an earlier error.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250875" needsReview="no" symbol="kErrorInterruptNotFound"/>
+      <desc><![CDATA[The specified interrupt was not found.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250876" needsReview="no" symbol="kErrorJsonParseFailure"/>
+      <desc><![CDATA[The input is not valid JSON content.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250877" needsReview="no" symbol="kErrorJsonSchemaFailure"/>
+      <desc><![CDATA[The input failed JSON schema validation.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250878" needsReview="no" symbol="kErrorInvalidDeviceCaps"/>
+      <desc><![CDATA[Invalid SLSC device capabilities.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250879" needsReview="no" symbol="kErrorCapsHardwareMismatch"/>
+      <desc><![CDATA[Capabilities do not match the specified hardware.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250880" needsReview="no" symbol="kErrorCapsRuleFailure"/>
+      <desc><![CDATA[The input caps failed JSON rule validation.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250881" needsReview="no" symbol="kErrorEventNotFound"/>
+      <desc><![CDATA[The specified event was not found. This usually indicates that the event is not supported by the device or physical channel.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250882" needsReview="no" symbol="kErrorInvalidEventName"/>
+      <desc><![CDATA[The specified event name is invalid. Event names may consist of multiple identifiers separated by periods. For example, "SomeVendor.Load.TemperatureFault" is a valid event name.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250883" needsReview="no" symbol="kErrorVariantDataTypeMismatch"/>
+      <desc><![CDATA[Variant data type mismatch]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250884" needsReview="no" symbol="kErrorAliasNotFound"/>
+      <desc><![CDATA[The specified alias was not found.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250885" needsReview="no" symbol="kErrorAliasNotSupported"/>
+      <desc><![CDATA[The specified alias is not supported in this situation. The VI/function may not support this alias, or the VI/function may require you to specify this alias separately from other resource names, not as part of a comma-delimited list.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250886" needsReview="no" symbol="kErrorPropertyValueOutOfRange"/>
+      <desc><![CDATA[The property value is outside of the range of the property data type.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250887" needsReview="no" symbol="kErrorChassisFanFault"/>
+      <desc><![CDATA[A chassis fan fault condition was detected. This might result in overheating chassis/modules and software malfunction.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250888" needsReview="no" symbol="kErrorEnumNotFound"/>
+      <desc><![CDATA[The specified enum was not found.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250889" needsReview="no" symbol="kErrorDeviceCapabilitiesTooNew"/>
+      <desc><![CDATA[The device capabilities are too new to be used by this version of NI-SLSC. Update the SLSC driver and firmware or obtain a compatible capabilities file from the module vendor.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250890" needsReview="no" symbol="kErrorChassisFirmwareTooNew"/>
+      <desc><![CDATA[The SLSC chassis firmware is newer than the NI-SLSC driver. Upgrade the driver or downgrade the firmware to use the chassis.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250891" needsReview="no" symbol="kErrorChassisFirmwareTooOld"/>
+      <desc><![CDATA[The SLSC chassis firmware is older than the NI-SLSC driver. Upgrade the firmware or downgrade the driver to use the chassis.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250892" needsReview="no" symbol="kErrorPowerOnHoursNotTracking"/>
+      <desc><![CDATA[The chassis is not tracking power-on hours due to corrupted storage. Please write an initial value to this property in order to resume the tracking.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250893" needsReview="no" symbol="kErrorPowerOnHoursPropertyWriteFailure"/>
+      <desc><![CDATA[Chassis power-on hours property write failed.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250894" needsReview="no" symbol="kErrorCommandInProgress"/>
+      <desc><![CDATA[Another command is already in progress on the SLSC device.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250895" needsReview="no" symbol="kErrorInvalidModuleNvmem"/>
+      <desc><![CDATA[The module NVMEM is not programmed correctly. Rewrite the module NVMEM to restore functionality.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250896" needsReview="no" symbol="kErrorModuleInitializationFailed"/>
+      <desc><![CDATA[Module initialization failed. Reprogram the module NVMEM or contact the module vendor for assistance.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250897" needsReview="no" symbol="kErrorInvalidDeviceIdentification"/>
+      <desc><![CDATA[Invalid device identification.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250898" needsReview="no" symbol="kErrorRegisterResourceConflict"/>
+      <desc><![CDATA[The specified register operation has resource conflicts with other register operations.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250899" needsReview="no" symbol="kErrorInitializationActionsUncommittedProperties"/>
+      <desc><![CDATA[There are uncommitted properties in initialization actions.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250900" needsReview="no" symbol="kErrorDeviceAlreadyReservedBySameSession"/>
+      <desc><![CDATA[The operation cannot be performed because the SLSC device is already reserved by the same session.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250901" needsReview="no" symbol="kErrorSessionNumUpToLimition"/>
+      <desc><![CDATA[Maximum number of sessions reached. To create new sessions, you must close existing sessions.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250902" needsReview="no" symbol="kErrorIncorrectSerialNumber"/>
+      <desc><![CDATA[The specified serial number does not match the hardware.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250903" needsReview="no" symbol="kErrorIncorrectNvmemPassword"/>
+      <desc><![CDATA[The specified NVMEM password is incorrect.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250904" needsReview="no" symbol="kErrorRemoteChassisNotAdded"/>
+      <desc><![CDATA[You are connecting to a remote chassis. You need to use the <b>Add Network Chassis VI</b> to add the chassis to the local configuration file before using the chassis.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250905" needsReview="no" symbol="kErrorNoAvailableSockets"/>
+      <desc>
+         <![CDATA[There are no available sockets in the Phar Lap ETS target. To increase the maximum number of sockets in the Phar Lap ETS target, add the following text to the <b>ni-rt.ini</b> file in the Phar Lap ETS target:
+
+[TCP_Stack_Config]
+Max_Sockets = n
+
+n is the maximum number of sockets in the Phar Lap ETS target. The default maximum number of sockets in a Phar Lap ETS target is 256.]]>
+    </desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250906" needsReview="no" symbol="kErrorScalingRuleFailure"/>
+      <desc><![CDATA[The input scaling failed JSON rule validation.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250907" needsReview="no" symbol="kErrorInvalidDeviceScaling"/>
+      <desc><![CDATA[Invalid device scaling.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250908" needsReview="no" symbol="kErrorReadingScalingWithUncommittedChange"/>
+      <desc><![CDATA[The specified scaling method cannot be read because it has an uncommitted change. Either commit or revert the uncommitted change.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250909" needsReview="no" symbol="kErrorReservedScalingParameterName"/>
+      <desc><![CDATA[The specified scaling paramter name has been reserved.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250910" needsReview="no" symbol="kErrorCapsScalingMismatch"/>
+      <desc><![CDATA[Capabilities do not match the scaling.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250911" needsReview="no" symbol="kErrorNoScalingNvmemArea"/>
+      <desc><![CDATA[The scaling area does not exist.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250912" needsReview="no" symbol="kErrorUserDefinedScalingLengthNotEqual"/>
+      <desc><![CDATA[The number of user-defined parameter names is not equal to the number of user-defined parameter values.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250913" needsReview="no" symbol="kErrorInvalidLinearScalingSlopeValue"/>
+      <desc><![CDATA[Multiplier must not be Inf, NaN, or Zero.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250914" needsReview="no" symbol="kErrorInvalidLinearScalingInterceptValue"/>
+      <desc><![CDATA[Offset must not be Inf or NaN.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250915" needsReview="no" symbol="kErrorEmptyPolynomialScalingCoeffs"/>
+      <desc><![CDATA[The polynomial scaling parameter array is empty.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250916" needsReview="no" symbol="kErrorTableScalingTooFewElements"/>
+      <desc><![CDATA[The number of elements in the table scaling parameter array must be greater than or equal to two.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250917" needsReview="no" symbol="kErrorTableScalingLengthNotEqual"/>
+      <desc><![CDATA[The length of scaled values is not equal to the length of unscaled values.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250918" needsReview="no" symbol="kErrorEmptyUserDefinedScalingEquation"/>
+      <desc><![CDATA[The user-defined scaling equation is empty.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250919" needsReview="no" symbol="kErrorPhysicalChannelHasNoScaling"/>
+      <desc><![CDATA[The specified physical channel is not bound with a scale.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250920" needsReview="no" symbol="kErrorScaleTypeUnmatched"/>
+      <desc><![CDATA[The physical channel does not have a matching scale type.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250921" needsReview="no" symbol="kErrorDuplicateScalingParameterName"/>
+      <desc><![CDATA[The input scaling parameters have duplicate names.]]></desc>
+    </error>
+    <error>
+      <code category="NI SLSC Error" code="-250922" needsReview="no" symbol="kErrorCommandInsufficientRemainTimeout"/>
+      <desc><![CDATA[The remain timeout value is less than the vendor-specified timeout value in capabilities file for this command after waited for other running operations.]]></desc>
+    </error>
+  </descriptions>
+</dict>

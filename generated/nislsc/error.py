@@ -1,4 +1,4 @@
-from error_codes import ErrorCode
+from nislsc.error_codes import ErrorCode
 
 __all__ = ['SLSCError', 'SLSCWarning']
 

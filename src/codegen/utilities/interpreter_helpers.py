@@ -1,3 +1,19 @@
+"""Utility functions for the interpreter code generation process.
+
+These functions help with converting names, determining parameter types,
+and handling data types in the context of generating C API bindings for
+the NI-SLSC API.
+
+This module provides functions to:
+- Convert camelCase names to snake_case.
+- Determine if a parameter is an input or output.
+- Check if a parameter is part of the C API.
+- Standardize parameter names.
+- Map data types to their ctypes equivalents.
+- Get C API function names.
+- Get Python function names from C API functions.
+"""
+
 import re
 
 INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES = [
@@ -54,39 +70,55 @@ DATATYPE_MAP = {
     "uint32[]": "ctypes.c_uint32",
     "uint8[]": "ctypes.c_uint8",
     "bool[]": "ctypes.c_bool",
-    "enum": "ctypes.c_int32"
+    "enum": "ctypes.c_int32",
 }
 
+
 def convert_to_snake_case(name: str) -> str:
+    """Convert a camelCase or PascalCase name to snake_case."""
     for regex in INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES:
         name = regex.sub(r"\1_\2", name)
     return name.lower().replace("u_int", "uint")
 
+
 def is_param_input(param: dict) -> bool:
-    return 'in' in param['dir']
+    """Check if the parameter is an input parameter."""
+    return "in" in param["dir"]
+
 
 def is_param_output(param: dict) -> bool:
-    return 'out' in param['dir']
+    """Check if the parameter is an output parameter."""
+    return "out" in param["dir"]
+
 
 def is_capi(param: dict) -> bool:
-    return 'targets' not in param or 'capi' in param['targets']
+    """Check if the parameter is part of the C API."""
+    return "targets" not in param or "capi" in param["targets"]
+
 
 def get_standardized_param_name(param: dict) -> str:
-    return convert_to_snake_case(NAME_EXPANSION.get(param['name'], param['name']))
+    """Get the standardized parameter name, expanding known names."""
+    return convert_to_snake_case(NAME_EXPANSION.get(param["name"], param["name"]))
+
 
 def get_param_datatype_in_ctypes(param: dict) -> str:
-    if param['dataType'] not in DATATYPE_MAP:
+    """Get the ctypes equivalent of the parameter's data type."""
+    if param["dataType"] not in DATATYPE_MAP:
         raise ValueError(f"Unknown dataType: {param['dataType']}")
-    return DATATYPE_MAP[param['dataType']]
+    return DATATYPE_MAP[param["dataType"]]
+
 
 def get_capi_function_name(function: dict) -> str:
-    if 'capi' in function["targets"]:
-        if 'capiname' in function:
-            return function['capiname']
-    return function['name']
+    """Get the C API function name, using 'capiname' if available."""
+    if "capi" in function["targets"]:
+        if "capiname" in function:
+            return function["capiname"]
+    return function["name"]
+
 
 def get_python_function_name(function: dict) -> str:
-    if 'capi' in function["targets"]:
-        if 'capiname' in function:
-            return convert_to_snake_case(function['capiname'])
-    return convert_to_snake_case(function['name'])
+    """Get the Python function name, converting to snake_case."""
+    if "capi" in function["targets"]:
+        if "capiname" in function:
+            return convert_to_snake_case(function["capiname"])
+    return convert_to_snake_case(function["name"])

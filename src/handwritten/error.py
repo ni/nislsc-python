@@ -1,4 +1,4 @@
-from error_codes import ErrorCode
+from nislsc.error_codes import ErrorCode
 
 __all__ = ['SLSCError', 'SLSCWarning']
 
@@ -10,9 +10,9 @@ class SLSCError(Error):
         self._error_code = int(error_code)
 
         try:
-            self._error_type = ErrorCode(self._error_code)
+            self._error_type = f"{ErrorCode(self._error_code)}"
         except ValueError:
-            self._error_type = ErrorCode.UNKNOWN
+            self._error_type = "Unknown error code"
 
         if not message:
             message = f'Description could not be found for the status code.\n\nStatus Code: {self._error_code}'
@@ -35,9 +35,9 @@ class SLSCWarning(Warning):
         self._error_code = int(error_code)
 
         try:
-            self._error_type = ErrorCode(self._error_code)
+            self._error_type = f"{ErrorCode(self._error_code)}"
         except ValueError:
-            self._error_type = ErrorCode.UNKNOWN
+            self._error_type = "Unknown error code"
 
     @property
     def error_code(self) -> int:

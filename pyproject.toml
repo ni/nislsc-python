@@ -60,6 +60,13 @@ warn_unused_configs = true
 warn_unused_ignores = true
 
 
+[[tool.mypy.overrides]]
+module = [
+  "mako.*",
+]
+ignore_missing_imports = true
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

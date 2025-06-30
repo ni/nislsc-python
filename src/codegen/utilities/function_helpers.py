@@ -3,20 +3,6 @@
 These functions help with generating the necessary code for function
 declarations, parameter handling, and return value processing in the
 context of generating C API bindings for the NI-SLSC API.
-
-This module provides functions to:
-- Get ctypes argument types of C API functions.
-- Generate function parameters.
-- Determine function return types.
-- Generate variable declarations for function parameters.
-- Generate function calls for size determination.
-- Generate function calls for results.
-- Generate result parsers for output parameters.
-- Generate return parameters for functions.
-- Check if a function requires size determination.
-- Generate additional variable declarations for buffers.
-- Generate conditional statement for validation.
-- Determine if a function has a library handle.
 """
 
 from utilities.interpreter_helpers import (
@@ -186,7 +172,6 @@ def get_function_return_type(function: dict) -> str:
         return f" -> tuple[{', '.join(param_list)}]"
 
 
-# specifies the variable declaration for the function
 def generate_variable_declaration(function: dict) -> list[str]:
     """Generate variable declarations for function parameters."""
     var_list = []
@@ -256,7 +241,6 @@ def generate_variable_declaration(function: dict) -> list[str]:
     return var_list
 
 
-# call this function to get the size needed for the return value
 def generate_function_call_for_size(function: dict) -> list[str]:
     """Generate the function call for determining the size of return values."""
     var_list = []
@@ -301,7 +285,6 @@ def generate_function_call_for_size(function: dict) -> list[str]:
     return var_list
 
 
-# call this function to generate validation
 def generate_conditional_for_validation(function: dict) -> str:
     """Generate a conditional statement to validates C API results for determining buffer size."""
     var_list = []
@@ -318,7 +301,6 @@ def generate_conditional_for_validation(function: dict) -> str:
     return " or ".join(var_list)
 
 
-# additional variable declaration to create buffers
 def generate_additional_variable_declaration(function: dict) -> list[str]:
     """Generate additional variable declarations for buffers."""
     decl_list = []
@@ -341,7 +323,6 @@ def generate_additional_variable_declaration(function: dict) -> list[str]:
     return decl_list
 
 
-# call function with complete parameters
 def generate_function_call_for_result(function: dict) -> list[str]:
     """Generate the function call for getting results."""
     var_list = []
@@ -391,7 +372,6 @@ def generate_function_call_for_result(function: dict) -> list[str]:
     return var_list
 
 
-# checks if the function needs additional function call to determine size of the return value
 def is_size_unknown(function: dict) -> bool:
     """Check if the function requires an additional call to determine the size of return values."""
     for parameter in function["params"]:
@@ -403,7 +383,6 @@ def is_size_unknown(function: dict) -> bool:
     return False
 
 
-# produce conversion method for return values
 def generate_result_parser(function: dict) -> list[str]:
     """Generate the result parser for output parameters."""
     conv_list = []
@@ -430,7 +409,6 @@ def generate_result_parser(function: dict) -> list[str]:
     return conv_list
 
 
-# create the return parameter for the function
 def generate_return_parameter(function: dict) -> list[str]:
     """Generate the return parameters for a Python API function."""
     ret_list = []

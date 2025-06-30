@@ -3,15 +3,6 @@
 These functions help with converting names, determining parameter types,
 and handling data types in the context of generating C API bindings for
 the NI-SLSC API.
-
-This module provides functions to:
-- Convert camelCase names to snake_case.
-- Determine if a parameter is an input or output.
-- Check if a parameter is part of the C API.
-- Standardize parameter names.
-- Map data types to their ctypes equivalents.
-- Get C API function names.
-- Get Python function names from C API functions.
 """
 
 import re

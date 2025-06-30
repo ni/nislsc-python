@@ -52,12 +52,6 @@ extend_exclude = "generated,src/codegen/metadata,src/codegen/templates,src/handw
 [tool.mypy]
 files = "generated/"
 strict = true
-check_untyped_defs = true
-namespace_packages = true
-warn_redundant_casts = true
-warn_unreachable = true
-warn_unused_configs = true
-warn_unused_ignores = true
 
 
 [[tool.mypy.overrides]]

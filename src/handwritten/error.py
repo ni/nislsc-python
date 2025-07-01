@@ -12,7 +12,7 @@ class SLSCError(Error):
         try:
             self._error_type = SLSCErrors(self._error_code)
         except ValueError:
-            self._error_type = "UNKNOWN_ERROR_CODE"
+            self._error_type = SLSCErrors.ERROR_UNKNOWN
 
         if not message:
             message = f'Description could not be found for the status code.\n\nStatus Code: {self._error_code}'
@@ -24,7 +24,7 @@ class SLSCError(Error):
         return self._error_code
 
     @property
-    def error_type(self) -> str:
+    def error_type(self) -> SLSCErrors:
         return self._error_type
 
 class SLSCWarning(Warning):
@@ -37,12 +37,12 @@ class SLSCWarning(Warning):
         try:
             self._error_type = SLSCWarnings(self._error_code)
         except ValueError:
-            self._error_type = "UNKNOWN_ERROR_CODE"
+            self._error_type = SLSCWarnings.WARNING_UNKNOWN
 
     @property
     def error_code(self) -> int:
         return self._error_code
 
     @property
-    def error_type(self) -> str:
+    def error_type(self) -> SLSCWarnings:
         return self._error_type

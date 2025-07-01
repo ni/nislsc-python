@@ -45,20 +45,20 @@ def _copy_handwritten_files(source: Path, dest: Path) -> None:
 
 def _generate_code(json: dict, error: dict, source: Path, dest: Path) -> None:
     """Generate code from templates using the provided JSON and XML file provided."""
-    for template_file in source.iterdir():
-        if template_file.suffix == ".mako":
-            template_path = template_file
-            new_dest = dest / template_file.stem
+    for template_file in source.rglob("*.mako"):
+        relative_path = template_file.relative_to(source)
+        new_dest = dest / relative_path.with_suffix("")
+        new_dest.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(template_path, "r", encoding="utf-8") as f:
-                template_content = f.read()
+        with open(template_file, "r", encoding="utf-8") as f:
+            template_content = f.read()
 
-            template = Template(template_content)
-            context = {**json, "errors": error}
-            rendered = template.render(**context)
+        template = Template(template_content)
+        context = {**json, "errors": error}
+        rendered = template.render(**context)
 
-            with open(new_dest, "w", encoding="utf-8") as f:
-                f.write(rendered)
+        with open(new_dest, "w", encoding="utf-8") as f:
+            f.write(rendered)
 
 
 def main() -> None:

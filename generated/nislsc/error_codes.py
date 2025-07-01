@@ -3,7 +3,7 @@ from enum import Enum
 __all__ = ['SLSCErrors', 'SLSCWarnings']
 
 class SLSCErrors(Enum):
-    ERROR_UNKNOWN = -1
+    UNKNOWN = -1
     ERROR_INTERNAL = -250800
     ERROR_OUT_OF_MEMORY = -250801
     ERROR_INVALID_PARAMETER = -250802
@@ -129,5 +129,5 @@ class SLSCErrors(Enum):
     ERROR_COMMAND_INSUFFICIENT_REMAIN_TIMEOUT = -250922
 
 class SLSCWarnings(Enum):
-    WARNING_UNKNOWN = -1
+    UNKNOWN = -1
     WARNING_SCALING_TIMESTAMP_OUTDATED = 250800

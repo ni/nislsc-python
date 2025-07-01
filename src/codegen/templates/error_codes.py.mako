@@ -11,7 +11,7 @@ from enum import Enum
 __all__ = ['SLSCErrors', 'SLSCWarnings']
 
 class SLSCErrors(Enum):
-    ERROR_UNKNOWN = -1
+    UNKNOWN = -1
 %for error in errors:
 % if error['code'] < 0:
     ${remove_k_prefix(convert_to_snake_case(error['symbol']).upper())} = ${error['code']}
@@ -19,7 +19,7 @@ class SLSCErrors(Enum):
 %endfor
 
 class SLSCWarnings(Enum):
-    WARNING_UNKNOWN = -1
+    UNKNOWN = -1
 %for error in errors:
 % if error['code'] > 0:
     ${remove_k_prefix(convert_to_snake_case(error['symbol']).upper())} = ${error['code']}

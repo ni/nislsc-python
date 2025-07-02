@@ -2,8 +2,10 @@
     from utilities.interpreter_helpers import convert_to_snake_case
 
     def remove_k_prefix(s: str) -> str:
-        if s.upper().startswith("K_"):
-            return s[2:]
+        if s.upper().startswith("K_ERROR"):
+            return s[8:]
+        elif s.upper().startswith("K_WARNING"):
+            return s[10:]
         return s
 %>\
 from enum import Enum

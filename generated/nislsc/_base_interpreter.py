@@ -15,11 +15,11 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_extended_error_info(self, library_handle: int, language: int) -> str:
+    def get_extended_error_info(self, library_handle: int, language: Language = Language.UNDEFINED) -> str:
         pass
 
     @abc.abstractmethod
-    def get_error_description(self, library_handle: int, status_code: int, language: int) -> str:
+    def get_error_description(self, library_handle: int, status_code: int, language: Language = Language.UNDEFINED) -> str:
         pass
 
     @abc.abstractmethod

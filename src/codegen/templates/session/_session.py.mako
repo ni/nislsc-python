@@ -1,23 +1,50 @@
 <%!
-from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_calling_class
+from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_creating_handle
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
+from utilities.docstrings_helpers import generate_docstrings
 %>\
-from nislsc._library_interpreter import LibraryInterpreter
+from nislsc._base_interpreter import BaseInterpreter
 from nislsc.command._command import Command
 from nislsc.property._property import Property
 
 class Session():
-    def __init__(self, session_handle: int, interpreter: LibraryInterpreter) -> None:
+    """Represents a session for interacting with the NI SLSC hardware.
+
+    This class manages the session handle and interpreter, and provides context management
+    and resource cleanup for SLSC sessions.
+    """
+
+    def __init__(self, session_handle: int, interpreter: BaseInterpreter) -> None:
+        """Initializes a Session instance.
+
+        Args:
+            session_handle (int): The session handle returned by the initialization function.
+            interpreter (BaseInterpreter): The interpreter instance used for communication.
+        """
         self._session_handle = session_handle
         self._interpreter = interpreter
 
-    def __enter__(self) -> Session:
+    def __enter__(self) -> "Session":
+        """Enter the runtime context related to this object.
+
+        Returns:
+            Session: The session object itself.
+        """
         return self
   
-    def __exit__(self) -> None:
+    def __exit__(self, type, value, traceback) -> None:
+        """Exit the runtime context and close the session.
+
+        Args:
+            type (Type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
+            value (BaseException | None): The exception value, if an exception was raised, otherwise None.
+            traceback (TracebackType | None): The traceback, if an exception was raised, otherwise None.
+        """
         self._interpreter.close_session(self._session_handle)
+        self._session_handle = None
 
     def __del__(self) -> None:
+        """Destructor to ensure the session is closed when the object is deleted."""
         if self._session_handle is not None:
             self._interpreter.close_session(self._session_handle)
 
@@ -26,10 +53,13 @@ class Session():
 % for parameter in function["params"]:
 % if is_capi(parameter) and is_param_input(parameter) and parameter["dataType"] == "Session" and function["name"] != "CloseSession":
     def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session")])})${get_function_return_type(function, True)}:
-% if is_calling_class(function, "PropertyReference"):
+% for docstrings in generate_docstrings(function, "Session"):
+        ${docstrings}
+% endfor
+% if is_creating_handle(function, "PropertyReference"):
         return Property(self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session", False)])}), self._interpreter)
 
-% elif is_calling_class(function, "CommandReference"):
+% elif is_creating_handle(function, "CommandReference"):
         return Command(self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session", False)])}), self._interpreter)
 
 % else:

@@ -150,6 +150,8 @@ def get_function_parameter_list(
                 ):
                     if parameter["dataType"] == "uint8[]":
                         param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
+                    elif parameter["name"] == "language":
+                        param_list.append("language: Language = Language.UNDEFINED")
                     else:
                         param_list.append(
                             f"{get_standardized_param_name(parameter)}: {PYTHON_DATATYPE_MAP.get(parameter['dataType'])}"
@@ -422,13 +424,24 @@ def is_size_unknown(function: dict) -> bool:
     return False
 
 
-def is_calling_class(functions: dict, class_name: str) -> bool:
-    """Check if the function calls a specific class."""
+def is_creating_handle(functions: dict, class_name: str) -> bool:
+    """Check if this function creates a specific handle."""
     for parameter in functions["params"]:
         if (
             is_capi(parameter)
             and parameter["dataType"] == class_name
             and is_param_output(parameter)
+        ):
+            return True
+    return False
+
+def is_defining_language(functions: dict) -> bool:
+    """Check if this function needs to define new language."""
+    for parameter in functions["params"]:
+        if (
+            is_capi(parameter)
+            and parameter["name"] == "language"
+            and is_param_input(parameter)
         ):
             return True
     return False

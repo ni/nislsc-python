@@ -543,7 +543,7 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(None, status)
         return version_c.value
 
-    def get_extended_error_info(self, library_handle: int, language: int) -> str:
+    def get_extended_error_info(self, library_handle: int, language: Language = Language.UNDEFINED) -> str:
         library_handle_c = ctypes.c_void_p(library_handle)
         language_c = ctypes.c_int32(language)
         extended_error_info_actual_size = ctypes.c_size_t()
@@ -556,7 +556,7 @@ class LibraryInterpreter(BaseInterpreter):
         extended_error_info_value = buffer.value.decode('utf-8')
         return extended_error_info_value
 
-    def get_error_description(self, library_handle: int, status_code: int, language: int) -> str:
+    def get_error_description(self, library_handle: int, status_code: int, language: Language = Language.UNDEFINED) -> str:
         library_handle_c = ctypes.c_void_p(library_handle)
         status_code_c = ctypes.c_int32(status_code)
         language_c = ctypes.c_int32(language)

@@ -1,4 +1,5 @@
 import abc
+from nislsc.constants import Language
 
 class BaseInterpreter(abc.ABC):
 
@@ -15,11 +16,11 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_extended_error_info(self, library_handle: int, language: Language = Language.UNDEFINED) -> str:
+    def get_extended_error_info(self, library_handle: int, language: Language) -> str:
         pass
 
     @abc.abstractmethod
-    def get_error_description(self, library_handle: int, status_code: int, language: Language = Language.UNDEFINED) -> str:
+    def get_error_description(self, library_handle: int, status_code: int, language: Language) -> str:
         pass
 
     @abc.abstractmethod

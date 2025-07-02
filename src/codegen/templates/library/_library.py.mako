@@ -6,6 +6,7 @@ from utilities.docstrings_helpers import generate_docstrings
 from nislsc._library_interpreter import LibraryInterpreter
 from nislsc.constants import Language
 from nislsc.session._session import Session
+from types import TracebackType
 
 class Library():
     """Represents the NI SLSC Library interface.
@@ -18,6 +19,7 @@ class Library():
 
         Args:
             version (int): The version of the library to initialize.
+            language (Language): The language to use for error messages and outputs.
         """
         self._interpreter = LibraryInterpreter()
         self._library_handle = self._interpreter.initialize_library(version or self._interpreter.get_library_version())
@@ -31,20 +33,20 @@ class Library():
         """
         return self
   
-    def __exit__(self, type, value, traceback) -> None:
+    def __exit__(self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None) -> None:
         """Exit the runtime context and finalize the library handle.
 
         Args:
-            type (Type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
+            type (type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
             value (BaseException | None): The exception value, if an exception was raised, otherwise None.
             traceback (TracebackType | None): The traceback, if an exception was raised, otherwise None.
         """
         self._interpreter.finalize_library(self._library_handle)
-        self._library_handle = None
+        self._library_handle = 0
 
     def __del__(self) -> None:
         """Destructor to ensure the library is finalized when the object is deleted."""
-        if self._library_handle is not None:
+        if self._library_handle != 0:
             self._interpreter.finalize_library(self._library_handle)
 
     @property
@@ -69,12 +71,12 @@ class Library():
 % if 'capi' in function['targets']:
 % for parameter in function["params"]:
 % if is_capi(parameter) and is_param_input(parameter) and parameter["dataType"] == "Library" and function["name"] != "FinalizeLibrary":
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library")])})${get_function_return_type(function, True)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library", True, True)])})${get_function_return_type(function, True)}:
 % for docstrings in generate_docstrings(function, "Library"):
         ${docstrings}
 % endfor
 % if is_defining_language(function):
-        language = self._language if language == Language.UNDEFINED
+        language = self._language if language == Language.UNDEFINED else language
 % endif
 % if is_creating_handle(function, "Session"):
         return Session(self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library", False)])}), self._interpreter)

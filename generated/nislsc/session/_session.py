@@ -1,6 +1,7 @@
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.command._command import Command
 from nislsc.property._property import Property
+from types import TracebackType
 
 class Session():
     """Represents a session for interacting with the NI SLSC hardware.
@@ -27,20 +28,20 @@ class Session():
         """
         return self
   
-    def __exit__(self, type, value, traceback) -> None:
+    def __exit__(self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None) -> None:
         """Exit the runtime context and close the session.
 
         Args:
-            type (Type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
+            type (type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
             value (BaseException | None): The exception value, if an exception was raised, otherwise None.
             traceback (TracebackType | None): The traceback, if an exception was raised, otherwise None.
         """
         self._interpreter.close_session(self._session_handle)
-        self._session_handle = None
+        self._session_handle = 0
 
     def __del__(self) -> None:
         """Destructor to ensure the session is closed when the object is deleted."""
-        if self._session_handle is not None:
+        if self._session_handle != 0:
             self._interpreter.close_session(self._session_handle)
 
     def abort_session(self) -> None:

@@ -4,6 +4,7 @@ from utilities.interpreter_helpers import get_python_function_name, is_capi, is_
 from utilities.docstrings_helpers import generate_docstrings
 %>\
 from nislsc._base_interpreter import BaseInterpreter
+from types import TracebackType
 
 class Property():
     """Represents a property object for NI SLSC.
@@ -30,20 +31,20 @@ class Property():
         """
         return self
   
-    def __exit__(self, type, value, traceback) -> None:
+    def __exit__(self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None) -> None:
         """Exit the runtime context and close the property handle.
 
         Args:
-            type (Type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
+            type (type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
             value (BaseException | None): The exception value, if an exception was raised, otherwise None.
             traceback (TracebackType | None): The traceback, if an exception was raised, otherwise None.
         """
         self._interpreter.close_property(self._property_handle)
-        self._property_handle = None
+        self._property_handle = 0
 
     def __del__(self) -> None:
         """Destructor to ensure the property is closed when the object is deleted."""
-        if self._property_handle is not None:
+        if self._property_handle != 0:
             self._interpreter.close_property(self._property_handle)
 
 % for function in functions:

@@ -5,6 +5,7 @@ from utilities.function_helpers import get_function_parameter_list, generate_fun
 import ctypes
 
 from nislsc._base_interpreter import BaseInterpreter
+from nislsc.constants import Language
 from nislsc.error import SLSCError, SLSCWarning
 import warnings
 
@@ -48,7 +49,7 @@ class LibraryInterpreter(BaseInterpreter):
     def check_for_error(self, library_handle: int | None, error_code: int) -> None:
         extended_error_info = ""
         if library_handle is not None:
-            extended_error_info = self.get_extended_error_info(library_handle, language=0)
+            extended_error_info = self.get_extended_error_info(library_handle, language=Language.CURRENT_THREAD_LOCALE)
         if error_code < 0:
             raise SLSCError(extended_error_info, error_code)
         elif error_code > 0:

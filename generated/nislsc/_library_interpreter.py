@@ -1,6 +1,7 @@
 import ctypes
 
 from nislsc._base_interpreter import BaseInterpreter
+from nislsc.constants import Language
 from nislsc.error import SLSCError, SLSCWarning
 import warnings
 
@@ -543,9 +544,9 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(None, status)
         return version_c.value
 
-    def get_extended_error_info(self, library_handle: int, language: Language = Language.UNDEFINED) -> str:
+    def get_extended_error_info(self, library_handle: int, language: Language) -> str:
         library_handle_c = ctypes.c_void_p(library_handle)
-        language_c = ctypes.c_int32(language)
+        language_c = ctypes.c_int32(language.value)
         extended_error_info_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetExtendedErrorInfo(library_handle_c, language_c, None, 0, ctypes.byref(extended_error_info_actual_size))
         if extended_error_info_actual_size.value <= 0:
@@ -556,10 +557,10 @@ class LibraryInterpreter(BaseInterpreter):
         extended_error_info_value = buffer.value.decode('utf-8')
         return extended_error_info_value
 
-    def get_error_description(self, library_handle: int, status_code: int, language: Language = Language.UNDEFINED) -> str:
+    def get_error_description(self, library_handle: int, status_code: int, language: Language) -> str:
         library_handle_c = ctypes.c_void_p(library_handle)
         status_code_c = ctypes.c_int32(status_code)
-        language_c = ctypes.c_int32(language)
+        language_c = ctypes.c_int32(language.value)
         error_description_actual_size = ctypes.c_size_t()
         status = lib.niSLSC_GetErrorDescription(library_handle_c, status_code_c, language_c, None, 0, ctypes.byref(error_description_actual_size))
         if error_description_actual_size.value <= 0:
@@ -2329,7 +2330,7 @@ class LibraryInterpreter(BaseInterpreter):
     def check_for_error(self, library_handle: int | None, error_code: int) -> None:
         extended_error_info = ""
         if library_handle is not None:
-            extended_error_info = self.get_extended_error_info(library_handle, language=0)
+            extended_error_info = self.get_extended_error_info(library_handle, language=Language.CURRENT_THREAD_LOCALE)
         if error_code < 0:
             raise SLSCError(extended_error_info, error_code)
         elif error_code > 0:

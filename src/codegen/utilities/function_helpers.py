@@ -134,7 +134,7 @@ def get_ctypes_argtypes(function: dict) -> list[str]:
 
 
 def get_function_parameter_list(
-    function: dict, class_name: str = None, typing: bool = True
+    function: dict, class_name: str = None, typing: bool = True, is_language: bool = False
 ) -> list[str]:
     """Generate a list of function parameters for a Python API function."""
     param_list = []
@@ -150,8 +150,10 @@ def get_function_parameter_list(
                 ):
                     if parameter["dataType"] == "uint8[]":
                         param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
-                    elif parameter["name"] == "language":
+                    elif parameter["name"] == "language" and is_language:
                         param_list.append("language: Language = Language.UNDEFINED")
+                    elif parameter["dataType"] == "enum" and parameter["name"] == "language":
+                        param_list.append("language: Language")
                     else:
                         param_list.append(
                             f"{get_standardized_param_name(parameter)}: {PYTHON_DATATYPE_MAP.get(parameter['dataType'])}"
@@ -274,6 +276,10 @@ def generate_variable_declaration(function: dict) -> list[str]:
                 if parameter["dataType"] in STRING_LIST:
                     var_list.append(
                         f"{get_standardized_param_name(parameter)}_bytes = {get_standardized_param_name(parameter)}.encode('utf-8')"
+                    )
+                elif parameter["name"] == "language":
+                    var_list.append(
+                        f"{get_standardized_param_name(parameter)}_c = {get_param_datatype_in_ctypes(parameter)}({get_standardized_param_name(parameter)}.value)"
                     )
                 else:
                     var_list.append(
@@ -435,14 +441,11 @@ def is_creating_handle(functions: dict, class_name: str) -> bool:
             return True
     return False
 
+
 def is_defining_language(functions: dict) -> bool:
     """Check if this function needs to define new language."""
     for parameter in functions["params"]:
-        if (
-            is_capi(parameter)
-            and parameter["name"] == "language"
-            and is_param_input(parameter)
-        ):
+        if is_capi(parameter) and parameter["name"] == "language" and is_param_input(parameter):
             return True
     return False
 
@@ -491,7 +494,7 @@ def generate_return_parameter(function: dict) -> list[str]:
                     "Session",
                     "CommandReference",
                     "PropertyReference",
-                    ):
+                ):
                     ret_list.append(f"{get_standardized_param_name(parameter)}_c.value or 0")
 
                 else:

@@ -1,4 +1,6 @@
 from nislsc._library_interpreter import LibraryInterpreter
+from nislsc.command._command import Command
+from nislsc.property._property import Property
 
 class Session():
     def __init__(self, session_handle: int, interpreter: LibraryInterpreter) -> None:
@@ -450,24 +452,24 @@ class Session():
     def commit_scaling_for_devices(self, device_names: str) -> None:
         return self._interpreter.commit_scaling_for_devices(self._session_handle, device_names)
 
-    def open_device_command(self, device_name: str, command_name: str) -> int | None:
+    def open_device_command(self, device_name: str, command_name: str) -> Command:
         return Command(self._interpreter.open_device_command(self._session_handle, device_name, command_name), self._interpreter)
 
-    def open_physical_channel_command(self, physical_channel_names: str, command_name: str) -> int | None:
+    def open_physical_channel_command(self, physical_channel_names: str, command_name: str) -> Command:
         return Command(self._interpreter.open_physical_channel_command(self._session_handle, physical_channel_names, command_name), self._interpreter)
 
-    def open_generic_command(self, resource: str, command_name: str) -> int | None:
+    def open_generic_command(self, resource: str, command_name: str) -> Command:
         return Command(self._interpreter.open_generic_command(self._session_handle, resource, command_name), self._interpreter)
 
-    def open_device_property(self, device_name: str, property_name: str) -> int | None:
+    def open_device_property(self, device_name: str, property_name: str) -> Property:
         return Property(self._interpreter.open_device_property(self._session_handle, device_name, property_name), self._interpreter)
 
-    def open_physical_channel_property(self, physical_channel_names: str, property_name: str) -> int | None:
+    def open_physical_channel_property(self, physical_channel_names: str, property_name: str) -> Property:
         return Property(self._interpreter.open_physical_channel_property(self._session_handle, physical_channel_names, property_name), self._interpreter)
 
-    def open_driver_defined_property(self, property_name: str) -> int | None:
+    def open_driver_defined_property(self, property_name: str) -> Property:
         return Property(self._interpreter.open_driver_defined_property(self._session_handle, property_name), self._interpreter)
 
-    def open_generic_property(self, resource: str, property_name: str) -> int | None:
+    def open_generic_property(self, resource: str, property_name: str) -> Property:
         return Property(self._interpreter.open_generic_property(self._session_handle, resource, property_name), self._interpreter)
 

@@ -3,7 +3,7 @@ import abc
 class BaseInterpreter(abc.ABC):
 
     @abc.abstractmethod
-    def initialize_library(self, version: int) -> int | None:
+    def initialize_library(self, version: int) -> int:
         pass
 
     @abc.abstractmethod
@@ -31,19 +31,19 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         pass
 
     @abc.abstractmethod
-    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         pass
 
     @abc.abstractmethod
-    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         pass
 
     @abc.abstractmethod
-    def initialize_session_without_resources(self, library_handle: int) -> int | None:
+    def initialize_session_without_resources(self, library_handle: int) -> int:
         pass
 
     @abc.abstractmethod
@@ -631,15 +631,15 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def open_device_command(self, session_handle: int, device_name: str, command_name: str) -> int | None:
+    def open_device_command(self, session_handle: int, device_name: str, command_name: str) -> int:
         pass
 
     @abc.abstractmethod
-    def open_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str) -> int | None:
+    def open_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str) -> int:
         pass
 
     @abc.abstractmethod
-    def open_generic_command(self, session_handle: int, resource: str, command_name: str) -> int | None:
+    def open_generic_command(self, session_handle: int, resource: str, command_name: str) -> int:
         pass
 
     @abc.abstractmethod
@@ -651,19 +651,19 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def open_device_property(self, session_handle: int, device_name: str, property_name: str) -> int | None:
+    def open_device_property(self, session_handle: int, device_name: str, property_name: str) -> int:
         pass
 
     @abc.abstractmethod
-    def open_physical_channel_property(self, session_handle: int, physical_channel_names: str, property_name: str) -> int | None:
+    def open_physical_channel_property(self, session_handle: int, physical_channel_names: str, property_name: str) -> int:
         pass
 
     @abc.abstractmethod
-    def open_driver_defined_property(self, session_handle: int, property_name: str) -> int | None:
+    def open_driver_defined_property(self, session_handle: int, property_name: str) -> int:
         pass
 
     @abc.abstractmethod
-    def open_generic_property(self, session_handle: int, resource: str, property_name: str) -> int | None:
+    def open_generic_property(self, session_handle: int, resource: str, property_name: str) -> int:
         pass
 
     @abc.abstractmethod

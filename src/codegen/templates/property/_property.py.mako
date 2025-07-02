@@ -23,7 +23,7 @@ class Property():
 % if 'capi' in function['targets']:
 % for parameter in function["params"]:
 % if is_capi(parameter) and is_param_input(parameter) and parameter["dataType"] == "PropertyReference" and function["name"] != "CloseProperty":
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "PropertyReference")])})${get_function_return_type(function)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "PropertyReference")])})${get_function_return_type(function, True)}:
         return self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "PropertyReference", False)])})
 
 % endif

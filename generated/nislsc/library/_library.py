@@ -1,8 +1,9 @@
 from nislsc._library_interpreter import LibraryInterpreter
 from nislsc.constants import Language
+from nislsc.session._session import Session
 
 class Library():
-    def __init__(self, version) -> None:
+    def __init__(self, version: int) -> None:
         self._interpreter = LibraryInterpreter()
         self._library_handle = self._interpreter.initialize_library(self._interpreter.get_library_version())
         self._language = Language.CURRENT_THREAD_LOCALE
@@ -23,15 +24,15 @@ class Library():
     def get_error_description(self, status_code: int, language: int) -> str:
         return self._interpreter.get_error_description(self._library_handle, status_code, language)
 
-    def initialize_session_with_devices(self, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_devices(self, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
         return Session(self._interpreter.initialize_session_with_devices(self._library_handle, device_names, connection_timeout, reservation_access, reservation_group, reservation_timeout), self._interpreter)
 
-    def initialize_session_with_nvmem_areas(self, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_nvmem_areas(self, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
         return Session(self._interpreter.initialize_session_with_nvmem_areas(self._library_handle, nvmem_area_names, connection_timeout, reservation_access, reservation_group, reservation_timeout), self._interpreter)
 
-    def initialize_session_with_physical_channels(self, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_physical_channels(self, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
         return Session(self._interpreter.initialize_session_with_physical_channels(self._library_handle, physical_channel_names, connection_timeout, reservation_access, reservation_group, reservation_timeout), self._interpreter)
 
-    def initialize_session_without_resources(self) -> int | None:
+    def initialize_session_without_resources(self) -> Session:
         return Session(self._interpreter.initialize_session_without_resources(self._library_handle), self._interpreter)
 

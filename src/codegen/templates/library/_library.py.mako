@@ -4,9 +4,10 @@ from utilities.interpreter_helpers import get_python_function_name, is_capi, is_
 %>\
 from nislsc._library_interpreter import LibraryInterpreter
 from nislsc.constants import Language
+from nislsc.session._session import Session
 
 class Library():
-    def __init__(self, version) -> None:
+    def __init__(self, version: int) -> None:
         self._interpreter = LibraryInterpreter()
         self._library_handle = self._interpreter.initialize_library(self._interpreter.get_library_version())
         self._language = Language.CURRENT_THREAD_LOCALE
@@ -25,7 +26,7 @@ class Library():
 % if 'capi' in function['targets']:
 % for parameter in function["params"]:
 % if is_capi(parameter) and is_param_input(parameter) and parameter["dataType"] == "Library" and function["name"] != "FinalizeLibrary":
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library")])})${get_function_return_type(function)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library")])})${get_function_return_type(function, True)}:
 % if is_calling_class(function, "Session"):
         return Session(self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library", False)])}), self._interpreter)
 

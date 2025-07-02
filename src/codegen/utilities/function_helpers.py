@@ -6,6 +6,7 @@ context of generating C API bindings for the NI-SLSC API.
 """
 
 from utilities.interpreter_helpers import (
+    convert_to_class_name,
     get_param_datatype_in_ctypes,
     get_standardized_param_name,
     is_capi,
@@ -132,14 +133,21 @@ def get_ctypes_argtypes(function: dict) -> list[str]:
     return arg_list
 
 
-def get_function_parameter_list(function: dict, class_name: str = None, typing: bool = True) -> list[str]:
+def get_function_parameter_list(
+    function: dict, class_name: str = None, typing: bool = True
+) -> list[str]:
     """Generate a list of function parameters for a Python API function."""
     param_list = []
     if "capi" in function["targets"]:
         if typing:
             param_list.append("self")
             for parameter in function["params"]:
-                if is_capi(parameter) and is_param_input(parameter) and "Size" not in parameter["name"] and parameter["dataType"] != class_name:
+                if (
+                    is_capi(parameter)
+                    and is_param_input(parameter)
+                    and "Size" not in parameter["name"]
+                    and parameter["dataType"] != class_name
+                ):
                     if parameter["dataType"] == "uint8[]":
                         param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
                     else:
@@ -154,35 +162,47 @@ def get_function_parameter_list(function: dict, class_name: str = None, typing: 
                     param_list.append(f"num_{get_standardized_param_name(parameter)}: int")
         else:
             for parameter in function["params"]:
-                if is_capi(parameter) and is_param_input(parameter) and "Size" not in parameter["name"]:
+                if (
+                    is_capi(parameter)
+                    and is_param_input(parameter)
+                    and "Size" not in parameter["name"]
+                ):
                     if parameter["dataType"] == "uint8[]":
                         param_list.append(f"{get_standardized_param_name(parameter)}s_data")
                     elif parameter["dataType"] == class_name:
                         param_list.append(f"self._{get_standardized_param_name(parameter)}")
                     else:
-                        param_list.append(
-                            f"{get_standardized_param_name(parameter)}"
-                        )
+                        param_list.append(f"{get_standardized_param_name(parameter)}")
                 elif (
                     is_capi(parameter)
                     and is_param_output(parameter)
                     and parameter["dataType"] == "uint8[]"
                 ):
-                    param_list.append(f"num_{get_standardized_param_name(parameter)}")            
+                    param_list.append(f"num_{get_standardized_param_name(parameter)}")
     return param_list
 
 
-def get_function_return_type(function: dict) -> str:
+def get_function_return_type(function: dict, return_object: bool = False) -> str:
     """Generate the return type for a Python API function."""
     num = 0
     if "capi" in function["targets"]:
         param_list = []
         for parameter in function["params"]:
-            if is_capi(parameter) and is_param_output(parameter):
-                param_list.append(
-                    f"{PYTHON_DATATYPE_MAP.get(parameter['dataType'])}{' | None' if parameter['dataType'] in ('Library', 'Session', 'CommandReference', 'PropertyReference') else ''}"
-                )
+            if is_capi(parameter) and is_param_output(parameter) and return_object:
+                if parameter["dataType"] in (
+                    "Library",
+                    "Session",
+                    "CommandReference",
+                    "PropertyReference",
+                ):
+                    return f" -> {convert_to_class_name(parameter['dataType'])}"
+                else:
+                    param_list.append(f"{PYTHON_DATATYPE_MAP.get(parameter['dataType'])}")
+                    num += 1
+            elif is_capi(parameter) and is_param_output(parameter):
+                param_list.append(f"{PYTHON_DATATYPE_MAP.get(parameter['dataType'])}")
                 num += 1
+
     if num == 0:
         return " -> None"
     elif num == 1:
@@ -401,10 +421,15 @@ def is_size_unknown(function: dict) -> bool:
                 return True
     return False
 
+
 def is_calling_class(functions: dict, class_name: str) -> bool:
     """Check if the function calls a specific class."""
     for parameter in functions["params"]:
-        if is_capi(parameter) and parameter["dataType"] == class_name and is_param_output(parameter):
+        if (
+            is_capi(parameter)
+            and parameter["dataType"] == class_name
+            and is_param_output(parameter)
+        ):
             return True
     return False
 
@@ -448,6 +473,14 @@ def generate_return_parameter(function: dict) -> list[str]:
             else:
                 if parameter["dataType"] in STRING_LIST:
                     ret_list.append(f"{get_standardized_param_name(parameter)}_value")
+                elif parameter["dataType"] in (
+                    "Library",
+                    "Session",
+                    "CommandReference",
+                    "PropertyReference",
+                    ):
+                    ret_list.append(f"{get_standardized_param_name(parameter)}_c.value or 0")
+
                 else:
                     ret_list.append(f"{get_standardized_param_name(parameter)}_c.value")
 

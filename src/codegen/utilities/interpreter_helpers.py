@@ -32,6 +32,13 @@ NAME_EXPANSION = {
     "propertyRefOut": "propertyHandle",
 }
 
+CLASSNAME_MAP = {
+    "Session": "Session",
+    "Library": "Library",
+    "CommandReference": "Command",
+    "PropertyReference": "Property",
+}
+
 DATATYPE_MAP = {
     "uint8": "ctypes.c_uint8",
     "uint16": "ctypes.c_uint16",
@@ -70,6 +77,11 @@ def convert_to_snake_case(name: str) -> str:
     for regex in INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES:
         name = regex.sub(r"\1_\2", name)
     return name.lower().replace("u_int", "uint")
+
+
+def convert_to_class_name(name: str) -> str:
+    """Convert a property to its corresponding class name."""
+    return CLASSNAME_MAP.get(name)
 
 
 def is_param_input(param: dict) -> bool:

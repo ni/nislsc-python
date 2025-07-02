@@ -3,6 +3,8 @@ from utilities.function_helpers import get_function_parameter_list, get_function
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 %>\
 from nislsc._library_interpreter import LibraryInterpreter
+from nislsc.command._command import Command
+from nislsc.property._property import Property
 
 class Session():
     def __init__(self, session_handle: int, interpreter: LibraryInterpreter) -> None:
@@ -23,7 +25,7 @@ class Session():
 % if 'capi' in function['targets']:
 % for parameter in function["params"]:
 % if is_capi(parameter) and is_param_input(parameter) and parameter["dataType"] == "Session" and function["name"] != "CloseSession":
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session")])})${get_function_return_type(function)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session")])})${get_function_return_type(function, True)}:
 % if is_calling_class(function, "PropertyReference"):
         return Property(self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session", False)])}), self._interpreter)
 

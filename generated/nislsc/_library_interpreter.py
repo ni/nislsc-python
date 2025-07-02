@@ -524,12 +524,12 @@ lib.niSLSC_GetPropertyPropertyStringArray.argtypes = [ctypes.c_void_p, ctypes.c_
 
 class LibraryInterpreter(BaseInterpreter):
 
-    def initialize_library(self, version: int) -> int | None:
+    def initialize_library(self, version: int) -> int:
         version_c = ctypes.c_uint32(version)
         library_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_InitializeLibrary(version_c, ctypes.byref(library_handle_c))
         self.check_for_error(None, status)
-        return library_handle_c.value
+        return library_handle_c.value or 0
 
     def finalize_library(self, library_handle: int) -> None:
         library_handle_c = ctypes.c_void_p(library_handle)
@@ -600,7 +600,7 @@ class LibraryInterpreter(BaseInterpreter):
             names_out_array.append(ctypes.string_at(names_out_ptr[i]).decode('utf-8'))
         return names_out_array
 
-    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         library_handle_c = ctypes.c_void_p(library_handle)
         session_handle_c = ctypes.c_void_p()
         device_names_bytes = device_names.encode('utf-8')
@@ -610,9 +610,9 @@ class LibraryInterpreter(BaseInterpreter):
         reservation_timeout_c = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithDevices(library_handle_c, ctypes.byref(session_handle_c), device_names_bytes, connection_timeout_c, reservation_access_c, reservation_group_bytes, reservation_timeout_c)
         self.check_for_error(library_handle_c.value, status)
-        return session_handle_c.value
+        return session_handle_c.value or 0
 
-    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         library_handle_c = ctypes.c_void_p(library_handle)
         session_handle_c = ctypes.c_void_p()
         nvmem_area_names_bytes = nvmem_area_names.encode('utf-8')
@@ -622,9 +622,9 @@ class LibraryInterpreter(BaseInterpreter):
         reservation_timeout_c = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithNVMEMAreas(library_handle_c, ctypes.byref(session_handle_c), nvmem_area_names_bytes, connection_timeout_c, reservation_access_c, reservation_group_bytes, reservation_timeout_c)
         self.check_for_error(library_handle_c.value, status)
-        return session_handle_c.value
+        return session_handle_c.value or 0
 
-    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int | None:
+    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
         library_handle_c = ctypes.c_void_p(library_handle)
         session_handle_c = ctypes.c_void_p()
         physical_channel_names_bytes = physical_channel_names.encode('utf-8')
@@ -634,14 +634,14 @@ class LibraryInterpreter(BaseInterpreter):
         reservation_timeout_c = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithPhysicalChannels(library_handle_c, ctypes.byref(session_handle_c), physical_channel_names_bytes, connection_timeout_c, reservation_access_c, reservation_group_bytes, reservation_timeout_c)
         self.check_for_error(library_handle_c.value, status)
-        return session_handle_c.value
+        return session_handle_c.value or 0
 
-    def initialize_session_without_resources(self, library_handle: int) -> int | None:
+    def initialize_session_without_resources(self, library_handle: int) -> int:
         library_handle_c = ctypes.c_void_p(library_handle)
         session_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_InitializeSessionWithoutResources(library_handle_c, ctypes.byref(session_handle_c))
         self.check_for_error(library_handle_c.value, status)
-        return session_handle_c.value
+        return session_handle_c.value or 0
 
     def close_session(self, session_handle: int) -> None:
         session_handle_c = ctypes.c_void_p(session_handle)
@@ -2180,32 +2180,32 @@ class LibraryInterpreter(BaseInterpreter):
         self.check_for_error(None, status)
         return 
 
-    def open_device_command(self, session_handle: int, device_name: str, command_name: str) -> int | None:
+    def open_device_command(self, session_handle: int, device_name: str, command_name: str) -> int:
         session_handle_c = ctypes.c_void_p(session_handle)
         device_name_bytes = device_name.encode('utf-8')
         command_name_bytes = command_name.encode('utf-8')
         command_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_OpenDeviceCommand(session_handle_c, device_name_bytes, command_name_bytes, ctypes.byref(command_handle_c))
         self.check_for_error(None, status)
-        return command_handle_c.value
+        return command_handle_c.value or 0
 
-    def open_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str) -> int | None:
+    def open_physical_channel_command(self, session_handle: int, physical_channel_names: str, command_name: str) -> int:
         session_handle_c = ctypes.c_void_p(session_handle)
         physical_channel_names_bytes = physical_channel_names.encode('utf-8')
         command_name_bytes = command_name.encode('utf-8')
         command_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_OpenPhysicalChannelCommand(session_handle_c, physical_channel_names_bytes, command_name_bytes, ctypes.byref(command_handle_c))
         self.check_for_error(None, status)
-        return command_handle_c.value
+        return command_handle_c.value or 0
 
-    def open_generic_command(self, session_handle: int, resource: str, command_name: str) -> int | None:
+    def open_generic_command(self, session_handle: int, resource: str, command_name: str) -> int:
         session_handle_c = ctypes.c_void_p(session_handle)
         resource_bytes = resource.encode('utf-8')
         command_name_bytes = command_name.encode('utf-8')
         command_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_OpenGenericCommand(session_handle_c, resource_bytes, command_name_bytes, ctypes.byref(command_handle_c))
         self.check_for_error(None, status)
-        return command_handle_c.value
+        return command_handle_c.value or 0
 
     def close_command(self, command_handle: int) -> None:
         command_handle_c = ctypes.c_void_p(command_handle)
@@ -2226,40 +2226,40 @@ class LibraryInterpreter(BaseInterpreter):
         property_value_value = buffer.value.decode('utf-8')
         return property_value_value
 
-    def open_device_property(self, session_handle: int, device_name: str, property_name: str) -> int | None:
+    def open_device_property(self, session_handle: int, device_name: str, property_name: str) -> int:
         session_handle_c = ctypes.c_void_p(session_handle)
         device_name_bytes = device_name.encode('utf-8')
         property_name_bytes = property_name.encode('utf-8')
         property_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_OpenDeviceProperty(session_handle_c, device_name_bytes, property_name_bytes, ctypes.byref(property_handle_c))
         self.check_for_error(None, status)
-        return property_handle_c.value
+        return property_handle_c.value or 0
 
-    def open_physical_channel_property(self, session_handle: int, physical_channel_names: str, property_name: str) -> int | None:
+    def open_physical_channel_property(self, session_handle: int, physical_channel_names: str, property_name: str) -> int:
         session_handle_c = ctypes.c_void_p(session_handle)
         physical_channel_names_bytes = physical_channel_names.encode('utf-8')
         property_name_bytes = property_name.encode('utf-8')
         property_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_OpenPhysicalChannelProperty(session_handle_c, physical_channel_names_bytes, property_name_bytes, ctypes.byref(property_handle_c))
         self.check_for_error(None, status)
-        return property_handle_c.value
+        return property_handle_c.value or 0
 
-    def open_driver_defined_property(self, session_handle: int, property_name: str) -> int | None:
+    def open_driver_defined_property(self, session_handle: int, property_name: str) -> int:
         session_handle_c = ctypes.c_void_p(session_handle)
         property_name_bytes = property_name.encode('utf-8')
         property_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_OpenDriverDefinedProperty(session_handle_c, property_name_bytes, ctypes.byref(property_handle_c))
         self.check_for_error(None, status)
-        return property_handle_c.value
+        return property_handle_c.value or 0
 
-    def open_generic_property(self, session_handle: int, resource: str, property_name: str) -> int | None:
+    def open_generic_property(self, session_handle: int, resource: str, property_name: str) -> int:
         session_handle_c = ctypes.c_void_p(session_handle)
         resource_bytes = resource.encode('utf-8')
         property_name_bytes = property_name.encode('utf-8')
         property_handle_c = ctypes.c_void_p()
         status = lib.niSLSC_OpenGenericProperty(session_handle_c, resource_bytes, property_name_bytes, ctypes.byref(property_handle_c))
         self.check_for_error(None, status)
-        return property_handle_c.value
+        return property_handle_c.value or 0
 
     def close_property(self, property_handle: int) -> None:
         property_handle_c = ctypes.c_void_p(property_handle)

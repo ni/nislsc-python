@@ -22,7 +22,7 @@ class NISLSC():
         Returns:
             int: The library handle.
         """
-        return Library(self._interpreter, version or self._interpreter.get_library_version(), language)
+        return Library(self._interpreter.initialize_library(version or self._interpreter.get_library_version()), self._interpreter, language)
 
     def flatten_names(self, names_in: list[str]) -> str:
         """Converts an array of device, NVMEM area, or physical channel names into a comma-delimited list of names.

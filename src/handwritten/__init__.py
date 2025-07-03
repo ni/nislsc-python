@@ -1,6 +1,3 @@
-from nislsc.command import Command
-from nislsc.library import Library
-from nislsc.property import Property
-from nislsc.session import Session
+from nislsc._nislsc import NISLSC
 
-__all__ = ["Command", "Library", "Property", "Session"]
+__all__ = ["Command", "Library", "Property", "Session", "NISLSC"]

@@ -34,7 +34,7 @@ class NISLSC():
         Returns:
             int: The library handle.
         """
-        return Library(self._interpreter, version or self._interpreter.get_library_version(), language)
+        return Library(self._interpreter.initialize_library(version or self._interpreter.get_library_version()), self._interpreter, language)
 
 % for function in functions:
 % if 'capi' in function['targets']:

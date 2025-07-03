@@ -14,16 +14,16 @@ class Library():
     This class manages the library handle and interpreter, and provides methods
     for session initialization, error handling, and resource management.
     """
-    def __init__(self, interpreter: BaseInterpreter, version: int = 0, language: Language = Language.CURRENT_THREAD_LOCALE) -> None:
+    def __init__(self, library_handle: int, interpreter: BaseInterpreter, language: Language = Language.CURRENT_THREAD_LOCALE) -> None:
         """Initializes a Library instance.
 
         Args:
-            interpreter (LibraryInterpreter): The interpreter for the SLSC library.
-            version (int): The version of the library to initialize.
+            library_handle (int): The library handle returned by the initialization function.
+            interpreter (BaseInterpreter): The interpreter instance used for communication.
             language (Language): The language to use for error messages and outputs.
         """
+        self._library_handle = library_handle
         self._interpreter = interpreter
-        self._library_handle = self._interpreter.initialize_library(version or self._interpreter.get_library_version())
         self._language = language
 
     def __enter__(self) -> "Library":

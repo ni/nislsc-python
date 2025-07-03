@@ -136,7 +136,17 @@ def get_ctypes_argtypes(function: dict) -> list[str]:
 def get_function_parameter_list(
     function: dict, class_name: str = None, typing: bool = True, is_language: bool = False
 ) -> list[str]:
-    """Generate a list of function parameters for a Python API function."""
+    """Generate a list of function parameters for a Python API function.
+    
+    Args:
+        function (dict): The function definition containing parameters and targets.
+        class_name (str, optional): The name of the class for which the function is defined, used to avoid repeating the self variable.
+        typing (bool, optional): If True, include type hints in the parameter list.
+        is_language (bool, optional): If True, include the language argument with a default value of Language.UNDEFINED.
+
+    Returns:
+        list[str]: A list of parameter strings for the function definition.
+    """
     param_list = []
     if "capi" in function["targets"]:
         if typing:

@@ -26,7 +26,7 @@ class NISLSC():
         self._interpreter = LibraryInterpreter()
 
     def __enter__(self) -> "NISLSC":
-        """Enter the runtime context related to this object.
+        """Enter the runtime context related to this object."""
         return self
         
     def __exit__(self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None) -> None:

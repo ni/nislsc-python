@@ -1,6 +1,7 @@
 from nislsc._library_interpreter import LibraryInterpreter
 from nislsc.library._library import Library
 from nislsc.constants import Language
+from types import TracebackType
 
 class NISLSC():
     """Represents the NI SLSC interface.
@@ -11,6 +12,14 @@ class NISLSC():
     def __init__(self) -> None:
         """Initializes the SLSC interface."""
         self._interpreter = LibraryInterpreter()
+
+    def __enter__(self) -> "NISLSC":
+        """Enter the runtime context related to this object.
+        return self
+        
+    def __exit__(self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None) -> None:
+        """Exit the runtime context."""
+        pass
 
     def initialize_library(self, version: int = 0, language: Language = Language.CURRENT_THREAD_LOCALE) -> Library:
         """Initializes the SLSC library.

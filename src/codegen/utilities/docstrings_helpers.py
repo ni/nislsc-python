@@ -21,7 +21,7 @@ CLASS_DOCSTRINGS_MAP = {
 }
 
 
-def wrap_text(text, width=72):
+def wrap_text(text: str, width: int = 72) -> list[str]:
     """Wraps text at a given width."""
     words = text.split()
     lines = []
@@ -37,7 +37,7 @@ def wrap_text(text, width=72):
     return lines
 
 
-def generate_docstrings(function, ignore_type):
+def generate_docstrings(function: dict, ignore_type: str = "") -> list[str]:
     """Generate a Google style docstring for a function."""
     docstrings = []
     for doc in generate_doc(function):
@@ -54,7 +54,7 @@ def generate_docstrings(function, ignore_type):
     return docstrings
 
 
-def generate_doc(function):
+def generate_doc(function: dict) -> list[str]:
     """Generate the summary and description part of the docstring."""
     doc = []
     doc_lines = function["doc"].splitlines()
@@ -68,7 +68,7 @@ def generate_doc(function):
     return doc
 
 
-def generate_args(function, ignore_type):
+def generate_args(function: dict, ignore_type: str) -> list[str]:
     """Generate the Args section of the docstring."""
     args = []
     if is_inputting_something(function, ignore_type):
@@ -83,7 +83,7 @@ def generate_args(function, ignore_type):
     return args
 
 
-def generate_returns(function):
+def generate_returns(function: dict) -> list[str]:
     """Generate the Returns section of the docstring."""
     returns = []
     if is_returning_something(function):
@@ -104,7 +104,7 @@ def generate_returns(function):
     return returns
 
 
-def is_returning_something(function):
+def is_returning_something(function: dict) -> bool:
     """Check if the function returns something."""
     for param in function["params"]:
         if is_capi(param) and is_param_output(param):
@@ -112,7 +112,7 @@ def is_returning_something(function):
     return False
 
 
-def is_inputting_something(function, ignore_type=None):
+def is_inputting_something(function: dict, ignore_type: str = "") -> bool:
     """Check if the function has input parameters (excluding ignore_type)."""
     for param in function["params"]:
         if is_capi(param) and is_param_input(param) and param["dataType"] != ignore_type:

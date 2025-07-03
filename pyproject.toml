@@ -30,6 +30,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
   "Topic :: System :: Hardware :: Hardware Drivers",
 ]
+packages = [{ include = "nislsc", from = "generated" }]
 
 
 [tool.poetry.dependencies]

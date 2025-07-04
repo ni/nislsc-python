@@ -9,16 +9,18 @@ from types import TracebackType
 class Property():
     """Represents a property object for NI SLSC.
 
-    This class manages the property handle and interpreter, and provides context
-    management and resource cleanup for SLSC properties.
+    This class manages the property handle and interpreter, and provides
+    context management and resource cleanup for SLSC properties.
     """
 
     def __init__(self, property_handle: int, interpreter: BaseInterpreter) -> None:
         """Initializes a Property instance.
 
         Args:
-            property_handle (int): The property handle returned by the initialization function.
-            interpreter (BaseInterpreter): The interpreter instance used for communication.
+            property_handle (int): The property handle returned by the
+                initialization function.
+            interpreter (BaseInterpreter): The interpreter instance used for
+                communication.
         """
         self._property_handle = property_handle
         self._interpreter = interpreter
@@ -35,15 +37,20 @@ class Property():
         """Exit the runtime context and close the property handle.
 
         Args:
-            type (type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
-            value (BaseException | None): The exception value, if an exception was raised, otherwise None.
-            traceback (TracebackType | None): The traceback, if an exception was raised, otherwise None.
+            type (type[BaseException] | None): The exception type, if an
+                exception was raised, otherwise None.
+            value (BaseException | None): The exception value, if an exception
+                was raised, otherwise None.
+            traceback (TracebackType | None): The traceback, if an exception was
+                raised, otherwise None.
         """
         self._interpreter.close_property(self._property_handle)
         self._property_handle = 0
 
     def __del__(self) -> None:
-        """Destructor to ensure the property is closed when the object is deleted."""
+        """Destructor to ensure the property is closed when the object is
+        deleted.
+        """
         if self._property_handle != 0:
             self._interpreter.close_property(self._property_handle)
 

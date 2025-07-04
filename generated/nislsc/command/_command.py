@@ -4,15 +4,17 @@ from types import TracebackType
 class Command():
     """Represents a command object for NI SLSC.
 
-    This class manages the command handle and interpreter, and provides context
-    management and resource cleanup for SLSC commands.
+    This class manages the command handle and interpreter, and provides 
+    context management and resource cleanup for SLSC commands.
     """
     def __init__(self, command_handle: int, interpreter: BaseInterpreter) -> None:
         """Initializes a Command instance.
 
         Args:
-            command_handle (int): The command handle returned by the initialization function.
-            interpreter (BaseInterpreter): The interpreter instance used for communication.
+            command_handle (int): The command handle returned by the
+                initialization function.
+            interpreter (BaseInterpreter): The interpreter instance used for
+                communication.
         """
         self._command_handle = command_handle
         self._interpreter = interpreter
@@ -29,15 +31,20 @@ class Command():
         """Exit the runtime context and close the command handle.
         
         Args:
-            type (type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
-            value (BaseException | None): The exception value, if an exception was raised, otherwise None.
-            traceback (TracebackType | None): The traceback, if an exception was raised, otherwise None.
+            type (type[BaseException] | None): The exception type, if an
+                exception was raised, otherwise None.
+            value (BaseException | None): The exception value, if an exception
+                was raised, otherwise None.
+            traceback (TracebackType | None): The traceback, if an exception was
+                raised, otherwise None.
         """
         self._interpreter.close_command(self._command_handle)
         self._command_handle = 0
 
     def __del__(self) -> None:
-        """Destructor to ensure the command is closed when the object is deleted."""
+        """Destructor to ensure the command is closed when the object is
+        deleted.
+        """
         if self._command_handle != 0:
             self._interpreter.close_command(self._command_handle)
 

@@ -13,8 +13,8 @@ class Session():
         """Initializes a Session instance.
 
         Args:
-            session_handle (int): The session handle returned by the initialization 
-                function.
+            session_handle (int): The session handle returned by the
+                initialization function.
             interpreter (BaseInterpreter): The interpreter instance used for
                 communication.
         """
@@ -33,10 +33,10 @@ class Session():
         """Exit the runtime context and close the session.
 
         Args:
-            type (type[BaseException] | None): The exception type, if an exception
+            type (type[BaseException] | None): The exception type, if an
+                exception was raised, otherwise None.
+            value (BaseException | None): The exception value, if an exception
                 was raised, otherwise None.
-            value (BaseException | None): The exception value, if an exception was 
-                raised, otherwise None.
             traceback (TracebackType | None): The traceback, if an exception was
                 raised, otherwise None.
         """

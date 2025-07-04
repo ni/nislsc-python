@@ -6,16 +6,20 @@ from types import TracebackType
 class Library():
     """Represents the NI SLSC Library interface.
 
-    This class manages the library handle and interpreter, and provides methods
-    for session initialization, error handling, and resource management.
+    This class manages the library handle and interpreter, and provides
+    methods for session initialization, error handling, and resource
+    management.
     """
     def __init__(self, library_handle: int, interpreter: BaseInterpreter, language: Language = Language.CURRENT_THREAD_LOCALE) -> None:
         """Initializes a Library instance.
 
         Args:
-            library_handle (int): The library handle returned by the initialization function.
-            interpreter (BaseInterpreter): The interpreter instance used for communication.
-            language (Language): The language to use for error messages and outputs.
+            library_handle (int): The library handle returned by the
+                initialization function.
+            interpreter (BaseInterpreter): The interpreter instance used for
+                communication.
+            language (Language): The language to use for error messages and
+                outputs.
         """
         self._library_handle = library_handle
         self._interpreter = interpreter
@@ -33,15 +37,20 @@ class Library():
         """Exit the runtime context and finalize the library handle.
 
         Args:
-            type (type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
-            value (BaseException | None): The exception value, if an exception was raised, otherwise None.
-            traceback (TracebackType | None): The traceback, if an exception was raised, otherwise None.
+            type (type[BaseException] | None): The exception type, if an
+                exception was raised, otherwise None.
+            value (BaseException | None): The exception value, if an exception
+                was raised, otherwise None.
+            traceback (TracebackType | None): The traceback, if an exception was
+                raised, otherwise None.
         """
         self._interpreter.finalize_library(self._library_handle)
         self._library_handle = 0
 
     def __del__(self) -> None:
-        """Destructor to ensure the library is finalized when the object is deleted."""
+        """Destructor to ensure the library is finalized when the object is
+        deleted.
+        """
         if self._library_handle != 0:
             self._interpreter.finalize_library(self._library_handle)
 

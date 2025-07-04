@@ -11,16 +11,17 @@ from types import TracebackType
 class Session():
     """Represents a session for interacting with the NI SLSC hardware.
 
-    This class manages the session handle and interpreter, and provides context management
-    and resource cleanup for SLSC sessions.
+    This class manages the session handle and interpreter, and provides
+    context management and resource cleanup for SLSC sessions.
     """
-
     def __init__(self, session_handle: int, interpreter: BaseInterpreter) -> None:
         """Initializes a Session instance.
 
         Args:
-            session_handle (int): The session handle returned by the initialization function.
-            interpreter (BaseInterpreter): The interpreter instance used for communication.
+            session_handle (int): The session handle returned by the initialization 
+                function.
+            interpreter (BaseInterpreter): The interpreter instance used for
+                communication.
         """
         self._session_handle = session_handle
         self._interpreter = interpreter
@@ -37,15 +38,20 @@ class Session():
         """Exit the runtime context and close the session.
 
         Args:
-            type (type[BaseException] | None): The exception type, if an exception was raised, otherwise None.
-            value (BaseException | None): The exception value, if an exception was raised, otherwise None.
-            traceback (TracebackType | None): The traceback, if an exception was raised, otherwise None.
+            type (type[BaseException] | None): The exception type, if an exception
+                was raised, otherwise None.
+            value (BaseException | None): The exception value, if an exception was 
+                raised, otherwise None.
+            traceback (TracebackType | None): The traceback, if an exception was
+                raised, otherwise None.
         """
         self._interpreter.close_session(self._session_handle)
         self._session_handle = 0
 
     def __del__(self) -> None:
-        """Destructor to ensure the session is closed when the object is deleted."""
+        """Destructor to ensure the session is closed when the object is 
+        deleted.
+        """
         if self._session_handle != 0:
             self._interpreter.close_session(self._session_handle)
 
@@ -59,14 +65,12 @@ class Session():
 % endfor
 % if is_creating_handle(function, "PropertyReference"):
         return Property(self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session", False)])}), self._interpreter)
-
 % elif is_creating_handle(function, "CommandReference"):
         return Command(self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session", False)])}), self._interpreter)
-
 % else:
         return self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session", False)])})
-
 % endif
+
 % endif
 % endfor
 % endif

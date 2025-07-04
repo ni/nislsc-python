@@ -21,19 +21,27 @@ CLASS_DOCSTRINGS_MAP = {
 }
 
 
-def wrap_text(text: str, width: int = 72) -> list[str]:
+def wrap_text(text: str, width: int = 72, indent: str = "    ", is_doc: bool = False) -> list[str]:
     """Wraps text at a given width."""
     words = text.split()
     lines = []
     current_line = ""
     for word in words:
-        if len(current_line) + len(word) + 1 > width:
-            lines.append(current_line.rstrip())
-            current_line = "    " + word + " "
+        if is_doc:
+            current_indent = '"""' if len(lines) == 0 else ""
+        else:
+            current_indent = indent if len(lines) == 0 else indent + indent
+        if len(current_line.lstrip()) + len(word) + len(current_indent) > width:
+            lines.append(current_indent + current_line.rstrip())
+            current_line = word + " "
         else:
             current_line += word + " "
     if current_line:
-        lines.append(current_line.rstrip())
+        if is_doc:
+            current_indent = '"""' if len(lines) == 0 else ""
+        else:
+            current_indent = indent if len(lines) == 0 else indent + indent
+        lines.append(current_indent + current_line.rstrip())
     return lines
 
 
@@ -42,11 +50,11 @@ def generate_docstrings(function: dict, ignore_type: str = "") -> list[str]:
     docstrings = []
     for doc in generate_doc(function):
         docstrings.append(doc)
-    if generate_args(function, ignore_type):
+    if len(generate_args(function, ignore_type)) != 0:
         docstrings.append("")
         for arg in generate_args(function, ignore_type):
             docstrings.append(arg)
-    if generate_returns(function):
+    if len(generate_returns(function)) != 0:
         docstrings.append("")
         for ret in generate_returns(function):
             docstrings.append(ret)
@@ -57,14 +65,20 @@ def generate_docstrings(function: dict, ignore_type: str = "") -> list[str]:
 def generate_doc(function: dict) -> list[str]:
     """Generate the summary and description part of the docstring."""
     doc = []
-    doc_lines = function["doc"].splitlines()
-    doc.append('"""' + doc_lines[0])
-    for line in doc_lines[1:]:
-        if line.strip() == "":
+    first_split = function["doc"].split(".", 1)
+    first_sentence = first_split[0] + "."
+    summary_wrapped = wrap_text(first_sentence, 72, "", True)
+    doc.append(summary_wrapped[0])
+    for line in summary_wrapped[1:]:
+        doc.append(line)
+    if len(first_split[1]) != 0:
+        rest_sentence = first_split[1].strip()
+        doc_lines = rest_sentence.split("\n\n")
+        for text in doc_lines:
             doc.append("")
-        else:
-            for text in wrap_text(line, 72):
-                doc.append(text)
+            line = wrap_text(text, 72, "")
+            for line in wrap_text(text, 72, ""):
+                doc.append(line)
     return doc
 
 
@@ -77,9 +91,9 @@ def generate_args(function: dict, ignore_type: str) -> list[str]:
         if is_capi(param) and is_param_input(param):
             if param["dataType"] == ignore_type:
                 continue
-            args_line = f"    {get_standardized_param_name(param)} ({PYTHON_DATATYPE_MAP.get(param['dataType'])}): {param['doc']}"
+            args_line = f"{get_standardized_param_name(param)} ({PYTHON_DATATYPE_MAP.get(param['dataType'])}): {param['doc']}"
             for text in wrap_text(args_line, 72):
-                args.append("    " + text)
+                args.append(text)
     return args
 
 
@@ -98,9 +112,9 @@ def generate_returns(function: dict) -> list[str]:
             ):
                 ret_line = CLASS_DOCSTRINGS_MAP.get(param["dataType"])
             else:
-                ret_line = f"    {get_standardized_param_name(param)} ({PYTHON_DATATYPE_MAP.get(param['dataType'])}): {param['doc']}"
+                ret_line = f"{get_standardized_param_name(param)} ({PYTHON_DATATYPE_MAP.get(param['dataType'])}): {param['doc']}"
             for text in wrap_text(ret_line, 72):
-                returns.append("    " + text)
+                returns.append(text)
     return returns
 
 

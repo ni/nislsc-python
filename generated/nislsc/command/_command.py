@@ -7,7 +7,6 @@ class Command():
     This class manages the command handle and interpreter, and provides context
     management and resource cleanup for SLSC commands.
     """
-
     def __init__(self, command_handle: int, interpreter: BaseInterpreter) -> None:
         """Initializes a Command instance.
 

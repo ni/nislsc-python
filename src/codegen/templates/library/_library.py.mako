@@ -81,11 +81,10 @@ class Library():
 % endif
 % if is_creating_handle(function, "Session"):
         return Session(self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library", False)])}), self._interpreter)
-
 % else:
         return self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library", False)])})
-
 % endif
+
 % endif
 % endfor
 % endif

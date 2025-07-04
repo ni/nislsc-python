@@ -64,7 +64,8 @@ class Library():
         self._language = language
 
     def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
-        """Returns extended error information for the last error that occurred on the specified library handle.
+        """Returns extended error information for the last error that occurred
+        on the specified library handle.
         
         Args:
             language (int): Language to return error information in
@@ -89,19 +90,22 @@ class Library():
         return self._interpreter.get_error_description(self._library_handle, status_code, language)
 
     def initialize_session_with_devices(self, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
-        """Initializes an SLSC session with one or multiple devices. The session opens network connections for devices. If reservationAccess is set to ReadOnly or ReadWrite, the session also reserves the devices.
+        """Initializes an SLSC session with one or multiple devices.
+        
+        The session opens network connections for devices. If reservationAccess
+        is set to ReadOnly or ReadWrite, the session also reserves the devices.
         
         This function saves the specified device names in the
-            Session.DefaultDevices property as the default devices of the
-            session. You may change the session default devices by setting the
-            Session.DefaultDevices property.
+        Session.DefaultDevices property as the default devices of the session.
+        You may change the session default devices by setting the
+        Session.DefaultDevices property.
         
         You cannot use the AbortSession function to cancel any blocking network
-            operations performed by this function. If you need to
-            programmatically abort blocking network operations, call
-            InitializeSessionWithoutResources to obtain a session reference,
-            then call ConnectToDevices to open network connections for the
-            devices, and then call ReserveDevices to reserve the devices.
+        operations performed by this function. If you need to programmatically
+        abort blocking network operations, call
+        InitializeSessionWithoutResources to obtain a session reference, then
+        call ConnectToDevices to open network connections for the devices, and
+        then call ReserveDevices to reserve the devices.
         
         Args:
             device_names (str): Comma-delimited list of devices
@@ -109,10 +113,10 @@ class Library():
                 seconds. Specify -1 to use the default value.
             reservation_access (int): Access mode with which to reserve devices:
                 None (do not reserve devices), ReadOnly, or ReadWrite
-            reservation_group (str): Arbitrary name to allow multiple sessions to
-                simultaneously reserve the same device(s)
-            reservation_timeout (float): Timeout for reserving devices, in seconds.
-                Specify -1 to use the default value.
+            reservation_group (str): Arbitrary name to allow multiple sessions
+                to simultaneously reserve the same device(s)
+            reservation_timeout (float): Timeout for reserving devices, in
+                seconds. Specify -1 to use the default value.
         
         Returns:
             Session: An instance of the Session class.
@@ -120,20 +124,24 @@ class Library():
         return Session(self._interpreter.initialize_session_with_devices(self._library_handle, device_names, connection_timeout, reservation_access, reservation_group, reservation_timeout), self._interpreter)
 
     def initialize_session_with_nvmem_areas(self, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
-        """Initializes an SLSC session with one or multiple NVMEM areas. The session opens network connections for NVMEM areas. If reservationAccess is set to ReadOnly or ReadWrite, the session also reserves the devices.
+        """Initializes an SLSC session with one or multiple NVMEM areas.
+        
+        The session opens network connections for NVMEM areas. If
+        reservationAccess is set to ReadOnly or ReadWrite, the session also
+        reserves the devices.
         
         This function saves the specified NVMEM area names in the
-            Session.DefaultNVMEMAreas property as the default NVMEM areas of
-            the session. You may change the session default NVMEM areas or
-            session default devices by setting the Session.DefaultNVMEMAreas
-            property or the Session.DefaultDevices property.
+        Session.DefaultNVMEMAreas property as the default NVMEM areas of the
+        session. You may change the session default NVMEM areas or session
+        default devices by setting the Session.DefaultNVMEMAreas property or the
+        Session.DefaultDevices property.
         
         You cannot use the AbortSession function to cancel any blocking network
-            operations performed by this function. If you need to
-            programmatically abort blocking network operations, call
-            InitializeSessionWithoutResources to obtain a session reference,
-            then call ConnectToDevices to open network connections for the
-            devices, and then call ReserveDevices to reserve the devices.
+        operations performed by this function. If you need to programmatically
+        abort blocking network operations, call
+        InitializeSessionWithoutResources to obtain a session reference, then
+        call ConnectToDevices to open network connections for the devices, and
+        then call ReserveDevices to reserve the devices.
         
         Args:
             nvmem_area_names (str): Comma-delimited list of NVMEM areas
@@ -141,10 +149,10 @@ class Library():
                 seconds. Specify -1 to use the default value.
             reservation_access (int): Access mode with which to reserve devices:
                 None (do not reserve devices), ReadOnly, or ReadWrite
-            reservation_group (str): Arbitrary name to allow multiple sessions to
-                simultaneously reserve the same device(s)
-            reservation_timeout (float): Timeout for reserving devices, in seconds.
-                Specify -1 to use the default value.
+            reservation_group (str): Arbitrary name to allow multiple sessions
+                to simultaneously reserve the same device(s)
+            reservation_timeout (float): Timeout for reserving devices, in
+                seconds. Specify -1 to use the default value.
         
         Returns:
             Session: An instance of the Session class.
@@ -152,21 +160,25 @@ class Library():
         return Session(self._interpreter.initialize_session_with_nvmem_areas(self._library_handle, nvmem_area_names, connection_timeout, reservation_access, reservation_group, reservation_timeout), self._interpreter)
 
     def initialize_session_with_physical_channels(self, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
-        """Initializes an SLSC session with one or multiple physical channels. The session opens network connections for devices that correspond to the physical channels. The session opens network connections for devices that correspond to the physical channels. If reservationAccess is set to ReadOnly or ReadWrite, the session also reserves the devices.
+        """Initializes an SLSC session with one or multiple physical channels.
+        
+        The session opens network connections for devices that correspond to the
+        physical channels. The session opens network connections for devices
+        that correspond to the physical channels. If reservationAccess is set to
+        ReadOnly or ReadWrite, the session also reserves the devices.
         
         This function saves the specified physical channel names in the
-            Session.DefaultPhysChans property as the default physical channels
-            of the session. You may change the session default physical
-            channels or session default devices by setting
-            Session.DefaultPhysChans property or the Session.DefaultDevices
-            property.
+        Session.DefaultPhysChans property as the default physical channels of
+        the session. You may change the session default physical channels or
+        session default devices by setting Session.DefaultPhysChans property or
+        the Session.DefaultDevices property.
         
-        nYou cannot use the AbortSession function to cancel any blocking
-            network operations performed by this function. If you need to
-            programmatically abort blocking network operations, call
-            InitializeSessionWithoutResources to obtain a session reference,
-            then call ConnectToDevices to open network connections for the
-            devices, and then call ReserveDevices to reserve the devices.
+        You cannot use the AbortSession function to cancel any blocking network
+        operations performed by this function. If you need to programmatically
+        abort blocking network operations, call
+        InitializeSessionWithoutResources to obtain a session reference, then
+        call ConnectToDevices to open network connections for the devices, and
+        then call ReserveDevices to reserve the devices.
         
         Args:
             physical_channel_names (str): Comma-delimited list of physical
@@ -176,10 +188,10 @@ class Library():
                 seconds. Specify -1 to use the default value.
             reservation_access (int): Access mode with which to reserve devices:
                 None (do not reserve devices), ReadOnly or ReadWrite
-            reservation_group (str): Arbitrary name to allow multiple sessions to
-                simultaneously reserve the same device(s)
-            reservation_timeout (float): Timeout for reserving devices, in seconds.
-                Specify -1 to use the default value.
+            reservation_group (str): Arbitrary name to allow multiple sessions
+                to simultaneously reserve the same device(s)
+            reservation_timeout (float): Timeout for reserving devices, in
+                seconds. Specify -1 to use the default value.
         
         Returns:
             Session: An instance of the Session class.
@@ -187,11 +199,12 @@ class Library():
         return Session(self._interpreter.initialize_session_with_physical_channels(self._library_handle, physical_channel_names, connection_timeout, reservation_access, reservation_group, reservation_timeout), self._interpreter)
 
     def initialize_session_without_resources(self) -> Session:
-        """Initializes an SLSC session without specifying any resources or opening any network connections.
+        """Initializes an SLSC session without specifying any resources or
+        opening any network connections.
         
         Use InitializeSessionWithoutResources if you need to set session
-            properties that control network timeouts or the ability to
-            programmatically abort blocking network operations.
+        properties that control network timeouts or the ability to
+        programmatically abort blocking network operations.
         
         Returns:
             Session: An instance of the Session class.

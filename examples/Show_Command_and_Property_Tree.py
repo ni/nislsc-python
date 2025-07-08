@@ -9,12 +9,13 @@ both device-level and physical channel-level commands and properties.
 import json
 import sys
 
-from nislsc._nislsc import NISLSC
+from nislsc import NISLSC
 from nislsc.constants import (
     DataType,
     PropertyAccess,
     ReservationAccess,
 )
+from nislsc.utils import get_property
 
 
 def show_command_and_property_tree(device_names: str) -> dict:
@@ -28,7 +29,7 @@ def show_command_and_property_tree(device_names: str) -> dict:
             reservation_timeout = 10.0
 
             data = {
-                "name": device_names,
+                "Name": device_names,
                 "Commands": [],
                 "Properties": [],
             }
@@ -65,11 +66,10 @@ def show_command_and_property_tree(device_names: str) -> dict:
                             {"name": name, "description": description, "access": access.name}
                         )
 
-                        print(data)
-
                 for device_property in device_properties:
                     with session.open_device_property(device_names, device_property) as property:
                         name = device_property
+
                         datatype = DataType(property.get_property_property_int32("Prop.DataType"))
 
                         current_value = get_property(
@@ -77,16 +77,19 @@ def show_command_and_property_tree(device_names: str) -> dict:
                         )
 
                         access = PropertyAccess(property.get_property_property_int32("Prop.Access"))
+
                         description = property.get_property_property_string("Prop.Descr")
+
+                        documentation = property.get_property_property_string("Prop.Doc")
 
                         min_value = property.get_property_property_string("Prop.MinValue")
                         max_value = property.get_property_property_string("Prop.MaxValue")
 
-                        range_value = (
-                            f"[{min_value}, {max_value}]"
-                            if min_value is not None and max_value is not None
-                            else ""
-                        )
+                        if len(min_value) == 0 and len(max_value) == 0:
+                            range_value = ""
+                        else:
+                            range_value = f"[{min_value}, {max_value}]"
+
                         data["Properties"].append(
                             {
                                 "name": name,
@@ -95,6 +98,7 @@ def show_command_and_property_tree(device_names: str) -> dict:
                                 "range": range_value,
                                 "access": access.name,
                                 "description": description,
+                                "documentation": documentation,
                             }
                         )
 
@@ -138,14 +142,19 @@ def show_command_and_property_tree(device_names: str) -> dict:
                             access = PropertyAccess(
                                 property.get_property_property_int32("Prop.Access")
                             )
+
                             description = property.get_property_property_string("Prop.Descr")
+
+                            documentation = property.get_property_property_string("Prop.Doc")
 
                             min_value = property.get_property_property_string("Prop.MinValue")
                             max_value = property.get_property_property_string("Prop.MaxValue")
 
-                            range_value = (
-                                f"[{min_value}, {max_value}]" if min_value and max_value else ""
-                            )
+                            if len(min_value) == 0 and len(max_value) == 0:
+                                range_value = ""
+                            else:
+                                range_value = f"[{min_value}, {max_value}]"
+
                             data[physical_channel]["Properties"].append(
                                 {
                                     "name": name,
@@ -154,57 +163,31 @@ def show_command_and_property_tree(device_names: str) -> dict:
                                     "range": range_value,
                                     "access": access.name,
                                     "description": description,
+                                    "documentation": documentation,
                                 }
                             )
 
                 complete_data = json.dumps(data, indent=4)
-                print(complete_data)
-
-
-def get_property(session, resource, property, datatype):
-    """Retrieve the current value of a property based on its data type."""
-    if datatype.value == DataType.BOOL:
-        current_value = session.get_generic_property_bool(resource, property)
-    elif datatype.value == DataType.DOUBLE:
-        current_value = session.get_generic_property_double(resource, property)
-    elif datatype.value == DataType.INT32:
-        current_value = session.get_generic_property_int32(resource, property)
-    elif datatype.value == DataType.INT64:
-        current_value = session.get_generic_property_int64(resource, property)
-    elif datatype.value == DataType.STRING:
-        current_value = session.get_generic_property_string(resource, property)
-    elif datatype.value == DataType.UINT32:
-        current_value = session.get_generic_property_uint32(resource, property)
-    elif datatype.value == DataType.UINT64:
-        current_value = session.get_generic_property_uint64(resource, property)
-    elif datatype.value == DataType.BOOL_ARRAY:
-        current_value = session.get_generic_property_bool_array(resource, property)
-    elif datatype.value == DataType.DOUBLE_ARRAY:
-        current_value = session.get_generic_property_double_array(resource, property)
-    elif datatype.value == DataType.INT32_ARRAY:
-        current_value = session.get_generic_property_int32_array(resource, property)
-    elif datatype.value == DataType.INT64_ARRAY:
-        current_value = session.get_generic_property_int64_array(resource, property)
-    elif datatype.value == DataType.STRING_ARRAY:
-        current_value = session.get_generic_property_string_array(resource, property)
-    elif datatype.value == DataType.UINT32_ARRAY:
-        current_value = session.get_generic_property_uint32_array(resource, property)
-    elif datatype.value == DataType.UINT64_ARRAY:
-        current_value = session.get_generic_property_uint64_array(resource, property)
-    else:
-        current_value = "Unsupported DataType"
-
-    return current_value
+                return complete_data
 
 
 def main():
-    """Main function to execute the command."""
+    """Main function to execute the command.
+
+    Examples:
+        Valid device names:
+            "SLSC-12001-03146D67"
+            "SLSC-12001-03146D67-Mod1"
+            "SLSC-12001-03146D67-Mod2"
+    """
     if len(sys.argv) > 1:
         device_names = sys.argv[1]
     else:
         print("Please provide device names.")
 
-    show_command_and_property_tree(device_names)
+    data = show_command_and_property_tree(device_names)
+
+    print(data)
 
 
 main()

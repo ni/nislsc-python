@@ -34,8 +34,8 @@ jobs:
         run: poetry run mypy
       - name: Run mypy (Windows)
         run: poetry run mypy --platform win32
-      # - name: Run Bandit security checks
-      #   run: poetry run bandit -c pyproject.toml -r generated/nislsc
+      - name: Run Bandit security checks
+        run: poetry run bandit -c pyproject.toml -r generated/nislsc
       - name: Generate ni-slsc files
         run: |
           rm -fr generated/nislsc

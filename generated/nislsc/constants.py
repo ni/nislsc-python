@@ -1,0 +1,50 @@
+from enum import Enum
+
+class ReservationAccess(Enum):
+   NONE = 0
+   READ_ONLY = 1
+   WRITE_ONLY = 2
+   READ_WRITE = 3
+
+class PropertyAccess(Enum):
+   NONE = 0
+   READ_ONLY = 1
+   WRITE_ONLY = 2
+   READ_WRITE = 3
+
+class DataType(Enum):
+   NONE = 0
+   BOOL = 1
+   DOUBLE = 2
+   INT32 = 3
+   INT64 = 4
+   STRING = 5
+   UINT32 = 6
+   UINT64 = 7
+   BOOL_ARRAY = 8
+   DOUBLE_ARRAY = 9
+   INT32_ARRAY = 10
+   INT64_ARRAY = 11
+   STRING_ARRAY = 12
+   UINT32_ARRAY = 13
+   UINT64_ARRAY = 14
+
+class TableScaleCoercion(Enum):
+   INTERPOLATE = 0
+   ROUND_TO_NEAREST = 1
+   STRICT = 2
+
+class Language(Enum):
+   CURRENT_THREAD_LOCALE = 0
+   ENGLISH = 1033
+   FRENCH = 1036
+   GERMAN = 1031
+   JAPANESE = 1041
+   KOREAN = 1042
+   SIMPLIFIED_CHINESE = 2052
+
+class ProductCategory(Enum):
+   UNKNOWN = 0
+   SLSC_CHASSIS = 1
+   SLSC_MODULE = 2
+

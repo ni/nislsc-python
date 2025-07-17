@@ -36,6 +36,24 @@ classifiers = [
 python = "^3.9"
 
 
+[tool.poetry.group.codegen.dependencies]
+mako = ">=1.3.10"
+
+
+[tool.poetry.group.lint.dependencies]
+mypy = ">=1.16.1"
+ni-python-styleguide = ">=0.4.6"
+
+
+[tool.ni-python-styleguide]
+extend_exclude = "generated,src/codegen/metadata,src/codegen/templates,src/handwritten"
+
+
+[tool.mypy]
+files = "generated/"
+strict = true
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

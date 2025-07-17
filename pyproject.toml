@@ -54,13 +54,6 @@ files = "generated/"
 strict = true
 
 
-[[tool.mypy.overrides]]
-module = [
-  "mako.*",
-]
-ignore_missing_imports = true
-
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

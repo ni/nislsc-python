@@ -2,7 +2,6 @@ from typing_extensions import Self
 
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.constants import Language
-from nislsc.session._session import Session
 from nislsc.utils import _select_interpreter, get_library_version
 from types import TracebackType
 
@@ -93,9 +92,10 @@ class Library():
                 application. Pass NISLSC_LIBRARY_VERSION for this parameter.
         
         Returns:
-            library_handle: Newly allocated library handle
+            Self: New instance of Library object.
         """
-        return self._interpreter.initialize_library(version)
+        library_handle = self._interpreter.initialize_library(version)
+        return library_handle
 
     def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
         """Return extended error information for the last error that occurred on
@@ -108,7 +108,8 @@ class Library():
             extended_error_info: Extended error info text
         """
         language = self._language if language == Language.UNDEFINED else language
-        return self._interpreter.get_extended_error_info(self._library_handle, language)
+        extended_error_info = self._interpreter.get_extended_error_info(self._library_handle, language)
+        return extended_error_info
 
     def get_error_description(self, status_code: int, language: Language = Language.UNDEFINED) -> str:
         """Return the error description for the specified status code.
@@ -121,5 +122,6 @@ class Library():
             error_description: Error description text
         """
         language = self._language if language == Language.UNDEFINED else language
-        return self._interpreter.get_error_description(self._library_handle, status_code, language)
+        error_description = self._interpreter.get_error_description(self._library_handle, status_code, language)
+        return error_description
 

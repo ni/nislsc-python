@@ -67,18 +67,18 @@ def wrap_text(text: str, width: int = 72, indent: str = "    ", is_doc: bool = F
     return lines
 
 
-def generate_docstrings(function: dict, ignore_type: str = "") -> list[str]:
+def generate_docstrings(function: dict, ignore_type: str = "", is_classmethod: bool = False) -> list[str]:
     """Generate a Google style docstring for a function."""
     docstrings = []
     for doc in generate_doc(function):
         docstrings.append(doc)
-    if len(generate_args(function, ignore_type)) != 0:
+    if len(generate_args(function, ignore_type, is_classmethod)) != 0:
         docstrings.append("")
-        for arg in generate_args(function, ignore_type):
+        for arg in generate_args(function, ignore_type, is_classmethod):
             docstrings.append(arg)
-    if len(generate_returns(function)) != 0:
+    if len(generate_returns(function, is_classmethod)) != 0:
         docstrings.append("")
-        for ret in generate_returns(function):
+        for ret in generate_returns(function, is_classmethod):
             docstrings.append(ret)
     docstrings.append('"""')
     return docstrings
@@ -107,7 +107,7 @@ def generate_doc(function: dict) -> list[str]:
     return doc
 
 
-def generate_args(function: dict, ignore_type: str) -> list[str]:
+def generate_args(function: dict, ignore_type: str, is_classmethod: bool = False) -> list[str]:
     """Generate the Args section of the docstring."""
     args = []
     if is_inputting_something(function, ignore_type):
@@ -116,23 +116,37 @@ def generate_args(function: dict, ignore_type: str) -> list[str]:
         if is_capi(param) and is_param_input(param):
             if param["dataType"] == ignore_type:
                 continue
-            args_line = f"{get_standardized_param_name(param)}: {param['doc']}"
+            elif param["dataType"] == "Library" and is_classmethod:
+                args_line = f"library: Previously initialized Library instance."
+            elif param["dataType"] == "Session" and is_classmethod:
+                args_line = f"session: Previously initialized Session instance."
+            else:
+                args_line = f"{get_standardized_param_name(param)}: {param['doc']}"
             for text in wrap_text(args_line, 72):
                 args.append(text)
     return args
 
 
-def generate_returns(function: dict) -> list[str]:
+def generate_returns(function: dict, is_classmethod: bool = False) -> list[str]:
     """Generate the Returns section of the docstring."""
     returns = []
     if is_returning_something(function):
         returns.append("Returns:")
     for param in function["params"]:
         if is_capi(param) and is_param_output(param):
-            ret_line = f"{get_standardized_param_name(param)}: {param['doc']}"
+            if param["dataType"] in (
+                "Library",
+                "Session",
+                "CommandReference",
+                "PropertyReference",
+            ):
+                ret_line = f"Self: New instance of " + param["dataType"] + " object."
+            else:
+                ret_line = f"{get_standardized_param_name(param)}: {param['doc']}"
             for text in wrap_text(ret_line, 72):
                 returns.append(text)
     return returns
+
 
 
 def is_returning_something(function: dict) -> bool:

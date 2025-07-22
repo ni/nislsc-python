@@ -1,5 +1,5 @@
 <%!
-from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_creating_handle, is_defining_language, is_class_func
+from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_creating_handle, is_defining_language, is_class_func, generate_return
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 from utilities.docstrings_helpers import generate_docstrings
 %>\
@@ -7,7 +7,6 @@ from typing_extensions import Self
 
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.constants import Language
-from nislsc.session._session import Session
 from nislsc.utils import _select_interpreter, get_library_version
 from types import TracebackType
 
@@ -94,7 +93,9 @@ class Library():
 % if is_defining_language(function):
         language = self._language if language == Language.UNDEFINED else language
 % endif
-        return self._interpreter.${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library", False)])})
+% for result in generate_return(function, 'Library'):
+        ${result}
+% endfor
 
 % endif
 % endif

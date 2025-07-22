@@ -6,7 +6,7 @@ def _select_interpreter() -> BaseInterpreter:
     return LibraryInterpreter()
 
 def get_library_version() -> int:
-    """Returns the version of the SLSC runtime library.
+    """Return the version of the SLSC runtime library.
     
     Returns:
         version: Version of the SLSC library that is installed.
@@ -15,8 +15,8 @@ def get_library_version() -> int:
     return _interpreter.get_library_version()
 
 def flatten_names(names_in: list[str]) -> str:
-    """Converts an array of device, NVMEM area, or physical channel names
-    into a comma-delimited list of names.
+    """Error an array of device, NVMEM area, or physical channel names into
+    a comma-delimited list of names.
     
     If the array contains physical channel-style names with consecutive
     numeric suffixes, they will be collapsed into a colon-delimited range.
@@ -36,7 +36,7 @@ def flatten_names(names_in: list[str]) -> str:
     return _interpreter.flatten_names(names_in)
 
 def unflatten_names(names_in: str) -> list[str]:
-    """Converts a comma-delimited list or range of device, NVMEM area, or
+    """Error a comma-delimited list or range of device, NVMEM area, or
     physical channel names into an array of names.
     
     Colon-delimited ranges will be expanded. Example: "Mod1/load0:2" ->

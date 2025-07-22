@@ -80,7 +80,7 @@ class Library():
             self._library_handle = None
 
     def initialize_library(self, version: int) -> int:
-        """Returns a library handle to identify the SLSC library.
+        """Return a library handle to identify the SLSC library.
         
         You must call this function at least once for the application.
         
@@ -98,8 +98,8 @@ class Library():
         return self._interpreter.initialize_library(version)
 
     def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
-        """Returns extended error information for the last error that occurred
-        on the specified library handle.
+        """Return extended error information for the last error that occurred on
+        the specified library handle.
         
         Args:
             language: Language to return error information in
@@ -111,7 +111,7 @@ class Library():
         return self._interpreter.get_extended_error_info(self._library_handle, language)
 
     def get_error_description(self, status_code: int, language: Language = Language.UNDEFINED) -> str:
-        """Returns the error description for the specified status code.
+        """Return the error description for the specified status code.
         
         Args:
             status_code: Status code to look up

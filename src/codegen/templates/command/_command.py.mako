@@ -71,7 +71,7 @@ class Command():
 % if 'capi' in function['targets']:
 % for parameter in function["params"]:
 % if is_capi(parameter) and is_param_input(parameter) and parameter["dataType"] == "CommandReference" and function["name"] != "CloseCommand":
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "CommandReference")])})${get_function_return_type(function)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "CommandReference")])})${get_function_return_type(function, True)}:
 % for docstrings in generate_docstrings(function, "CommandReference"):
         ${docstrings}
 % endfor

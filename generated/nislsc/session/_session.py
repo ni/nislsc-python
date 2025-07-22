@@ -64,8 +64,8 @@ class Session():
             self._interpreter.close_session(self._session_handle)
             self._session_handle = None
 
-    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
-        """Initializes an SLSC session with one or multiple devices.
+    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+        """Initialize an SLSC session with one or multiple devices.
         
         The session opens network connections for devices. If reservationAccess
         is set to ReadOnly or ReadWrite, the session also reserves the devices.
@@ -99,8 +99,8 @@ class Session():
         """
         return self._interpreter.initialize_session_with_devices(library_handle, device_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
 
-    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
-        """Initializes an SLSC session with one or multiple NVMEM areas.
+    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+        """Initialize an SLSC session with one or multiple NVMEM areas.
         
         The session opens network connections for NVMEM areas. If
         reservationAccess is set to ReadOnly or ReadWrite, the session also
@@ -136,8 +136,8 @@ class Session():
         """
         return self._interpreter.initialize_session_with_nvmem_areas(library_handle, nvmem_area_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
 
-    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
-        """Initializes an SLSC session with one or multiple physical channels.
+    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+        """Initialize an SLSC session with one or multiple physical channels.
         
         The session opens network connections for devices that correspond to the
         physical channels. The session opens network connections for devices
@@ -176,8 +176,8 @@ class Session():
         """
         return self._interpreter.initialize_session_with_physical_channels(library_handle, physical_channel_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
 
-    def initialize_session_without_resources(self, library_handle: int) -> Session:
-        """Initializes an SLSC session without specifying any resources or
+    def initialize_session_without_resources(self, library_handle: int) -> Self:
+        """Initialize an SLSC session without specifying any resources or
         opening any network connections.
         
         Use InitializeSessionWithoutResources if you need to set session
@@ -193,7 +193,7 @@ class Session():
         return self._interpreter.initialize_session_without_resources(library_handle)
 
     def abort_session(self) -> None:
-        """Attempts to cancel a VI/function that blocks on network
+        """Attempt to cancel a VI/function that blocks on network
         communications, such as ConnectToDevices() or AddNetworkChassis(),
         making it wake up and return an error.
         
@@ -206,7 +206,7 @@ class Session():
         return self._interpreter.abort_session(self._session_handle)
 
     def log_in(self, chassis_name: str, username: str, password: str, connection_timeout: float, save_credentials_to_disk: bool) -> None:
-        """Attempts to connect and log in to the specified SLSC chassis.
+        """Attempt to connect and log in to the specified SLSC chassis.
         
         If successful, the username and password are cached on the local system
         until LogOut is called. Credentials are cached across reboots.
@@ -251,7 +251,7 @@ class Session():
         return self._interpreter.log_in(self._session_handle, chassis_name, username, password, connection_timeout, save_credentials_to_disk)
 
     def log_out(self, chassis_name: str) -> None:
-        """Deletes any cached credentials for this chassis.
+        """Delete any cached credentials for this chassis.
         
         If the specified SLSC chassis is no longer accessible but it is in the
         config file, this function still deletes the cached credentials.
@@ -264,7 +264,7 @@ class Session():
         return self._interpreter.log_out(self._session_handle, chassis_name)
 
     def connect_to_devices(self, device_names: str, connection_timeout: float) -> None:
-        """Opens network connections for the specified device(s), sharing
+        """Open network connections for the specified device(s), sharing
         connections to the same SLSC chassis.
         
         ConnectToDevices attempts to connect using all the known hostnames and
@@ -285,7 +285,7 @@ class Session():
         return self._interpreter.connect_to_devices(self._session_handle, device_names, connection_timeout)
 
     def disconnect_from_devices(self, device_names: str) -> None:
-        """Closes network connections for the specified devices.
+        """Close network connections for the specified devices.
         
         When multiple devices share a network connection because they are in the
         same SLSC chassis, the network connection will remain open until the
@@ -299,7 +299,7 @@ class Session():
         return self._interpreter.disconnect_from_devices(self._session_handle, device_names)
 
     def connect_to_chassis_by_address(self, address: str, username: str, password: str, connection_timeout: float) -> str:
-        """Opens a network connection for a chassis by the specified IP address
+        """Open a network connection for a chassis by the specified IP address
         or hostname.
         
         If the connect timeout expires before a connection is successfully
@@ -319,7 +319,7 @@ class Session():
         return self._interpreter.connect_to_chassis_by_address(self._session_handle, address, username, password, connection_timeout)
 
     def reserve_devices(self, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float) -> None:
-        """Reserves the specified device(s), which prevents other sessions from
+        """Reserve the specified device(s), which prevents other sessions from
         accessing them.
         
         You must reserve a device before using it.
@@ -345,7 +345,7 @@ class Session():
         return self._interpreter.reserve_devices(self._session_handle, device_names, reservation_access, reservation_group, reservation_timeout)
 
     def unreserve_devices(self, device_names: str) -> None:
-        """Unreserves the specified device(s), allowing other sessions to access
+        """Unreserve the specified device(s), allowing other sessions to access
         them.
         
         Args:
@@ -356,7 +356,7 @@ class Session():
         return self._interpreter.unreserve_devices(self._session_handle, device_names)
 
     def reset_devices(self, device_names: str) -> None:
-        """Resets the specified device(s) to the default state.
+        """Reset the specified device(s) to the default state.
         
         This function sends the specified devices a hardware reset signal,
         reinitializes module registers to their initial value, and rereads
@@ -376,7 +376,7 @@ class Session():
         return self._interpreter.reset_devices(self._session_handle, device_names)
 
     def rename_device(self, device_name: str, new_device_name: str) -> None:
-        """Renames the specified device, both on the remote device and in the
+        """Rename the specified device, both on the remote device and in the
         local SLSC configuration file.
         
         When renaming a chassis, the hostname of the chassis will be changed on
@@ -391,7 +391,7 @@ class Session():
         return self._interpreter.rename_device(self._session_handle, device_name, new_device_name)
 
     def update_system_configuration_file(self, chassis_name: str, connection_timeout: float) -> None:
-        """Updates the information of the specified chassis and its modules in
+        """Update the information of the specified chassis and its modules in
         the local configuration file.
         
         UpdateSystemConfigFile opens a new network connection to the chassis and
@@ -408,7 +408,7 @@ class Session():
         return self._interpreter.update_system_configuration_file(self._session_handle, chassis_name, connection_timeout)
 
     def add_network_chassis(self, address: str, username: str, password: str, connection_timeout: float) -> str:
-        """Connects to the specified network chassis, adds the chassis and its
+        """Connect to the specified network chassis, adds the chassis and its
         modules to the system, and saves them to the local configuration file.
         
         If the chassis has already been added, calling this function again
@@ -432,7 +432,7 @@ class Session():
         return self._interpreter.add_network_chassis(self._session_handle, address, username, password, connection_timeout)
 
     def remove_chassis(self, chassis_name: str) -> None:
-        """Removes the specified chassis from the local configuration file.
+        """Remove the specified chassis from the local configuration file.
         
         Note that if the chassis is still discoverable via mDNS, it will
         continue to show up in SLSC I/O controls, the Sys.Devices property, etc.
@@ -443,7 +443,7 @@ class Session():
         return self._interpreter.remove_chassis(self._session_handle, chassis_name)
 
     def get_device_property_bool(self, device_names: str, property_name: str) -> bool:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -461,7 +461,7 @@ class Session():
         return self._interpreter.get_device_property_bool(self._session_handle, device_names, property_name)
 
     def get_device_property_bool_array(self, device_names: str, property_name: str) -> list[bool]:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -479,7 +479,7 @@ class Session():
         return self._interpreter.get_device_property_bool_array(self._session_handle, device_names, property_name)
 
     def get_device_property_double(self, device_names: str, property_name: str) -> float:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -497,7 +497,7 @@ class Session():
         return self._interpreter.get_device_property_double(self._session_handle, device_names, property_name)
 
     def get_device_property_double_array(self, device_names: str, property_name: str) -> list[float]:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -515,7 +515,7 @@ class Session():
         return self._interpreter.get_device_property_double_array(self._session_handle, device_names, property_name)
 
     def get_device_property_int32(self, device_names: str, property_name: str) -> int:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -533,7 +533,7 @@ class Session():
         return self._interpreter.get_device_property_int32(self._session_handle, device_names, property_name)
 
     def get_device_property_int32_array(self, device_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -551,7 +551,7 @@ class Session():
         return self._interpreter.get_device_property_int32_array(self._session_handle, device_names, property_name)
 
     def get_device_property_int64(self, device_names: str, property_name: str) -> int:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -569,7 +569,7 @@ class Session():
         return self._interpreter.get_device_property_int64(self._session_handle, device_names, property_name)
 
     def get_device_property_int64_array(self, device_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -587,7 +587,7 @@ class Session():
         return self._interpreter.get_device_property_int64_array(self._session_handle, device_names, property_name)
 
     def get_device_property_string(self, device_names: str, property_name: str) -> str:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -605,7 +605,7 @@ class Session():
         return self._interpreter.get_device_property_string(self._session_handle, device_names, property_name)
 
     def get_device_property_string_array(self, device_names: str, property_name: str) -> list[str]:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -623,7 +623,7 @@ class Session():
         return self._interpreter.get_device_property_string_array(self._session_handle, device_names, property_name)
 
     def get_device_property_uint32(self, device_names: str, property_name: str) -> int:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -641,7 +641,7 @@ class Session():
         return self._interpreter.get_device_property_uint32(self._session_handle, device_names, property_name)
 
     def get_device_property_uint32_array(self, device_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -659,7 +659,7 @@ class Session():
         return self._interpreter.get_device_property_uint32_array(self._session_handle, device_names, property_name)
 
     def get_device_property_uint64(self, device_names: str, property_name: str) -> int:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -677,7 +677,7 @@ class Session():
         return self._interpreter.get_device_property_uint64(self._session_handle, device_names, property_name)
 
     def get_device_property_uint64_array(self, device_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified device property from one or more
+        """Get the value of the specified device property from one or more
         devices.
         
         To get a property from multiple devices, specify a comma-delimited list
@@ -695,7 +695,7 @@ class Session():
         return self._interpreter.get_device_property_uint64_array(self._session_handle, device_names, property_name)
 
     def set_device_property_bool(self, device_names: str, property_name: str, property_value: bool) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -715,7 +715,7 @@ class Session():
         return self._interpreter.set_device_property_bool(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_bool_array(self, device_names: str, property_name: str, property_value: list[bool]) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -735,7 +735,7 @@ class Session():
         return self._interpreter.set_device_property_bool_array(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_double(self, device_names: str, property_name: str, property_value: float) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -755,7 +755,7 @@ class Session():
         return self._interpreter.set_device_property_double(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_double_array(self, device_names: str, property_name: str, property_value: list[float]) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -775,7 +775,7 @@ class Session():
         return self._interpreter.set_device_property_double_array(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_int32(self, device_names: str, property_name: str, property_value: int) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -795,7 +795,7 @@ class Session():
         return self._interpreter.set_device_property_int32(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_int32_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -815,7 +815,7 @@ class Session():
         return self._interpreter.set_device_property_int32_array(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_int64(self, device_names: str, property_name: str, property_value: int) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -835,7 +835,7 @@ class Session():
         return self._interpreter.set_device_property_int64(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_int64_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -855,7 +855,7 @@ class Session():
         return self._interpreter.set_device_property_int64_array(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_string(self, device_names: str, property_name: str, property_value: str) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -875,7 +875,7 @@ class Session():
         return self._interpreter.set_device_property_string(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_string_array(self, device_names: str, property_name: str, property_value: list[str]) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -895,7 +895,7 @@ class Session():
         return self._interpreter.set_device_property_string_array(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_uint32(self, device_names: str, property_name: str, property_value: int) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -915,7 +915,7 @@ class Session():
         return self._interpreter.set_device_property_uint32(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_uint32_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -935,7 +935,7 @@ class Session():
         return self._interpreter.set_device_property_uint32_array(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_uint64(self, device_names: str, property_name: str, property_value: int) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -955,7 +955,7 @@ class Session():
         return self._interpreter.set_device_property_uint64(self._session_handle, device_names, property_name, property_value)
 
     def set_device_property_uint64_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified device property to a new value for one or more
+        """Set the specified device property to a new value for one or more
         devices.
         
         To set a property for multiple devices, specify a comma-delimited list
@@ -975,7 +975,7 @@ class Session():
         return self._interpreter.set_device_property_uint64_array(self._session_handle, device_names, property_name, property_value)
 
     def get_physical_channel_property_bool(self, physical_channel_names: str, property_name: str) -> bool:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -996,7 +996,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_bool_array(self, physical_channel_names: str, property_name: str) -> list[bool]:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1017,7 +1017,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_double(self, physical_channel_names: str, property_name: str) -> float:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1038,7 +1038,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_double(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_double_array(self, physical_channel_names: str, property_name: str) -> list[float]:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1059,7 +1059,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_int32(self, physical_channel_names: str, property_name: str) -> int:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1080,7 +1080,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_int32_array(self, physical_channel_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1101,7 +1101,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_int64(self, physical_channel_names: str, property_name: str) -> int:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1122,7 +1122,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_int64_array(self, physical_channel_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1143,7 +1143,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_string(self, physical_channel_names: str, property_name: str) -> str:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1164,7 +1164,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_string(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_string_array(self, physical_channel_names: str, property_name: str) -> list[str]:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1185,7 +1185,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_uint32(self, physical_channel_names: str, property_name: str) -> int:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1206,7 +1206,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_uint32_array(self, physical_channel_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1227,7 +1227,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_uint64(self, physical_channel_names: str, property_name: str) -> int:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1248,7 +1248,7 @@ class Session():
         return self._interpreter.get_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name)
 
     def get_physical_channel_property_uint64_array(self, physical_channel_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified physical channel property from one or
+        """Get the value of the specified physical channel property from one or
         more physical channels.
         
         To get a property from multiple physical channels, specify a
@@ -1269,8 +1269,8 @@ class Session():
         return self._interpreter.get_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name)
 
     def set_physical_channel_property_bool(self, physical_channel_names: str, property_name: str, property_value: bool) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1293,8 +1293,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_bool_array(self, physical_channel_names: str, property_name: str, property_value: list[bool]) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1317,8 +1317,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_double(self, physical_channel_names: str, property_name: str, property_value: float) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1341,8 +1341,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_double(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_double_array(self, physical_channel_names: str, property_name: str, property_value: list[float]) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1365,8 +1365,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_int32(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1389,8 +1389,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_int32_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1413,8 +1413,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_int64(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1437,8 +1437,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_int64_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1461,8 +1461,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_string(self, physical_channel_names: str, property_name: str, property_value: str) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1485,8 +1485,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_string(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_string_array(self, physical_channel_names: str, property_name: str, property_value: list[str]) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1509,8 +1509,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_uint32(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1533,8 +1533,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_uint32_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1557,8 +1557,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_uint64(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1581,8 +1581,8 @@ class Session():
         return self._interpreter.set_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name, property_value)
 
     def set_physical_channel_property_uint64_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified physical channel property to a new value for one
-        or more physical channels.
+        """Set the specified physical channel property to a new value for one or
+        more physical channels.
         
         To set a property for multiple physical channels, specify a
         comma-delimited list or colon-delimited range of physical channels and
@@ -1605,7 +1605,7 @@ class Session():
         return self._interpreter.set_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name, property_value)
 
     def commit_properties_for_devices(self, device_names: str) -> None:
-        """Commits all device or physical channels properties with pending
+        """Commit all device or physical channels properties with pending
         changes to hardware for the specified device(s) and the physical
         channels that they contain.
         
@@ -1620,7 +1620,7 @@ class Session():
         return self._interpreter.commit_properties_for_devices(self._session_handle, device_names)
 
     def commit_properties_for_physical_channels(self, physical_channel_names: str) -> None:
-        """Commits all physical channel properties with pending changes to
+        """Commit all physical channel properties with pending changes to
         hardware for the specified physical channel(s).
         
         If you set a property multiple times between commits, only the last
@@ -1636,7 +1636,7 @@ class Session():
         return self._interpreter.commit_properties_for_physical_channels(self._session_handle, physical_channel_names)
 
     def commit_properties_for_session(self) -> None:
-        """Commits all device and physical channel properties with pending
+        """Commit all device and physical channel properties with pending
         changes to hardware for all devices and physical channels used by the
         session.
         
@@ -1646,7 +1646,7 @@ class Session():
         return self._interpreter.commit_properties_for_session(self._session_handle)
 
     def commit_properties_generic(self, resources: str) -> None:
-        """Commits all properties with pending changes to hardware for the
+        """Commit all properties with pending changes to hardware for the
         specified resource(s).
         
         If you set a property multiple times between commits, only the last
@@ -1661,7 +1661,7 @@ class Session():
         return self._interpreter.commit_properties_generic(self._session_handle, resources)
 
     def get_nvmem_area_property_bool(self, nvmem_area_names: str, property_name: str) -> bool:
-        """Gets the value of the specified NVMEM area property for one or more
+        """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
         To get a property from multiple NVMEM areas, specify a comma-delimited
@@ -1679,7 +1679,7 @@ class Session():
         return self._interpreter.get_nvmem_area_property_bool(self._session_handle, nvmem_area_names, property_name)
 
     def get_nvmem_area_property_bool_array(self, nvmem_area_names: str, property_name: str) -> list[bool]:
-        """Gets the value of the specified NVMEM area property for one or more
+        """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
         To get a property from multiple NVMEM areas, specify a comma-delimited
@@ -1697,7 +1697,7 @@ class Session():
         return self._interpreter.get_nvmem_area_property_bool_array(self._session_handle, nvmem_area_names, property_name)
 
     def get_nvmem_area_property_string(self, nvmem_area_names: str, property_name: str) -> str:
-        """Gets the value of the specified NVMEM area property for one or more
+        """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
         To get a property from multiple NVMEM areas, specify a comma-delimited
@@ -1715,7 +1715,7 @@ class Session():
         return self._interpreter.get_nvmem_area_property_string(self._session_handle, nvmem_area_names, property_name)
 
     def get_nvmem_area_property_string_array(self, nvmem_area_names: str, property_name: str) -> list[str]:
-        """Gets the value of the specified NVMEM area property for one or more
+        """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
         To get a property from multiple NVMEM areas, specify a comma-delimited
@@ -1733,7 +1733,7 @@ class Session():
         return self._interpreter.get_nvmem_area_property_string_array(self._session_handle, nvmem_area_names, property_name)
 
     def get_nvmem_area_property_uint32(self, nvmem_area_names: str, property_name: str) -> int:
-        """Gets the value of the specified NVMEM area property for one or more
+        """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
         To get a property from multiple NVMEM areas, specify a comma-delimited
@@ -1751,7 +1751,7 @@ class Session():
         return self._interpreter.get_nvmem_area_property_uint32(self._session_handle, nvmem_area_names, property_name)
 
     def get_nvmem_area_property_uint32_array(self, nvmem_area_names: str, property_name: str) -> list[int]:
-        """Gets the value of the specified NVMEM area property for one or more
+        """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
         To get a property from multiple NVMEM areas, specify a comma-delimited
@@ -1769,7 +1769,7 @@ class Session():
         return self._interpreter.get_nvmem_area_property_uint32_array(self._session_handle, nvmem_area_names, property_name)
 
     def get_session_property_double(self, property_name: str) -> float:
-        """Gets the value of the specified session property.
+        """Get the value of the specified session property.
         
         Args:
             property_name: Name of property to get
@@ -1780,7 +1780,7 @@ class Session():
         return self._interpreter.get_session_property_double(self._session_handle, property_name)
 
     def get_session_property_string(self, property_name: str) -> str:
-        """Gets the value of the specified session property.
+        """Get the value of the specified session property.
         
         Args:
             property_name: Name of property to get
@@ -1791,7 +1791,7 @@ class Session():
         return self._interpreter.get_session_property_string(self._session_handle, property_name)
 
     def get_session_property_string_array(self, property_name: str) -> list[str]:
-        """Gets the value of the specified session property.
+        """Get the value of the specified session property.
         
         Args:
             property_name: Name of property to get
@@ -1802,7 +1802,7 @@ class Session():
         return self._interpreter.get_session_property_string_array(self._session_handle, property_name)
 
     def set_session_property_double(self, property_name: str, property_value: float) -> None:
-        """Sets the specified session property to a new value.
+        """Set the specified session property to a new value.
         
         The change takes effect immediately.
         
@@ -1813,7 +1813,7 @@ class Session():
         return self._interpreter.set_session_property_double(self._session_handle, property_name, property_value)
 
     def set_session_property_string(self, property_name: str, property_value: str) -> None:
-        """Sets the specified session property to a new value.
+        """Set the specified session property to a new value.
         
         The change takes effect immediately.
         
@@ -1824,7 +1824,7 @@ class Session():
         return self._interpreter.set_session_property_string(self._session_handle, property_name, property_value)
 
     def set_session_property_string_array(self, property_name: str, property_value: list[str]) -> None:
-        """Sets the specified session property to a new value.
+        """Set the specified session property to a new value.
         
         The change takes effect immediately.
         
@@ -1835,7 +1835,7 @@ class Session():
         return self._interpreter.set_session_property_string_array(self._session_handle, property_name, property_value)
 
     def get_system_property_double(self, property_name: str) -> float:
-        """Gets the value of the specified system property.
+        """Get the value of the specified system property.
         
         Args:
             property_name: Name of property to get
@@ -1846,7 +1846,7 @@ class Session():
         return self._interpreter.get_system_property_double(self._session_handle, property_name)
 
     def get_system_property_string_array(self, property_name: str) -> list[str]:
-        """Gets the value of the specified system property.
+        """Get the value of the specified system property.
         
         Args:
             property_name: Name of property to get
@@ -1857,7 +1857,7 @@ class Session():
         return self._interpreter.get_system_property_string_array(self._session_handle, property_name)
 
     def get_system_property_uint64(self, property_name: str) -> int:
-        """Gets the value of the specified system property.
+        """Get the value of the specified system property.
         
         Args:
             property_name: Name of property to get
@@ -1868,7 +1868,7 @@ class Session():
         return self._interpreter.get_system_property_uint64(self._session_handle, property_name)
 
     def set_system_property_double(self, property_name: str, property_value: float) -> None:
-        """Sets the specified system property to a new value.
+        """Set the specified system property to a new value.
         
         The change takes effect immediately.
         
@@ -1879,7 +1879,7 @@ class Session():
         return self._interpreter.set_system_property_double(self._session_handle, property_name, property_value)
 
     def get_generic_property_bool(self, resources: str, property_name: str) -> bool:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -1899,7 +1899,7 @@ class Session():
         return self._interpreter.get_generic_property_bool(self._session_handle, resources, property_name)
 
     def get_generic_property_bool_array(self, resources: str, property_name: str) -> list[bool]:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -1919,7 +1919,7 @@ class Session():
         return self._interpreter.get_generic_property_bool_array(self._session_handle, resources, property_name)
 
     def get_generic_property_double(self, resources: str, property_name: str) -> float:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -1939,7 +1939,7 @@ class Session():
         return self._interpreter.get_generic_property_double(self._session_handle, resources, property_name)
 
     def get_generic_property_double_array(self, resources: str, property_name: str) -> list[float]:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -1959,7 +1959,7 @@ class Session():
         return self._interpreter.get_generic_property_double_array(self._session_handle, resources, property_name)
 
     def get_generic_property_int32(self, resources: str, property_name: str) -> int:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -1979,7 +1979,7 @@ class Session():
         return self._interpreter.get_generic_property_int32(self._session_handle, resources, property_name)
 
     def get_generic_property_int32_array(self, resources: str, property_name: str) -> list[int]:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -1999,7 +1999,7 @@ class Session():
         return self._interpreter.get_generic_property_int32_array(self._session_handle, resources, property_name)
 
     def get_generic_property_int64(self, resources: str, property_name: str) -> int:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -2019,7 +2019,7 @@ class Session():
         return self._interpreter.get_generic_property_int64(self._session_handle, resources, property_name)
 
     def get_generic_property_int64_array(self, resources: str, property_name: str) -> list[int]:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -2039,7 +2039,7 @@ class Session():
         return self._interpreter.get_generic_property_int64_array(self._session_handle, resources, property_name)
 
     def get_generic_property_string(self, resources: str, property_name: str) -> str:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -2059,7 +2059,7 @@ class Session():
         return self._interpreter.get_generic_property_string(self._session_handle, resources, property_name)
 
     def get_generic_property_string_array(self, resources: str, property_name: str) -> list[str]:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -2079,7 +2079,7 @@ class Session():
         return self._interpreter.get_generic_property_string_array(self._session_handle, resources, property_name)
 
     def get_generic_property_uint32(self, resources: str, property_name: str) -> int:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -2099,7 +2099,7 @@ class Session():
         return self._interpreter.get_generic_property_uint32(self._session_handle, resources, property_name)
 
     def get_generic_property_uint32_array(self, resources: str, property_name: str) -> list[int]:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -2119,7 +2119,7 @@ class Session():
         return self._interpreter.get_generic_property_uint32_array(self._session_handle, resources, property_name)
 
     def get_generic_property_uint64(self, resources: str, property_name: str) -> int:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -2139,7 +2139,7 @@ class Session():
         return self._interpreter.get_generic_property_uint64(self._session_handle, resources, property_name)
 
     def get_generic_property_uint64_array(self, resources: str, property_name: str) -> list[int]:
-        """Gets the value of the specified property from one or more resources,
+        """Get the value of the specified property from one or more resources,
         the session, or the system.
         
         To get a property from multiple resources, specify a comma-delimited
@@ -2159,7 +2159,7 @@ class Session():
         return self._interpreter.get_generic_property_uint64_array(self._session_handle, resources, property_name)
 
     def set_generic_property_bool(self, resources: str, property_name: str, property_value: bool) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2178,7 +2178,7 @@ class Session():
         return self._interpreter.set_generic_property_bool(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_bool_array(self, resources: str, property_name: str, property_value: list[bool]) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2197,7 +2197,7 @@ class Session():
         return self._interpreter.set_generic_property_bool_array(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_double(self, resources: str, property_name: str, property_value: float) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2216,7 +2216,7 @@ class Session():
         return self._interpreter.set_generic_property_double(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_double_array(self, resources: str, property_name: str, property_value: list[float]) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2235,7 +2235,7 @@ class Session():
         return self._interpreter.set_generic_property_double_array(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_int32(self, resources: str, property_name: str, property_value: int) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2254,7 +2254,7 @@ class Session():
         return self._interpreter.set_generic_property_int32(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_int32_array(self, resources: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2273,7 +2273,7 @@ class Session():
         return self._interpreter.set_generic_property_int32_array(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_int64(self, resources: str, property_name: str, property_value: int) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2292,7 +2292,7 @@ class Session():
         return self._interpreter.set_generic_property_int64(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_int64_array(self, resources: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2311,7 +2311,7 @@ class Session():
         return self._interpreter.set_generic_property_int64_array(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_string(self, resources: str, property_name: str, property_value: str) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2330,7 +2330,7 @@ class Session():
         return self._interpreter.set_generic_property_string(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_string_array(self, resources: str, property_name: str, property_value: list[str]) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2349,7 +2349,7 @@ class Session():
         return self._interpreter.set_generic_property_string_array(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_uint32(self, resources: str, property_name: str, property_value: int) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2368,7 +2368,7 @@ class Session():
         return self._interpreter.set_generic_property_uint32(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_uint32_array(self, resources: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2387,7 +2387,7 @@ class Session():
         return self._interpreter.set_generic_property_uint32_array(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_uint64(self, resources: str, property_name: str, property_value: int) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2406,7 +2406,7 @@ class Session():
         return self._interpreter.set_generic_property_uint64(self._session_handle, resources, property_name, property_value)
 
     def set_generic_property_uint64_array(self, resources: str, property_name: str, property_value: list[int]) -> None:
-        """Sets the specified property to a new value for one or more resources,
+        """Set the specified property to a new value for one or more resources,
         the session, or the system.
         
         If the property is defined by the SLSC driver, the change takes effect
@@ -2425,7 +2425,7 @@ class Session():
         return self._interpreter.set_generic_property_uint64_array(self._session_handle, resources, property_name, property_value)
 
     def execute_device_command(self, device_names: str, command_name: str, timeout: float) -> None:
-        """Executes the specified device command on one or more devices.
+        """Execute the specified device command on one or more devices.
         
         Commands define how user applications initiate actions or coordinated
         state changes on the SLSC module. For example, user applications may
@@ -2449,7 +2449,7 @@ class Session():
         return self._interpreter.execute_device_command(self._session_handle, device_names, command_name, timeout)
 
     def execute_physical_channel_command(self, physical_channel_names: str, command_name: str, timeout: float) -> None:
-        """Executes the specified physical channel command on one or more
+        """Execute the specified physical channel command on one or more
         physical channels.
         
         Commands define how user applications initiate actions or coordinated
@@ -2474,7 +2474,7 @@ class Session():
         return self._interpreter.execute_physical_channel_command(self._session_handle, physical_channel_names, command_name, timeout)
 
     def execute_generic_command(self, resources: str, command_name: str, timeout: float) -> None:
-        """Executes the specified command on one or more resources.
+        """Execute the specified command on one or more resources.
         
         Commands define how user applications initiate actions or coordinated
         state changes on the SLSC module. For example, user applications may
@@ -2499,7 +2499,7 @@ class Session():
         return self._interpreter.execute_generic_command(self._session_handle, resources, command_name, timeout)
 
     def read_register_uint8(self, device_name: str, register_address: int) -> int:
-        """Reads the specified register.
+        """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
         
@@ -2517,7 +2517,7 @@ class Session():
         return self._interpreter.read_register_uint8(self._session_handle, device_name, register_address)
 
     def read_register_uint16(self, device_name: str, register_address: int) -> int:
-        """Reads the specified register.
+        """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
         
@@ -2535,7 +2535,7 @@ class Session():
         return self._interpreter.read_register_uint16(self._session_handle, device_name, register_address)
 
     def read_register_uint32(self, device_name: str, register_address: int) -> int:
-        """Reads the specified register.
+        """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
         
@@ -2553,7 +2553,7 @@ class Session():
         return self._interpreter.read_register_uint32(self._session_handle, device_name, register_address)
 
     def read_register_uint64(self, device_name: str, register_address: int) -> int:
-        """Reads the specified register.
+        """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
         
@@ -2571,7 +2571,7 @@ class Session():
         return self._interpreter.read_register_uint64(self._session_handle, device_name, register_address)
 
     def write_register_uint8(self, device_name: str, register_address: int, data: int) -> None:
-        """Writes data to the specified register.
+        """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
         
@@ -2587,7 +2587,7 @@ class Session():
         return self._interpreter.write_register_uint8(self._session_handle, device_name, register_address, data)
 
     def write_register_uint16(self, device_name: str, register_address: int, data: int) -> None:
-        """Writes data to the specified register.
+        """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
         
@@ -2603,7 +2603,7 @@ class Session():
         return self._interpreter.write_register_uint16(self._session_handle, device_name, register_address, data)
 
     def write_register_uint32(self, device_name: str, register_address: int, data: int) -> None:
-        """Writes data to the specified register.
+        """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
         
@@ -2619,7 +2619,7 @@ class Session():
         return self._interpreter.write_register_uint32(self._session_handle, device_name, register_address, data)
 
     def write_register_uint64(self, device_name: str, register_address: int, data: int) -> None:
-        """Writes data to the specified register.
+        """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
         
@@ -2635,7 +2635,7 @@ class Session():
         return self._interpreter.write_register_uint64(self._session_handle, device_name, register_address, data)
 
     def get_nvmem_bytes(self, nvmem_area: str, nvmem_address: int, num_byte: int) -> bytes:
-        """Gets a range of bytes from an NVMEM area.
+        """Get a range of bytes from an NVMEM area.
         
         Args:
             nvmem_area: NVMEM area from which to get data. If you do not specify
@@ -2648,7 +2648,7 @@ class Session():
         return self._interpreter.get_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, num_byte)
 
     def set_nvmem_bytes(self, nvmem_area: str, nvmem_address: int, bytes_data: bytes, serial_number: str, password: str) -> None:
-        """Sets a range of bytes to write to an NVMEM area.
+        """Set a range of bytes to write to an NVMEM area.
         
         The data is cached in the session until the NVMEM area is committed. If
         you close the session without committing the NVMEM areas, the cached
@@ -2670,7 +2670,7 @@ class Session():
         return self._interpreter.set_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, bytes_data, serial_number, password)
 
     def commit_nvmem_areas(self, nvmem_area_names: str) -> None:
-        """Commits pending changes to hardware for the specified NVMEM area(s).
+        """Commit pending changes to hardware for the specified NVMEM area(s).
         
         Args:
             nvmem_area_names: Comma-delimited list of NVMEM areas to commit. If
@@ -2680,7 +2680,7 @@ class Session():
         return self._interpreter.commit_nvmem_areas(self._session_handle, nvmem_area_names)
 
     def commit_nvmem_for_devices(self, device_names: str) -> None:
-        """Commits pending changes to hardware for all NVMEM areas on the
+        """Commit pending changes to hardware for all NVMEM areas on the
         specified device(s).
         
         Args:
@@ -2691,7 +2691,7 @@ class Session():
         return self._interpreter.commit_nvmem_for_devices(self._session_handle, device_names)
 
     def commit_nvmem_for_session(self) -> None:
-        """Commits pending changes to hardware for all NVMEM areas for all
+        """Commit pending changes to hardware for all NVMEM areas for all
         modules in the session.
         
         If the session has any chassis reserved, this VI/function skips over
@@ -2700,7 +2700,7 @@ class Session():
         return self._interpreter.commit_nvmem_for_session(self._session_handle)
 
     def commit_nvmem_generic(self, resources: str) -> None:
-        """Commits pending changes to hardware for the specified resource(s).
+        """Commit pending changes to hardware for the specified resource(s).
         
         Args:
             resources: Comma-delimited list of resources for which to commit
@@ -2710,8 +2710,8 @@ class Session():
         return self._interpreter.commit_nvmem_generic(self._session_handle, resources)
 
     def get_linear_scaling_parameters(self, physical_channel_names: str) -> tuple[float, float]:
-        """Gets scaling parameters from a linear scale that uses the equation y
-        = mx + b, where x is a pre-scaled value and y is a scaled value.
+        """Get scaling parameters from a linear scale that uses the equation y =
+        mx + b, where x is a pre-scaled value and y is a scaled value.
         
         Args:
             physical_channel_names: Physical channel where the Scaling is
@@ -2724,8 +2724,8 @@ class Session():
         return self._interpreter.get_linear_scaling_parameters(self._session_handle, physical_channel_names)
 
     def get_polynomial_scaling_parameters(self, physical_channel_names: str) -> tuple[list[float], list[float]]:
-        """Gets scaling parameters from a polynomial scale that uses an nth
-        order polynomial equation.
+        """Get scaling parameters from a polynomial scale that uses an nth order
+        polynomial equation.
         
         A polynomial scale contains both a polynomial to convert pre-scaled
         values to scaled values and a polynomial to convert scaled values to
@@ -2742,7 +2742,7 @@ class Session():
         return self._interpreter.get_polynomial_scaling_parameters(self._session_handle, physical_channel_names)
 
     def get_table_scaling_parameters(self, physical_channel_names: str) -> tuple[list[float], list[float], int]:
-        """Gets scaling parameters from a table scale that maps an array of
+        """Get scaling parameters from a table scale that maps an array of
         pre-scaled values to an array of corresponding scaled values.
         
         Args:
@@ -2757,7 +2757,7 @@ class Session():
         return self._interpreter.get_table_scaling_parameters(self._session_handle, physical_channel_names)
 
     def get_user_defined_scaling_parameters(self, physical_channel_names: str) -> tuple[list[str], list[float]]:
-        """Gets scaling parameters from a user-defined scale.
+        """Get scaling parameters from a user-defined scale.
         
         Args:
             physical_channel_names: Physical channel where the Scaling is
@@ -2770,7 +2770,7 @@ class Session():
         return self._interpreter.get_user_defined_scaling_parameters(self._session_handle, physical_channel_names)
 
     def get_user_defined_scaling_equation(self, physical_channel_names: str) -> str:
-        """Gets a scaling equation from a user-defined scale.
+        """Get a scaling equation from a user-defined scale.
         
         Args:
             physical_channel_names: Physical channel where the Scaling is
@@ -2782,7 +2782,7 @@ class Session():
         return self._interpreter.get_user_defined_scaling_equation(self._session_handle, physical_channel_names)
 
     def set_linear_scaling_parameters(self, physical_channel_names: str, slope: float, intercept: float, serial_number: str, password: str) -> None:
-        """Sets scaling parameters for a linear scale that uses the equation y =
+        """Set scaling parameters for a linear scale that uses the equation y =
         mx + b, where x is a pre-scaled value and y is a scaled value.
         
         Args:
@@ -2798,7 +2798,7 @@ class Session():
         return self._interpreter.set_linear_scaling_parameters(self._session_handle, physical_channel_names, slope, intercept, serial_number, password)
 
     def set_polynomial_scaling_parameters(self, physical_channel_names: str, forward_coefficient: list[float], reverse_coefficient: list[float], serial_number: str, password: str) -> None:
-        """Sets scaling parameters for a polynomial scale that uses an nth order
+        """Set scaling parameters for a polynomial scale that uses an nth order
         polynomial equation.
         
         A polynomial scale contains both a polynomial to convert pre-scaled
@@ -2818,7 +2818,7 @@ class Session():
         return self._interpreter.set_polynomial_scaling_parameters(self._session_handle, physical_channel_names, forward_coefficient, reverse_coefficient, serial_number, password)
 
     def set_table_scaling_parameters(self, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: int, serial_number: str, password: str) -> None:
-        """Sets scaling parameters for a table scale that maps an array of
+        """Set scaling parameters for a table scale that maps an array of
         pre-scaled values to an array of corresponding scaled values.
         
         Args:
@@ -2835,7 +2835,7 @@ class Session():
         return self._interpreter.set_table_scaling_parameters(self._session_handle, physical_channel_names, scaled_value, prescale_value, coercion, serial_number, password)
 
     def set_user_defined_scaling_parameters(self, physical_channel_names: str, user_defined_parameter_name: list[str], user_defined_parameter_value: list[float], serial_number: str, password: str) -> None:
-        """Sets scaling parameters for a user-defined scale.
+        """Set scaling parameters for a user-defined scale.
         
         Args:
             physical_channel_names: Physical channel where the Scaling is
@@ -2850,7 +2850,7 @@ class Session():
         return self._interpreter.set_user_defined_scaling_parameters(self._session_handle, physical_channel_names, user_defined_parameter_name, user_defined_parameter_value, serial_number, password)
 
     def set_user_defined_scaling_equation(self, physical_channel_names: str, user_defined_equation: str, serial_number: str, password: str) -> None:
-        """Sets the scaling equation for a user-defined scale.
+        """Set the scaling equation for a user-defined scale.
         
         Args:
             physical_channel_names: Physical channel where the Scaling is
@@ -2864,7 +2864,7 @@ class Session():
         return self._interpreter.set_user_defined_scaling_equation(self._session_handle, physical_channel_names, user_defined_equation, serial_number, password)
 
     def commit_scaling_for_devices(self, device_names: str) -> None:
-        """Commits all scaling parameters with pending changes to all physical
+        """Commit all scaling parameters with pending changes to all physical
         channels that the devices contain.
         
         Args:

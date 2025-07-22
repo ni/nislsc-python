@@ -61,7 +61,7 @@ class Property():
             self._property_handle = None
 
     def get_property_property_bool(self, property_name: str) -> bool:
-        """Gets the value of the specified property reflection property.
+        """Get the value of the specified property reflection property.
         
         Args:
             property_name: Name of property reflection property to get
@@ -72,7 +72,7 @@ class Property():
         return self._interpreter.get_property_property_bool(self._property_handle, property_name)
 
     def get_property_property_int32(self, property_name: str) -> int:
-        """Gets the value of the specified property reflection property.
+        """Get the value of the specified property reflection property.
         
         Args:
             property_name: Name of property reflection property to get
@@ -83,7 +83,7 @@ class Property():
         return self._interpreter.get_property_property_int32(self._property_handle, property_name)
 
     def get_property_property_int32_array(self, property_name: str) -> list[int]:
-        """Gets the value of the specified property reflection property.
+        """Get the value of the specified property reflection property.
         
         Args:
             property_name: Name of property reflection property to get
@@ -94,7 +94,7 @@ class Property():
         return self._interpreter.get_property_property_int32_array(self._property_handle, property_name)
 
     def get_property_property_string(self, property_name: str) -> str:
-        """Gets the value of the specified property reflection property.
+        """Get the value of the specified property reflection property.
         
         Args:
             property_name: Name of property reflection property to get
@@ -105,7 +105,7 @@ class Property():
         return self._interpreter.get_property_property_string(self._property_handle, property_name)
 
     def get_property_property_string_array(self, property_name: str) -> list[str]:
-        """Gets the value of the specified property reflection property.
+        """Get the value of the specified property reflection property.
         
         Args:
             property_name: Name of property reflection property to get

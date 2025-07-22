@@ -203,20 +203,20 @@ def get_function_parameter_list(
     return param_list
 
 
-def get_function_return_type(function: dict, return_object: bool = False) -> str:
+def get_function_return_type(function: dict, return_self: bool = False) -> str:
     """Generate the return type for a Python API function."""
     num = 0
     if "capi" in function["targets"]:
         param_list = []
         for parameter in function["params"]:
-            if is_capi(parameter) and is_param_output(parameter) and return_object:
+            if is_capi(parameter) and is_param_output(parameter) and return_self:
                 if parameter["dataType"] in (
                     "Library",
                     "Session",
                     "CommandReference",
                     "PropertyReference",
                 ):
-                    return f" -> {convert_to_class_name(parameter['dataType'])}"
+                    return f" -> Self"
                 else:
                     param_list.append(f"{PYTHON_DATATYPE_MAP.get(parameter['dataType'])}")
                     num += 1

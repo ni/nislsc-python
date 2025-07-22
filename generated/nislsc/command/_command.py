@@ -63,7 +63,7 @@ class Command():
             self._command_handle = None
 
     def get_command_property_string(self, property_name: str) -> str:
-        """Gets the value of the specified command reflection property.
+        """Get the value of the specified command reflection property.
         
         Args:
             property_name: Name of command reflection property to get

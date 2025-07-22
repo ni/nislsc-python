@@ -20,6 +20,28 @@ CLASS_DOCSTRINGS_MAP = {
     "CommandReference": "Command: An instance of the Command class.",
 }
 
+IMPERATIVE_DOCSTRINGS_MAP = {
+    "Gets": "Get",
+    "Sets": "Set",
+    "Executes": "Execute",
+    "Commits": "Commit",
+    "Writes": "Write",
+    "Initializes": "Initialize",
+    "Returns": "Return",
+    "Attempts": "Attempt",
+    "Deletes": "Delete",
+    "Opens": "Open",
+    "Closes": "Close",
+    "Reserves": "Reserve",
+    "Unreserves": "Unreserve",
+    "Resets": "Reset",
+    "Renames": "Rename",
+    "Updates": "Update",
+    "Connects": "Connect",
+    "Removes": "Remove",
+    "Reads": "Read",
+}
+
 
 def wrap_text(text: str, width: int = 72, indent: str = "    ", is_doc: bool = False) -> list[str]:
     """Wraps text at a given width."""
@@ -67,7 +89,10 @@ def generate_doc(function: dict) -> list[str]:
     doc = []
     first_split = function["doc"].split(".", 1)
     first_sentence = first_split[0] + "."
-    summary_wrapped = wrap_text(first_sentence, 72, "", True)
+    words = first_sentence.split()
+    first_word = IMPERATIVE_DOCSTRINGS_MAP.get(words[0], "Error")
+    new_sentence = first_word + " " + " ".join(words[1:])
+    summary_wrapped = wrap_text(new_sentence, 72, "", True)
     doc.append(summary_wrapped[0])
     for line in summary_wrapped[1:]:
         doc.append(line)

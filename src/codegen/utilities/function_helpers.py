@@ -134,7 +134,7 @@ def get_ctypes_argtypes(function: dict) -> list[str]:
 
 
 def get_function_parameter_list(
-    function: dict, class_name: str = None, typing: bool = True, is_language: bool = False
+    function: dict, class_name: str = None, typing: bool = True, is_language: bool = False, class_func: bool = True
 ) -> list[str]:
     """Generate a list of function parameters for a Python API function.
 
@@ -147,6 +147,8 @@ def get_function_parameter_list(
             list.
         is_language (bool, optional): If True, include the language argument
             with a default value of Language.UNDEFINED.
+        class_func (bool, optional): If True, indicates that the function is
+            a class method.
 
     Returns:
         list[str]: A list of parameter strings for the function definition.
@@ -154,7 +156,8 @@ def get_function_parameter_list(
     param_list = []
     if "capi" in function["targets"]:
         if typing:
-            param_list.append("self")
+            if class_func:
+                param_list.append("self")
             for parameter in function["params"]:
                 if (
                     is_capi(parameter)
@@ -463,6 +466,23 @@ def is_defining_language(functions: dict) -> bool:
             return True
     return False
 
+
+def is_class_func(function: dict, class_name: str) -> bool:
+    """Check if the function is the respective class method."""
+    result = False
+    for parameter in function["params"]:
+        if is_capi(parameter) and parameter["dataType"] == class_name:
+            result = True
+        if is_capi(parameter) and is_param_output(parameter):
+            if parameter["dataType"] in (
+                    "Library",
+                    "Session",
+                    "CommandReference",
+                    "PropertyReference",
+                ):
+                if parameter["dataType"] != class_name:
+                    return False
+    return result
 
 def generate_result_parser(function: dict) -> list[str]:
     """Generate the result parser for output parameters."""

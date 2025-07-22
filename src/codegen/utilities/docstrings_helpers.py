@@ -91,7 +91,7 @@ def generate_args(function: dict, ignore_type: str) -> list[str]:
         if is_capi(param) and is_param_input(param):
             if param["dataType"] == ignore_type:
                 continue
-            args_line = f"{get_standardized_param_name(param)} ({PYTHON_DATATYPE_MAP.get(param['dataType'])}): {param['doc']}"
+            args_line = f"{get_standardized_param_name(param)}: {param['doc']}"
             for text in wrap_text(args_line, 72):
                 args.append(text)
     return args
@@ -104,15 +104,7 @@ def generate_returns(function: dict) -> list[str]:
         returns.append("Returns:")
     for param in function["params"]:
         if is_capi(param) and is_param_output(param):
-            if param["dataType"] in (
-                "Library",
-                "Session",
-                "CommandReference",
-                "PropertyReference",
-            ):
-                ret_line = CLASS_DOCSTRINGS_MAP.get(param["dataType"])
-            else:
-                ret_line = f"{get_standardized_param_name(param)} ({PYTHON_DATATYPE_MAP.get(param['dataType'])}): {param['doc']}"
+            ret_line = f"{get_standardized_param_name(param)}: {param['doc']}"
             for text in wrap_text(ret_line, 72):
                 returns.append(text)
     return returns

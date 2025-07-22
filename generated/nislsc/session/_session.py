@@ -1,54 +1,196 @@
+from typing_extensions import Self
+
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.command._command import Command
 from nislsc.property._property import Property
+from nislsc.utils import _select_interpreter
 from types import TracebackType
 
 class Session():
-    """Represents a session for interacting with the NI SLSC hardware.
-
-    This class manages the session handle and interpreter, and provides
-    context management and resource cleanup for SLSC sessions.
     """
-    def __init__(self, session_handle: int, interpreter: BaseInterpreter) -> None:
-        """Initializes a Session instance.
+    Represent Session class for NI SLSC.
+    """
+    def __init__(self, library: Library, session_handle: int, interpreter: BaseInterpreter) -> None:
+        """Initialize a Session instance.
 
         Args:
-            session_handle (int): The session handle returned by the
+            library: The library instance used for session
+                management.
+            session_handle: The session handle returned by the
                 initialization function.
-            interpreter (BaseInterpreter): The interpreter instance used for
+            interpreter: The interpreter instance used for
                 communication.
         """
         self._session_handle = session_handle
-        self._interpreter = interpreter
+        self._interpreter = _select_interpreter()
 
-    def __enter__(self) -> "Session":
+    def __enter__(self) -> Self:
         """Enter the runtime context related to this object.
 
         Returns:
-            Session: The session object itself.
+            Self: The session object itself.
         """
         return self
   
     def __exit__(self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None) -> None:
-        """Exit the runtime context and close the session.
+        """Exit the runtime context and close the Session instance.
 
         Args:
-            type (type[BaseException] | None): The exception type, if an
-                exception was raised, otherwise None.
-            value (BaseException | None): The exception value, if an exception
-                was raised, otherwise None.
-            traceback (TracebackType | None): The traceback, if an exception was
-                raised, otherwise None.
+            type: The exception type, if an exception was raised, otherwise 
+                None.
+            value: The exception value, if an exception was raised, otherwise
+                None.
+            traceback: The traceback, if an exception was raised, otherwise 
+                None.
         """
-        self._interpreter.close_session(self._session_handle)
-        self._session_handle = 0
+        self._close()
 
     def __del__(self) -> None:
-        """Destructor to ensure the session is closed when the object is 
-        deleted.
         """
-        if self._session_handle != 0:
+        Remind the user that the Session instance is not closed.
+        """
+        if self._session_handle is not None:
+            warnings.warn(
+                'Session was not closed before it was destructed. Resources on the'
+                'Session may still be reserved.',
+                SLSCResourceWarning
+            )
+
+    def close(self) -> None:
+        """
+        Close the Session instance.
+        """
+        if self._session_handle is not None:
             self._interpreter.close_session(self._session_handle)
+            self._session_handle = None
+
+    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
+        """Initializes an SLSC session with one or multiple devices.
+        
+        The session opens network connections for devices. If reservationAccess
+        is set to ReadOnly or ReadWrite, the session also reserves the devices.
+        
+        This function saves the specified device names in the
+        Session.DefaultDevices property as the default devices of the session.
+        You may change the session default devices by setting the
+        Session.DefaultDevices property.
+        
+        You cannot use the AbortSession function to cancel any blocking network
+        operations performed by this function. If you need to programmatically
+        abort blocking network operations, call
+        InitializeSessionWithoutResources to obtain a session reference, then
+        call ConnectToDevices to open network connections for the devices, and
+        then call ReserveDevices to reserve the devices.
+        
+        Args:
+            library_handle: Library handle
+            device_names: Comma-delimited list of devices
+            connection_timeout: Timeout for connecting to devices, in seconds.
+                Specify -1 to use the default value.
+            reservation_access: Access mode with which to reserve devices: None
+                (do not reserve devices), ReadOnly, or ReadWrite
+            reservation_group: Arbitrary name to allow multiple sessions to
+                simultaneously reserve the same device(s)
+            reservation_timeout: Timeout for reserving devices, in seconds.
+                Specify -1 to use the default value.
+        
+        Returns:
+            session_handle: Newly created session
+        """
+        return self._interpreter.initialize_session_with_devices(library_handle, device_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
+
+    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
+        """Initializes an SLSC session with one or multiple NVMEM areas.
+        
+        The session opens network connections for NVMEM areas. If
+        reservationAccess is set to ReadOnly or ReadWrite, the session also
+        reserves the devices.
+        
+        This function saves the specified NVMEM area names in the
+        Session.DefaultNVMEMAreas property as the default NVMEM areas of the
+        session. You may change the session default NVMEM areas or session
+        default devices by setting the Session.DefaultNVMEMAreas property or the
+        Session.DefaultDevices property.
+        
+        You cannot use the AbortSession function to cancel any blocking network
+        operations performed by this function. If you need to programmatically
+        abort blocking network operations, call
+        InitializeSessionWithoutResources to obtain a session reference, then
+        call ConnectToDevices to open network connections for the devices, and
+        then call ReserveDevices to reserve the devices.
+        
+        Args:
+            library_handle: Library handle
+            nvmem_area_names: Comma-delimited list of NVMEM areas
+            connection_timeout: Timeout for connecting to devices, in seconds.
+                Specify -1 to use the default value.
+            reservation_access: Access mode with which to reserve devices: None
+                (do not reserve devices), ReadOnly, or ReadWrite
+            reservation_group: Arbitrary name to allow multiple sessions to
+                simultaneously reserve the same device(s)
+            reservation_timeout: Timeout for reserving devices, in seconds.
+                Specify -1 to use the default value.
+        
+        Returns:
+            session_handle: Newly created session
+        """
+        return self._interpreter.initialize_session_with_nvmem_areas(library_handle, nvmem_area_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
+
+    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Session:
+        """Initializes an SLSC session with one or multiple physical channels.
+        
+        The session opens network connections for devices that correspond to the
+        physical channels. The session opens network connections for devices
+        that correspond to the physical channels. If reservationAccess is set to
+        ReadOnly or ReadWrite, the session also reserves the devices.
+        
+        This function saves the specified physical channel names in the
+        Session.DefaultPhysChans property as the default physical channels of
+        the session. You may change the session default physical channels or
+        session default devices by setting Session.DefaultPhysChans property or
+        the Session.DefaultDevices property.
+        
+        You cannot use the AbortSession function to cancel any blocking network
+        operations performed by this function. If you need to programmatically
+        abort blocking network operations, call
+        InitializeSessionWithoutResources to obtain a session reference, then
+        call ConnectToDevices to open network connections for the devices, and
+        then call ReserveDevices to reserve the devices.
+        
+        Args:
+            library_handle: Library handle
+            physical_channel_names: Comma-delimited list of physical channels.
+                Numbered physical channels may be specified as a colon-delimited
+                range, such as "Mod1/load0:3".
+            connection_timeout: Timeout for connecting to devices, in seconds.
+                Specify -1 to use the default value.
+            reservation_access: Access mode with which to reserve devices: None
+                (do not reserve devices), ReadOnly or ReadWrite
+            reservation_group: Arbitrary name to allow multiple sessions to
+                simultaneously reserve the same device(s)
+            reservation_timeout: Timeout for reserving devices, in seconds.
+                Specify -1 to use the default value.
+        
+        Returns:
+            session_handle: Newly created session
+        """
+        return self._interpreter.initialize_session_with_physical_channels(library_handle, physical_channel_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
+
+    def initialize_session_without_resources(self, library_handle: int) -> Session:
+        """Initializes an SLSC session without specifying any resources or
+        opening any network connections.
+        
+        Use InitializeSessionWithoutResources if you need to set session
+        properties that control network timeouts or the ability to
+        programmatically abort blocking network operations.
+        
+        Args:
+            library_handle: Library handle
+        
+        Returns:
+            session_handle: Newly created session
+        """
+        return self._interpreter.initialize_session_without_resources(library_handle)
 
     def abort_session(self) -> None:
         """Attempts to cancel a VI/function that blocks on network
@@ -96,15 +238,15 @@ class Session():
         disk, they are deleted.
         
         Args:
-            chassis_name (str): Chassis to log in to
-            username (str): Name of user account on the SLSC chassis
-            password (str): Password of user account on the SLSC chassis
-            connection_timeout (float): Timeout for connecting to devices, in
-                seconds. Specify -1 to use the value of the
-                Session.TCPIP.ConnectTimeout property.
-            save_credentials_to_disk (bool): Specify true to save login
-                credentials to disk, false to keep them in memory for the
-                lifetime of the process
+            chassis_name: Chassis to log in to
+            username: Name of user account on the SLSC chassis
+            password: Password of user account on the SLSC chassis
+            connection_timeout: Timeout for connecting to devices, in seconds.
+                Specify -1 to use the value of the Session.TCPIP.ConnectTimeout
+                property.
+            save_credentials_to_disk: Specify true to save login credentials to
+                disk, false to keep them in memory for the lifetime of the
+                process
         """
         return self._interpreter.log_in(self._session_handle, chassis_name, username, password, connection_timeout, save_credentials_to_disk)
 
@@ -117,7 +259,7 @@ class Session():
         LogOut deletes both in-memory and on-disk credentials.
         
         Args:
-            chassis_name (str): Chassis to log out of
+            chassis_name: Chassis to log out of
         """
         return self._interpreter.log_out(self._session_handle, chassis_name)
 
@@ -133,12 +275,12 @@ class Session():
         error is returned.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to
-                open network connections. If you do not specify this parameter,
-                the session default devices will be used.
-            connection_timeout (float): Timeout for connecting to devices, in
-                seconds. Specify -1 to use the value of the
-                Session.TCPIP.ConnectTimeout property.
+            device_names: Comma-delimited list of devices for which to open
+                network connections. If you do not specify this parameter, the
+                session default devices will be used.
+            connection_timeout: Timeout for connecting to devices, in seconds.
+                Specify -1 to use the value of the Session.TCPIP.ConnectTimeout
+                property.
         """
         return self._interpreter.connect_to_devices(self._session_handle, device_names, connection_timeout)
 
@@ -150,9 +292,9 @@ class Session():
         last device is disconnected.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to
-                close network connections. If you do not specify this parameter,
-                the session default devices will be used.
+            device_names: Comma-delimited list of devices for which to close
+                network connections. If you do not specify this parameter, the
+                session default devices will be used.
         """
         return self._interpreter.disconnect_from_devices(self._session_handle, device_names)
 
@@ -164,15 +306,15 @@ class Session():
         established, an error is returned.
         
         Args:
-            address (str): Chassis IP address or hostname
-            username (str): Name of user account on the SLSC chassis
-            password (str): Password of user account on the SLSC chassis
-            connection_timeout (float): Timeout for connecting to devices, in
-                seconds. Specify -1 to use the value of the
-                Session.TCPIP.ConnectTimeout property.
+            address: Chassis IP address or hostname
+            username: Name of user account on the SLSC chassis
+            password: Password of user account on the SLSC chassis
+            connection_timeout: Timeout for connecting to devices, in seconds.
+                Specify -1 to use the value of the Session.TCPIP.ConnectTimeout
+                property.
         
         Returns:
-            chassis_name (str): Name of connected chassis
+            chassis_name: Name of connected chassis
         """
         return self._interpreter.connect_to_chassis_by_address(self._session_handle, address, username, password, connection_timeout)
 
@@ -189,16 +331,16 @@ class Session():
         ReadOnly access.
         
         Args:
-            device_names (str): Comma-delimited list of devices to reserve. If
-                you do not specify this parameter, the session default devices
-                will be used.
-            reservation_access (int): Access mode with which to reserve devices:
+            device_names: Comma-delimited list of devices to reserve. If you do
+                not specify this parameter, the session default devices will be
+                used.
+            reservation_access: Access mode with which to reserve devices:
                 ReadOnly or ReadWrite
-            reservation_group (str): Arbitrary name to allow multiple sessions
-                to simultaneously reserve the same device(s)
-            reservation_timeout (float): Timeout for reserving devices, in
-                seconds. Specify -1 to use the value of the
-                Session.ReservationTimeout property
+            reservation_group: Arbitrary name to allow multiple sessions to
+                simultaneously reserve the same device(s)
+            reservation_timeout: Timeout for reserving devices, in seconds.
+                Specify -1 to use the value of the Session.ReservationTimeout
+                property
         """
         return self._interpreter.reserve_devices(self._session_handle, device_names, reservation_access, reservation_group, reservation_timeout)
 
@@ -207,9 +349,9 @@ class Session():
         them.
         
         Args:
-            device_names (str): Comma-delimited list of devices to unreserve. If
-                you do not specify this parameter, the session default devices
-                will be used.
+            device_names: Comma-delimited list of devices to unreserve. If you
+                do not specify this parameter, the session default devices will
+                be used.
         """
         return self._interpreter.unreserve_devices(self._session_handle, device_names)
 
@@ -227,9 +369,9 @@ class Session():
         Configuration API.
         
         Args:
-            device_names (str): Comma-delimited list of devices to reset. If you
-                do not specify this parameter, the session default devices will
-                be used.
+            device_names: Comma-delimited list of devices to reset. If you do
+                not specify this parameter, the session default devices will be
+                used.
         """
         return self._interpreter.reset_devices(self._session_handle, device_names)
 
@@ -243,8 +385,8 @@ class Session():
         to update the configuration file.
         
         Args:
-            device_name (str): Device to rename
-            new_device_name (str): New name for device
+            device_name: Device to rename
+            new_device_name: New name for device
         """
         return self._interpreter.rename_device(self._session_handle, device_name, new_device_name)
 
@@ -258,10 +400,10 @@ class Session():
         connection.
         
         Args:
-            chassis_name (str): Name of chassis to update
-            connection_timeout (float): Timeout for connecting to devices, in
-                seconds. Specify -1 to use the value of the
-                Session.TCPIP.ConnectTimeout property.
+            chassis_name: Name of chassis to update
+            connection_timeout: Timeout for connecting to devices, in seconds.
+                Specify -1 to use the value of the Session.TCPIP.ConnectTimeout
+                property.
         """
         return self._interpreter.update_system_configuration_file(self._session_handle, chassis_name, connection_timeout)
 
@@ -277,15 +419,15 @@ class Session():
         network connections, nor does it cache the new network connection.
         
         Args:
-            address (str): Chassis IP address or hostname
-            username (str): Name of user account on the SLSC chassis
-            password (str): Password of user account on the SLSC chassis
-            connection_timeout (float): Timeout for connecting to devices, in
-                seconds. Specify -1 to use the value of the
-                Session.TCPIP.ConnectTimeout property.
+            address: Chassis IP address or hostname
+            username: Name of user account on the SLSC chassis
+            password: Password of user account on the SLSC chassis
+            connection_timeout: Timeout for connecting to devices, in seconds.
+                Specify -1 to use the value of the Session.TCPIP.ConnectTimeout
+                property.
         
         Returns:
-            chassis_name (str): Name of added chassis
+            chassis_name: Name of added chassis
         """
         return self._interpreter.add_network_chassis(self._session_handle, address, username, password, connection_timeout)
 
@@ -296,7 +438,7 @@ class Session():
         continue to show up in SLSC I/O controls, the Sys.Devices property, etc.
         
         Args:
-            chassis_name (str): Name of chassis to remove
+            chassis_name: Name of chassis to remove
         """
         return self._interpreter.remove_chassis(self._session_handle, chassis_name)
 
@@ -308,13 +450,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (bool): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_bool(self._session_handle, device_names, property_name)
 
@@ -326,13 +468,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[bool]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_bool_array(self._session_handle, device_names, property_name)
 
@@ -344,13 +486,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (float): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_double(self._session_handle, device_names, property_name)
 
@@ -362,13 +504,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[float]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_double_array(self._session_handle, device_names, property_name)
 
@@ -380,13 +522,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_int32(self._session_handle, device_names, property_name)
 
@@ -398,13 +540,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_int32_array(self._session_handle, device_names, property_name)
 
@@ -416,13 +558,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_int64(self._session_handle, device_names, property_name)
 
@@ -434,13 +576,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_int64_array(self._session_handle, device_names, property_name)
 
@@ -452,13 +594,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (str): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_string(self._session_handle, device_names, property_name)
 
@@ -470,13 +612,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[str]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_string_array(self._session_handle, device_names, property_name)
 
@@ -488,13 +630,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_uint32(self._session_handle, device_names, property_name)
 
@@ -506,13 +648,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_uint32_array(self._session_handle, device_names, property_name)
 
@@ -524,13 +666,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_uint64(self._session_handle, device_names, property_name)
 
@@ -542,13 +684,13 @@ class Session():
         of devices and use an array version of this VI/function.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to get
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to get
+            device_names: Comma-delimited list of devices for which to get the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_device_property_uint64_array(self._session_handle, device_names, property_name)
 
@@ -564,11 +706,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (bool): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_bool(self._session_handle, device_names, property_name, property_value)
 
@@ -584,11 +726,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (list[bool]): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_bool_array(self._session_handle, device_names, property_name, property_value)
 
@@ -604,11 +746,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (float): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_double(self._session_handle, device_names, property_name, property_value)
 
@@ -624,11 +766,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (list[float]): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_double_array(self._session_handle, device_names, property_name, property_value)
 
@@ -644,11 +786,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_int32(self._session_handle, device_names, property_name, property_value)
 
@@ -664,11 +806,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_int32_array(self._session_handle, device_names, property_name, property_value)
 
@@ -684,11 +826,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_int64(self._session_handle, device_names, property_name, property_value)
 
@@ -704,11 +846,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_int64_array(self._session_handle, device_names, property_name, property_value)
 
@@ -724,11 +866,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (str): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_string(self._session_handle, device_names, property_name, property_value)
 
@@ -744,11 +886,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (list[str]): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_string_array(self._session_handle, device_names, property_name, property_value)
 
@@ -764,11 +906,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_uint32(self._session_handle, device_names, property_name, property_value)
 
@@ -784,11 +926,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_uint32_array(self._session_handle, device_names, property_name, property_value)
 
@@ -804,11 +946,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_uint64(self._session_handle, device_names, property_name, property_value)
 
@@ -824,11 +966,11 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to set
-                the specified property. If you do not specify this parameter,
-                the session default devices will be used.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            device_names: Comma-delimited list of devices for which to set the
+                specified property. If you do not specify this parameter, the
+                session default devices will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_device_property_uint64_array(self._session_handle, device_names, property_name, property_value)
 
@@ -841,15 +983,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (bool): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name)
 
@@ -862,15 +1004,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[bool]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name)
 
@@ -883,15 +1025,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (float): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_double(self._session_handle, physical_channel_names, property_name)
 
@@ -904,15 +1046,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[float]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name)
 
@@ -925,15 +1067,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name)
 
@@ -946,15 +1088,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name)
 
@@ -967,15 +1109,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name)
 
@@ -988,15 +1130,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name)
 
@@ -1009,15 +1151,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (str): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_string(self._session_handle, physical_channel_names, property_name)
 
@@ -1030,15 +1172,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[str]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name)
 
@@ -1051,15 +1193,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name)
 
@@ -1072,15 +1214,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name)
 
@@ -1093,15 +1235,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name)
 
@@ -1114,15 +1256,15 @@ class Session():
         use an array version of this VI/function.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to get the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to get
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to get the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name)
 
@@ -1140,13 +1282,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (bool): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1164,13 +1306,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (list[bool]): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1188,13 +1330,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (float): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_double(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1212,13 +1354,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (list[float]): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1236,13 +1378,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1260,13 +1402,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1284,13 +1426,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1308,13 +1450,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1332,13 +1474,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (str): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_string(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1356,13 +1498,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (list[str]): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1380,13 +1522,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1404,13 +1546,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1428,13 +1570,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1452,13 +1594,13 @@ class Session():
         channels(s).
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to set the specified property. Numbered
-                physical channels may be specified as a colon-delimited range,
-                such as "Mod1/load0:3". If you do not specify this parameter,
-                the session default physical channels will be used.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to set the specified property. Numbered physical
+                channels may be specified as a colon-delimited range, such as
+                "Mod1/load0:3". If you do not specify this parameter, the
+                session default physical channels will be used.
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name, property_value)
 
@@ -1471,9 +1613,9 @@ class Session():
         value is committed.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to
-                commit properties. If you do not specify this parameter, the
-                session default devices will be used.
+            device_names: Comma-delimited list of devices for which to commit
+                properties. If you do not specify this parameter, the session
+                default devices will be used.
         """
         return self._interpreter.commit_properties_for_devices(self._session_handle, device_names)
 
@@ -1485,11 +1627,11 @@ class Session():
         value is committed.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels for which to commit properties. Numbered physical
-                channels may be specified as a colon-delimited range, such as
-                "Mod1/load0:3". If you do not specify this parameter, the
-                session default physical channels will be used.
+            physical_channel_names: Comma-delimited list of physical channels
+                for which to commit properties. Numbered physical channels may
+                be specified as a colon-delimited range, such as "Mod1/load0:3".
+                If you do not specify this parameter, the session default
+                physical channels will be used.
         """
         return self._interpreter.commit_properties_for_physical_channels(self._session_handle, physical_channel_names)
 
@@ -1511,11 +1653,10 @@ class Session():
         value is committed.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to
-                commit properties, or a resource alias such as
-                "$DefaultDevices". Numbered physical channels may be specified
-                as a colon-delimited range, such as "Mod1/load0:3". This
-                parameter is required.
+            resources: Comma-delimited list of resources for which to commit
+                properties, or a resource alias such as "$DefaultDevices".
+                Numbered physical channels may be specified as a colon-delimited
+                range, such as "Mod1/load0:3". This parameter is required.
         """
         return self._interpreter.commit_properties_generic(self._session_handle, resources)
 
@@ -1527,13 +1668,13 @@ class Session():
         list of NVMEM areas and use an array version of this VI/function.
         
         Args:
-            nvmem_area_names (str): Comma-delimited list of NVMEM areas for
-                which to get the specified property. Specify "Default" to use
-                the value of the Session.DefaultNVMEMAreas property.
-            property_name (str): Name of property to get
+            nvmem_area_names: Comma-delimited list of NVMEM areas for which to
+                get the specified property. Specify "Default" to use the value
+                of the Session.DefaultNVMEMAreas property.
+            property_name: Name of property to get
         
         Returns:
-            property_value (bool): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_nvmem_area_property_bool(self._session_handle, nvmem_area_names, property_name)
 
@@ -1545,13 +1686,13 @@ class Session():
         list of NVMEM areas and use an array version of this VI/function.
         
         Args:
-            nvmem_area_names (str): Comma-delimited list of NVMEM areas for
-                which to get the specified property. Specify "Default" to use
-                the value of the Session.DefaultNVMEMAreas property.
-            property_name (str): Name of property to get
+            nvmem_area_names: Comma-delimited list of NVMEM areas for which to
+                get the specified property. Specify "Default" to use the value
+                of the Session.DefaultNVMEMAreas property.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[bool]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_nvmem_area_property_bool_array(self._session_handle, nvmem_area_names, property_name)
 
@@ -1563,13 +1704,13 @@ class Session():
         list of NVMEM areas and use an array version of this VI/function.
         
         Args:
-            nvmem_area_names (str): Comma-delimited list of NVMEM areas for
-                which to get the specified property. Specify "Default" to use
-                the value of the Session.DefaultNVMEMAreas property.
-            property_name (str): Name of property to get
+            nvmem_area_names: Comma-delimited list of NVMEM areas for which to
+                get the specified property. Specify "Default" to use the value
+                of the Session.DefaultNVMEMAreas property.
+            property_name: Name of property to get
         
         Returns:
-            property_value (str): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_nvmem_area_property_string(self._session_handle, nvmem_area_names, property_name)
 
@@ -1581,13 +1722,13 @@ class Session():
         list of NVMEM areas and use an array version of this VI/function.
         
         Args:
-            nvmem_area_names (str): Comma-delimited list of NVMEM areas for
-                which to get the specified property. Specify "Default" to use
-                the value of the Session.DefaultNVMEMAreas property.
-            property_name (str): Name of property to get
+            nvmem_area_names: Comma-delimited list of NVMEM areas for which to
+                get the specified property. Specify "Default" to use the value
+                of the Session.DefaultNVMEMAreas property.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[str]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_nvmem_area_property_string_array(self._session_handle, nvmem_area_names, property_name)
 
@@ -1599,13 +1740,13 @@ class Session():
         list of NVMEM areas and use an array version of this VI/function.
         
         Args:
-            nvmem_area_names (str): Comma-delimited list of NVMEM areas for
-                which to get the specified property. Specify "Default" to use
-                the value of the Session.DefaultNVMEMAreas property.
-            property_name (str): Name of property to get
+            nvmem_area_names: Comma-delimited list of NVMEM areas for which to
+                get the specified property. Specify "Default" to use the value
+                of the Session.DefaultNVMEMAreas property.
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_nvmem_area_property_uint32(self._session_handle, nvmem_area_names, property_name)
 
@@ -1617,13 +1758,13 @@ class Session():
         list of NVMEM areas and use an array version of this VI/function.
         
         Args:
-            nvmem_area_names (str): Comma-delimited list of NVMEM areas for
-                which to get the specified property. Specify "Default" to use
-                the value of the Session.DefaultNVMEMAreas property.
-            property_name (str): Name of property to get
+            nvmem_area_names: Comma-delimited list of NVMEM areas for which to
+                get the specified property. Specify "Default" to use the value
+                of the Session.DefaultNVMEMAreas property.
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_nvmem_area_property_uint32_array(self._session_handle, nvmem_area_names, property_name)
 
@@ -1631,10 +1772,10 @@ class Session():
         """Gets the value of the specified session property.
         
         Args:
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (float): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_session_property_double(self._session_handle, property_name)
 
@@ -1642,10 +1783,10 @@ class Session():
         """Gets the value of the specified session property.
         
         Args:
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (str): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_session_property_string(self._session_handle, property_name)
 
@@ -1653,10 +1794,10 @@ class Session():
         """Gets the value of the specified session property.
         
         Args:
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[str]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_session_property_string_array(self._session_handle, property_name)
 
@@ -1666,8 +1807,8 @@ class Session():
         The change takes effect immediately.
         
         Args:
-            property_name (str): Name of property to set
-            property_value (float): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_session_property_double(self._session_handle, property_name, property_value)
 
@@ -1677,8 +1818,8 @@ class Session():
         The change takes effect immediately.
         
         Args:
-            property_name (str): Name of property to set
-            property_value (str): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_session_property_string(self._session_handle, property_name, property_value)
 
@@ -1688,8 +1829,8 @@ class Session():
         The change takes effect immediately.
         
         Args:
-            property_name (str): Name of property to set
-            property_value (list[str]): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_session_property_string_array(self._session_handle, property_name, property_value)
 
@@ -1697,10 +1838,10 @@ class Session():
         """Gets the value of the specified system property.
         
         Args:
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (float): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_system_property_double(self._session_handle, property_name)
 
@@ -1708,10 +1849,10 @@ class Session():
         """Gets the value of the specified system property.
         
         Args:
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[str]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_system_property_string_array(self._session_handle, property_name)
 
@@ -1719,10 +1860,10 @@ class Session():
         """Gets the value of the specified system property.
         
         Args:
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_system_property_uint64(self._session_handle, property_name)
 
@@ -1732,8 +1873,8 @@ class Session():
         The change takes effect immediately.
         
         Args:
-            property_name (str): Name of property to set
-            property_value (float): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_system_property_double(self._session_handle, property_name, property_value)
 
@@ -1745,15 +1886,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (bool): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_bool(self._session_handle, resources, property_name)
 
@@ -1765,15 +1906,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[bool]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_bool_array(self._session_handle, resources, property_name)
 
@@ -1785,15 +1926,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (float): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_double(self._session_handle, resources, property_name)
 
@@ -1805,15 +1946,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[float]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_double_array(self._session_handle, resources, property_name)
 
@@ -1825,15 +1966,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_int32(self._session_handle, resources, property_name)
 
@@ -1845,15 +1986,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_int32_array(self._session_handle, resources, property_name)
 
@@ -1865,15 +2006,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_int64(self._session_handle, resources, property_name)
 
@@ -1885,15 +2026,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_int64_array(self._session_handle, resources, property_name)
 
@@ -1905,15 +2046,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (str): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_string(self._session_handle, resources, property_name)
 
@@ -1925,15 +2066,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[str]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_string_array(self._session_handle, resources, property_name)
 
@@ -1945,15 +2086,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_uint32(self._session_handle, resources, property_name)
 
@@ -1965,15 +2106,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_uint32_array(self._session_handle, resources, property_name)
 
@@ -1985,15 +2126,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (int): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_uint64(self._session_handle, resources, property_name)
 
@@ -2005,15 +2146,15 @@ class Session():
         list of resources and use an array version of this VI/function.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to get
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to get the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to get
+            property_name: Name of property to get
         
         Returns:
-            property_value (list[int]): Value of property
+            property_value: Value of property
         """
         return self._interpreter.get_generic_property_uint64_array(self._session_handle, resources, property_name)
 
@@ -2026,13 +2167,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (bool): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_bool(self._session_handle, resources, property_name, property_value)
 
@@ -2045,13 +2186,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (list[bool]): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_bool_array(self._session_handle, resources, property_name, property_value)
 
@@ -2064,13 +2205,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (float): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_double(self._session_handle, resources, property_name, property_value)
 
@@ -2083,13 +2224,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (list[float]): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_double_array(self._session_handle, resources, property_name, property_value)
 
@@ -2102,13 +2243,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_int32(self._session_handle, resources, property_name, property_value)
 
@@ -2121,13 +2262,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_int32_array(self._session_handle, resources, property_name, property_value)
 
@@ -2140,13 +2281,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_int64(self._session_handle, resources, property_name, property_value)
 
@@ -2159,13 +2300,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_int64_array(self._session_handle, resources, property_name, property_value)
 
@@ -2178,13 +2319,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (str): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_string(self._session_handle, resources, property_name, property_value)
 
@@ -2197,13 +2338,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (list[str]): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_string_array(self._session_handle, resources, property_name, property_value)
 
@@ -2216,13 +2357,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_uint32(self._session_handle, resources, property_name, property_value)
 
@@ -2235,13 +2376,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_uint32_array(self._session_handle, resources, property_name, property_value)
 
@@ -2254,13 +2395,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (int): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_uint64(self._session_handle, resources, property_name, property_value)
 
@@ -2273,13 +2414,13 @@ class Session():
         takes effect when properties are committed for the device(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to set
-                the specified property, or a resource alias such as
+            resources: Comma-delimited list of resources for which to set the
+                specified property, or a resource alias such as
                 "$DefaultDevices" or "$System". Numbered physical channels may
                 be specified as a colon-delimited range, such as "Mod1/load0:3".
                 This parameter is required.
-            property_name (str): Name of property to set
-            property_value (list[int]): New value to set property to
+            property_name: Name of property to set
+            property_value: New value to set property to
         """
         return self._interpreter.set_generic_property_uint64_array(self._session_handle, resources, property_name, property_value)
 
@@ -2299,11 +2440,11 @@ class Session():
         or per-physical-channel basis.
         
         Args:
-            device_names (str): Comma-delimited list of devices on which to
-                execute the command. If you do not specify this parameter, the
-                session default devices will be used.
-            command_name (str): Name of command to execute
-            timeout (float): Timeout in seconds
+            device_names: Comma-delimited list of devices on which to execute
+                the command. If you do not specify this parameter, the session
+                default devices will be used.
+            command_name: Name of command to execute
+            timeout: Timeout in seconds
         """
         return self._interpreter.execute_device_command(self._session_handle, device_names, command_name, timeout)
 
@@ -2324,12 +2465,11 @@ class Session():
         or per-physical-channel basis.
         
         Args:
-            physical_channel_names (str): Comma-delimited list of physical
-                channels on which to execute the command. If you do not specify
-                this parameter, the session default physical channels will be
-                used.
-            command_name (str): Name of command to execute
-            timeout (float): Timeout in seconds
+            physical_channel_names: Comma-delimited list of physical channels on
+                which to execute the command. If you do not specify this
+                parameter, the session default physical channels will be used.
+            command_name: Name of command to execute
+            timeout: Timeout in seconds
         """
         return self._interpreter.execute_physical_channel_command(self._session_handle, physical_channel_names, command_name, timeout)
 
@@ -2349,13 +2489,12 @@ class Session():
         or per-physical-channel basis.
         
         Args:
-            resources (str): Comma-delimited list of resources for which to
-                execute the command, or a resource alias such as
-                "$DefaultDevices". Numbered physical channels may be specified
-                as a colon-delimited range, such as "Mod1/load0:3". This
-                parameter is required.
-            command_name (str): Name of command to execute
-            timeout (float): Timeout in seconds
+            resources: Comma-delimited list of resources for which to execute
+                the command, or a resource alias such as "$DefaultDevices".
+                Numbered physical channels may be specified as a colon-delimited
+                range, such as "Mod1/load0:3". This parameter is required.
+            command_name: Name of command to execute
+            timeout: Timeout in seconds
         """
         return self._interpreter.execute_generic_command(self._session_handle, resources, command_name, timeout)
 
@@ -2365,15 +2504,15 @@ class Session():
         To read a single bitfield, consider using properties instead.
         
         Args:
-            device_name (str): Name of module. If you do not specify this
-                parameter, the session default devices will be used. If you
-                specify more than one device (either explicitly or by leaving
-                this parameter unspecified when the session has more than one
-                default device), an error will be returned.
-            register_address (int): Address of register
+            device_name: Name of module. If you do not specify this parameter,
+                the session default devices will be used. If you specify more
+                than one device (either explicitly or by leaving this parameter
+                unspecified when the session has more than one default device),
+                an error will be returned.
+            register_address: Address of register
         
         Returns:
-            data (int): Register data
+            data: Register data
         """
         return self._interpreter.read_register_uint8(self._session_handle, device_name, register_address)
 
@@ -2383,15 +2522,15 @@ class Session():
         To read a single bitfield, consider using properties instead.
         
         Args:
-            device_name (str): Name of module. If you do not specify this
-                parameter, the session default devices will be used. If you
-                specify more than one device (either explicitly or by leaving
-                this parameter unspecified when the session has more than one
-                default device), an error will be returned.
-            register_address (int): Address of register
+            device_name: Name of module. If you do not specify this parameter,
+                the session default devices will be used. If you specify more
+                than one device (either explicitly or by leaving this parameter
+                unspecified when the session has more than one default device),
+                an error will be returned.
+            register_address: Address of register
         
         Returns:
-            data (int): Register data
+            data: Register data
         """
         return self._interpreter.read_register_uint16(self._session_handle, device_name, register_address)
 
@@ -2401,15 +2540,15 @@ class Session():
         To read a single bitfield, consider using properties instead.
         
         Args:
-            device_name (str): Name of module. If you do not specify this
-                parameter, the session default devices will be used. If you
-                specify more than one device (either explicitly or by leaving
-                this parameter unspecified when the session has more than one
-                default device), an error will be returned.
-            register_address (int): Address of register
+            device_name: Name of module. If you do not specify this parameter,
+                the session default devices will be used. If you specify more
+                than one device (either explicitly or by leaving this parameter
+                unspecified when the session has more than one default device),
+                an error will be returned.
+            register_address: Address of register
         
         Returns:
-            data (int): Register data
+            data: Register data
         """
         return self._interpreter.read_register_uint32(self._session_handle, device_name, register_address)
 
@@ -2419,15 +2558,15 @@ class Session():
         To read a single bitfield, consider using properties instead.
         
         Args:
-            device_name (str): Name of module. If you do not specify this
-                parameter, the session default devices will be used. If you
-                specify more than one device (either explicitly or by leaving
-                this parameter unspecified when the session has more than one
-                default device), an error will be returned.
-            register_address (int): Address of register
+            device_name: Name of module. If you do not specify this parameter,
+                the session default devices will be used. If you specify more
+                than one device (either explicitly or by leaving this parameter
+                unspecified when the session has more than one default device),
+                an error will be returned.
+            register_address: Address of register
         
         Returns:
-            data (int): Register data
+            data: Register data
         """
         return self._interpreter.read_register_uint64(self._session_handle, device_name, register_address)
 
@@ -2437,13 +2576,13 @@ class Session():
         To write a single bitfield, consider using properties instead.
         
         Args:
-            device_name (str): Name of module. If you do not specify this
-                parameter, the session default devices will be used. If you
-                specify more than one device (either explicitly or by leaving
-                this parameter unspecified when the session has more than one
-                default device), an error will be returned.
-            register_address (int): Address of register
-            data (int): New register data
+            device_name: Name of module. If you do not specify this parameter,
+                the session default devices will be used. If you specify more
+                than one device (either explicitly or by leaving this parameter
+                unspecified when the session has more than one default device),
+                an error will be returned.
+            register_address: Address of register
+            data: New register data
         """
         return self._interpreter.write_register_uint8(self._session_handle, device_name, register_address, data)
 
@@ -2453,13 +2592,13 @@ class Session():
         To write a single bitfield, consider using properties instead.
         
         Args:
-            device_name (str): Name of module. If you do not specify this
-                parameter, the session default devices will be used. If you
-                specify more than one device (either explicitly or by leaving
-                this parameter unspecified when the session has more than one
-                default device), an error will be returned.
-            register_address (int): Address of register
-            data (int): New register data
+            device_name: Name of module. If you do not specify this parameter,
+                the session default devices will be used. If you specify more
+                than one device (either explicitly or by leaving this parameter
+                unspecified when the session has more than one default device),
+                an error will be returned.
+            register_address: Address of register
+            data: New register data
         """
         return self._interpreter.write_register_uint16(self._session_handle, device_name, register_address, data)
 
@@ -2469,13 +2608,13 @@ class Session():
         To write a single bitfield, consider using properties instead.
         
         Args:
-            device_name (str): Name of module. If you do not specify this
-                parameter, the session default devices will be used. If you
-                specify more than one device (either explicitly or by leaving
-                this parameter unspecified when the session has more than one
-                default device), an error will be returned.
-            register_address (int): Address of register
-            data (int): New register data
+            device_name: Name of module. If you do not specify this parameter,
+                the session default devices will be used. If you specify more
+                than one device (either explicitly or by leaving this parameter
+                unspecified when the session has more than one default device),
+                an error will be returned.
+            register_address: Address of register
+            data: New register data
         """
         return self._interpreter.write_register_uint32(self._session_handle, device_name, register_address, data)
 
@@ -2485,13 +2624,13 @@ class Session():
         To write a single bitfield, consider using properties instead.
         
         Args:
-            device_name (str): Name of module. If you do not specify this
-                parameter, the session default devices will be used. If you
-                specify more than one device (either explicitly or by leaving
-                this parameter unspecified when the session has more than one
-                default device), an error will be returned.
-            register_address (int): Address of register
-            data (int): New register data
+            device_name: Name of module. If you do not specify this parameter,
+                the session default devices will be used. If you specify more
+                than one device (either explicitly or by leaving this parameter
+                unspecified when the session has more than one default device),
+                an error will be returned.
+            register_address: Address of register
+            data: New register data
         """
         return self._interpreter.write_register_uint64(self._session_handle, device_name, register_address, data)
 
@@ -2499,13 +2638,12 @@ class Session():
         """Gets a range of bytes from an NVMEM area.
         
         Args:
-            nvmem_area (str): NVMEM area from which to get data. If you do not
-                specify this parameter, the session default NVMEM areas will be
-                used.
-            nvmem_address (int): Address of NVMEM area
+            nvmem_area: NVMEM area from which to get data. If you do not specify
+                this parameter, the session default NVMEM areas will be used.
+            nvmem_address: Address of NVMEM area
         
         Returns:
-            byte (bytes): NVMEM data
+            byte: NVMEM data
         """
         return self._interpreter.get_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, num_byte)
 
@@ -2520,15 +2658,14 @@ class Session():
         specify a serial number and password to write to protected areas.
         
         Args:
-            nvmem_area (str): NVMEM area for which to set data. If you do not
-                specify this parameter, the session default NVMEM areas will be
-                used.
-            nvmem_address (int): Address of data within NVMEM area
-            byte (bytes): New NVMEM data
-            serial_number (str): Serial number of the hardware. Do not specify
-                this parameter if the NVMEM area is not protected.
-            password (str): Password of the NVMEM area. Do not specify this
+            nvmem_area: NVMEM area for which to set data. If you do not specify
+                this parameter, the session default NVMEM areas will be used.
+            nvmem_address: Address of data within NVMEM area
+            byte: New NVMEM data
+            serial_number: Serial number of the hardware. Do not specify this
                 parameter if the NVMEM area is not protected.
+            password: Password of the NVMEM area. Do not specify this parameter
+                if the NVMEM area is not protected.
         """
         return self._interpreter.set_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, bytes_data, serial_number, password)
 
@@ -2536,9 +2673,9 @@ class Session():
         """Commits pending changes to hardware for the specified NVMEM area(s).
         
         Args:
-            nvmem_area_names (str): Comma-delimited list of NVMEM areas to
-                commit. If you do not specify this parameter, the session
-                default NVMEM areas will be used.
+            nvmem_area_names: Comma-delimited list of NVMEM areas to commit. If
+                you do not specify this parameter, the session default NVMEM
+                areas will be used.
         """
         return self._interpreter.commit_nvmem_areas(self._session_handle, nvmem_area_names)
 
@@ -2547,9 +2684,9 @@ class Session():
         specified device(s).
         
         Args:
-            device_names (str): Comma-delimited list of devices to commit. If
-                you do not specify this parameter, the session default devices
-                will be used.
+            device_names: Comma-delimited list of devices to commit. If you do
+                not specify this parameter, the session default devices will be
+                used.
         """
         return self._interpreter.commit_nvmem_for_devices(self._session_handle, device_names)
 
@@ -2566,9 +2703,9 @@ class Session():
         """Commits pending changes to hardware for the specified resource(s).
         
         Args:
-            resources (str): Comma-delimited list of resources for which to
-                commit NVMEM, or a resource alias such as "$DefaultDevices".
-                This parameter is required.
+            resources: Comma-delimited list of resources for which to commit
+                NVMEM, or a resource alias such as "$DefaultDevices". This
+                parameter is required.
         """
         return self._interpreter.commit_nvmem_generic(self._session_handle, resources)
 
@@ -2577,12 +2714,12 @@ class Session():
         = mx + b, where x is a pre-scaled value and y is a scaled value.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
         
         Returns:
-            slope (float): Slope value to get.
-            intercept (float): Intercept value to get.
+            slope: Slope value to get.
+            intercept: Intercept value to get.
         """
         return self._interpreter.get_linear_scaling_parameters(self._session_handle, physical_channel_names)
 
@@ -2595,12 +2732,12 @@ class Session():
         pre-scaled values.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
         
         Returns:
-            forward_coefficient (list[float]): Forward coefficients to get.
-            reverse_coefficient (list[float]): Reverse coefficients to get.
+            forward_coefficient: Forward coefficients to get.
+            reverse_coefficient: Reverse coefficients to get.
         """
         return self._interpreter.get_polynomial_scaling_parameters(self._session_handle, physical_channel_names)
 
@@ -2609,13 +2746,13 @@ class Session():
         pre-scaled values to an array of corresponding scaled values.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
         
         Returns:
-            scaled_value (list[float]): Scaled Values to get.
-            prescale_value (list[float]): Prescale Values to get.
-            coercion (int): Coercion to get.
+            scaled_value: Scaled Values to get.
+            prescale_value: Prescale Values to get.
+            coercion: Coercion to get.
         """
         return self._interpreter.get_table_scaling_parameters(self._session_handle, physical_channel_names)
 
@@ -2623,14 +2760,12 @@ class Session():
         """Gets scaling parameters from a user-defined scale.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
         
         Returns:
-            user_defined_parameter_names (list[str]): User-defined parameter
-                names to get.
-            user_defined_parameter_value (list[float]): User-defined parameters
-                to get.
+            user_defined_parameter_names: User-defined parameter names to get.
+            user_defined_parameter_value: User-defined parameters to get.
         """
         return self._interpreter.get_user_defined_scaling_parameters(self._session_handle, physical_channel_names)
 
@@ -2638,11 +2773,11 @@ class Session():
         """Gets a scaling equation from a user-defined scale.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
         
         Returns:
-            user_defined_equation (str): User-defined equation to get.
+            user_defined_equation: User-defined equation to get.
         """
         return self._interpreter.get_user_defined_scaling_equation(self._session_handle, physical_channel_names)
 
@@ -2651,14 +2786,14 @@ class Session():
         mx + b, where x is a pre-scaled value and y is a scaled value.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
-            slope (float): Slope value to set.
-            intercept (float): Intercept value to set.
-            serial_number (str): Serial number of the hardware. You do not have
-                to specify this parameter if the NVMEM area is not protected.
-            password (str): Password of the scaling area. You do not have to
-                specify this parameter if the scaling area is not protected.
+            slope: Slope value to set.
+            intercept: Intercept value to set.
+            serial_number: Serial number of the hardware. You do not have to
+                specify this parameter if the NVMEM area is not protected.
+            password: Password of the scaling area. You do not have to specify
+                this parameter if the scaling area is not protected.
         """
         return self._interpreter.set_linear_scaling_parameters(self._session_handle, physical_channel_names, slope, intercept, serial_number, password)
 
@@ -2671,14 +2806,14 @@ class Session():
         pre-scaled values.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
-            forward_coefficient (list[float]): Forward coefficients to set.
-            reverse_coefficient (list[float]): Reverse coefficients to set.
-            serial_number (str): Serial number of the hardware. You do not have
-                to specify this parameter if the NVMEM area is not protected.
-            password (str): Password of the scaling area. You do not have to
-                specify this parameter if the scaling area is not protected.
+            forward_coefficient: Forward coefficients to set.
+            reverse_coefficient: Reverse coefficients to set.
+            serial_number: Serial number of the hardware. You do not have to
+                specify this parameter if the NVMEM area is not protected.
+            password: Password of the scaling area. You do not have to specify
+                this parameter if the scaling area is not protected.
         """
         return self._interpreter.set_polynomial_scaling_parameters(self._session_handle, physical_channel_names, forward_coefficient, reverse_coefficient, serial_number, password)
 
@@ -2687,15 +2822,15 @@ class Session():
         pre-scaled values to an array of corresponding scaled values.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
-            scaled_value (list[float]): Scaled Values to set.
-            prescale_value (list[float]): Prescale Values to set.
-            coercion (int): Coercion to set.
-            serial_number (str): Serial number of the hardware. You do not have
-                to specify this parameter if the NVMEM area is not protected.
-            password (str): Password of the scaling area. You do not have to
-                specify this parameter if the scaling area is not protected.
+            scaled_value: Scaled Values to set.
+            prescale_value: Prescale Values to set.
+            coercion: Coercion to set.
+            serial_number: Serial number of the hardware. You do not have to
+                specify this parameter if the NVMEM area is not protected.
+            password: Password of the scaling area. You do not have to specify
+                this parameter if the scaling area is not protected.
         """
         return self._interpreter.set_table_scaling_parameters(self._session_handle, physical_channel_names, scaled_value, prescale_value, coercion, serial_number, password)
 
@@ -2703,15 +2838,14 @@ class Session():
         """Sets scaling parameters for a user-defined scale.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
-            user_defined_parameter_name (list[str]): parameter names
-            user_defined_parameter_value (list[float]): User-defined parameters
-                to set.
-            serial_number (str): Serial number of the hardware. You do not have
-                to specify this parameter if the NVMEM area is not protected.
-            password (str): Password of the scaling area. You do not have to
-                specify this parameter if the scaling area is not protected.
+            user_defined_parameter_name: parameter names
+            user_defined_parameter_value: User-defined parameters to set.
+            serial_number: Serial number of the hardware. You do not have to
+                specify this parameter if the NVMEM area is not protected.
+            password: Password of the scaling area. You do not have to specify
+                this parameter if the scaling area is not protected.
         """
         return self._interpreter.set_user_defined_scaling_parameters(self._session_handle, physical_channel_names, user_defined_parameter_name, user_defined_parameter_value, serial_number, password)
 
@@ -2719,13 +2853,13 @@ class Session():
         """Sets the scaling equation for a user-defined scale.
         
         Args:
-            physical_channel_names (str): Physical channel where the Scaling is
+            physical_channel_names: Physical channel where the Scaling is
                 located, or a resource alias such as "$DefaultPhysChans".
-            user_defined_equation (str): user-defined equation to set.
-            serial_number (str): Serial number of the hardware. You do not have
-                to specify this parameter if the NVMEM area is not protected.
-            password (str): Password of the scaling area. You do not have to
-                specify this parameter if the scaling area is not protected.
+            user_defined_equation: user-defined equation to set.
+            serial_number: Serial number of the hardware. You do not have to
+                specify this parameter if the NVMEM area is not protected.
+            password: Password of the scaling area. You do not have to specify
+                this parameter if the scaling area is not protected.
         """
         return self._interpreter.set_user_defined_scaling_equation(self._session_handle, physical_channel_names, user_defined_equation, serial_number, password)
 
@@ -2734,118 +2868,8 @@ class Session():
         channels that the devices contain.
         
         Args:
-            device_names (str): Comma-delimited list of devices for which to
-                commit the scaling changes.
+            device_names: Comma-delimited list of devices for which to commit
+                the scaling changes.
         """
         return self._interpreter.commit_scaling_for_devices(self._session_handle, device_names)
-
-    def open_device_command(self, device_name: str, command_name: str) -> Command:
-        """Opens a reference to a device command.
-        
-        This allows the application to programmatically get information about
-        the command at run time.
-        
-        Args:
-            device_name (str): Device where the command is located, or a
-                resource alias such as "$DefaultDevices".
-            command_name (str): Name of command to open
-        
-        Returns:
-            Command: An instance of the Command class.
-        """
-        return Command(self._interpreter.open_device_command(self._session_handle, device_name, command_name), self._interpreter)
-
-    def open_physical_channel_command(self, physical_channel_names: str, command_name: str) -> Command:
-        """Opens a reference to a physical channel command.
-        
-        This allows the application to programmatically get information about
-        the command at run time.
-        
-        Args:
-            physical_channel_names (str): Physical channel where the command is
-                located, or a resource alias such as "$DefaultPhysChans".
-            command_name (str): Name of command to open
-        
-        Returns:
-            Command: An instance of the Command class.
-        """
-        return Command(self._interpreter.open_physical_channel_command(self._session_handle, physical_channel_names, command_name), self._interpreter)
-
-    def open_generic_command(self, resource: str, command_name: str) -> Command:
-        """Opens a reference to a command.
-        
-        This allows the application to programmatically get information about
-        the command at run time.
-        
-        Args:
-            resource (str): Resource where the command is located, or a resource
-                alias such as "$DefaultDevices".
-            command_name (str): Name of command to open
-        
-        Returns:
-            Command: An instance of the Command class.
-        """
-        return Command(self._interpreter.open_generic_command(self._session_handle, resource, command_name), self._interpreter)
-
-    def open_device_property(self, device_name: str, property_name: str) -> Property:
-        """Opens a reference to a device property.
-        
-        This allows the application to programmatically get information about
-        the property at run time.
-        
-        Args:
-            device_name (str): Device where the property is located, or a
-                resource alias such as "$DefaultDevices".
-            property_name (str): Name of property to open
-        
-        Returns:
-            Property: An instance of the Property class.
-        """
-        return Property(self._interpreter.open_device_property(self._session_handle, device_name, property_name), self._interpreter)
-
-    def open_physical_channel_property(self, physical_channel_names: str, property_name: str) -> Property:
-        """Opens a reference to a physical channel property.
-        
-        This allows the application to programmatically get information about
-        the property at run time.
-        
-        Args:
-            physical_channel_names (str): Physical channel where the property is
-                located, or a resource alias such as "$DefaultPhysChans".
-            property_name (str): Name of property to open
-        
-        Returns:
-            Property: An instance of the Property class.
-        """
-        return Property(self._interpreter.open_physical_channel_property(self._session_handle, physical_channel_names, property_name), self._interpreter)
-
-    def open_driver_defined_property(self, property_name: str) -> Property:
-        """Opens a reference to a driver-defined property.
-        
-        This allows the application to programmatically get information about
-        the property at run time.
-        
-        Args:
-            property_name (str): Name of property to open
-        
-        Returns:
-            Property: An instance of the Property class.
-        """
-        return Property(self._interpreter.open_driver_defined_property(self._session_handle, property_name), self._interpreter)
-
-    def open_generic_property(self, resource: str, property_name: str) -> Property:
-        """Opens a reference to a property.
-        
-        This allows the application to programmatically get information about
-        the property at run time.
-        
-        Args:
-            resource (str): Resource where the property is located, or a
-                resource alias such as "$DefaultDevices".
-            property_name (str): Name of property to open
-        
-        Returns:
-            Property: An instance of the Property class.
-        """
-        return Property(self._interpreter.open_generic_property(self._session_handle, resource, property_name), self._interpreter)
 

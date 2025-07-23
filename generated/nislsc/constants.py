@@ -1,3 +1,9 @@
+"""SLSC Constants Module.
+
+This module provides enumeration classes that define constants and
+configuration values used throughout the SLSC API.
+"""
+
 from enum import Enum
 
 class ReservationAccess(Enum):

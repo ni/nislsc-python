@@ -1,5 +1,14 @@
+"""SLSC Base Interpreter Abstract Interface Module.
+
+This module defines the BaseInterpreter abstract base class that
+specifies the complete interface contract for SLSC driver 
+implementations.
+"""
+
 import abc
+
 from nislsc.constants import Language
+
 
 class BaseInterpreter(abc.ABC):
 

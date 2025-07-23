@@ -1,6 +1,12 @@
 <%!
 from utilities.interpreter_helpers import convert_to_snake_case
 %>\
+"""SLSC Constants Module.
+
+This module provides enumeration classes that define constants and
+configuration values used throughout the SLSC API.
+"""
+
 from enum import Enum
 
 % for enum in enums:

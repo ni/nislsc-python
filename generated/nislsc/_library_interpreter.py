@@ -1,11 +1,19 @@
+"""SLSC Library Interpreter Implementation Module.
+
+This module provides the LibraryInterpreter class, a concrete
+implementation of the BaseInterpreter abstract interface that uses
+ctypes to interface directly with the native SLSC C library.
+"""
+
 import ctypes
+import warnings
 
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.constants import Language
 from nislsc.error import SLSCError, SLSCWarning
-import warnings
 
-lib = ctypes.CDLL('nislsc.dll')
+
+lib = ctypes.CDLL("nislsc.dll")
 
 lib.niSLSC_InitializeLibrary.restype = ctypes.c_int32
 lib.niSLSC_InitializeLibrary.argtypes = [ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p)]

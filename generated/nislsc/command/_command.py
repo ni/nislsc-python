@@ -1,24 +1,31 @@
-from typing_extensions import Self
+"""SLSC Command Management Module.
+
+This module provides the Command class for managing SLSC command
+references that allow access to device and physical channel commands for
+execution and introspection.
+"""
 
 import warnings
 from types import TracebackType
 
-from nislsc.session._session import Session
-from nislsc.error import SLSCResourceWarning
+from typing_extensions import Self
 
-class Command():
-    """
-    Represent Command class for NI SLSC.
-    """
+from nislsc.error import SLSCResourceWarning
+from nislsc.session._session import Session
+
+
+class Command:
+    """Represent Command class for NI SLSC."""
+
     def __init__(self, session: Session, command_handle: int) -> None:
-        """Initialize a Command instance.
+        """Create a Command instance.
 
         Args:
             session: Previously initialized Session instance
             command_handle: The command handle returned by the
                 initialization function.
         """
-        self._property_handle = property_handle
+        self._command_handle = command_handle
         self._session = session
         self._interpreter = session._interpreter
 
@@ -43,21 +50,8 @@ class Command():
         """
         self.close()
 
-    def __del__(self) -> None:
-        """
-        Remind the user that the Command instance is not closed.
-        """
-        if self._command_handle is not None:
-            warnings.warn(
-                'Command was not closed before it was destructed. Resources on the'
-                'Command may still be reserved.',
-                SLSCResourceWarning
-            )
-
     def close(self) -> None:
-        """
-        Close the command instance.
-        """
+        """Close the command instance."""
         if self._command_handle is not None:
             self._interpreter.close_command(self._command_handle)
             self._command_handle = None

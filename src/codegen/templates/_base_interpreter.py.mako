@@ -2,8 +2,17 @@
 from utilities.interpreter_helpers import get_python_function_name
 from utilities.function_helpers import get_function_parameter_list, get_function_return_type
 %>\
+"""SLSC Base Interpreter Abstract Interface Module.
+
+This module defines the BaseInterpreter abstract base class that
+specifies the complete interface contract for SLSC driver 
+implementations.
+"""
+
 import abc
+
 from nislsc.constants import Language
+
 
 class BaseInterpreter(abc.ABC):
 

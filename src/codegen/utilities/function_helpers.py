@@ -6,13 +6,12 @@ context of generating C API bindings for the NI-SLSC API.
 """
 
 from utilities.interpreter_helpers import (
-    convert_to_class_name,
     get_param_datatype_in_ctypes,
+    get_python_function_name,
     get_standardized_param_name,
     is_capi,
     is_param_input,
     is_param_output,
-    get_python_function_name,
 )
 
 ARRAY_VAR = ["int64[]", "uint64[]", "int32[]", "uint32[]", "bool[]", "double[]"]
@@ -119,9 +118,7 @@ OUTPUT_DATATYPE_MAP = {
 
 
 def get_ctypes_argtypes(function: dict) -> list[str]:
-    """
-    Get the ctypes argument types for a Python API function.
-    """
+    """Get the ctypes argument types for a Python API function."""
     arg_list = []
     if "capi" in function["targets"]:
         for parameter in function["params"]:
@@ -137,24 +134,19 @@ def get_ctypes_argtypes(function: dict) -> list[str]:
 
 
 def get_classmethod_parameter_list(function: dict) -> list[str]:
+    """Generate the parameters for class methods."""
     param_list = []
     param_list.append("cls")
     if "capi" in function["targets"]:
         for parameter in function["params"]:
-            if (
-                is_capi(parameter)
-                and is_param_input(parameter)
-                and "Size" not in parameter["name"]
-            ):
+            if is_capi(parameter) and is_param_input(parameter) and "Size" not in parameter["name"]:
                 if parameter["dataType"] == "uint8[]":
                     param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
-                elif parameter["name"] == "language" and is_language:
-                    param_list.append("language: Language = Language.UNDEFINED")
                 elif parameter["dataType"] == "enum" and parameter["name"] == "language":
                     param_list.append("language: Language")
-                elif parameter['dataType'] == "Library":
+                elif parameter["dataType"] == "Library":
                     param_list.append("library: Library")
-                elif parameter['dataType'] == "Session":
+                elif parameter["dataType"] == "Session":
                     param_list.append("session: Session")
                 else:
                     param_list.append(
@@ -170,24 +162,28 @@ def get_classmethod_parameter_list(function: dict) -> list[str]:
 
 
 def get_function_parameter_list(
-    function: dict, class_name: str = None, typing: bool = True, is_language: bool = False, class_func: bool = True
+    function: dict,
+    class_name: str = None,
+    typing: bool = True,
+    is_language: bool = False,
+    class_func: bool = True,
 ) -> list[str]:
     """Generate a list of function parameters for a Python API function.
 
     Args:
-        function (dict): The function definition containing parameters and
+        function: The function definition containing parameters and
             targets.
-        class_name (str, optional): The name of the class for which the
+        class_name: The name of the class for which the
             function is defined. Used to avoid repeating the self variable.
-        typing (bool, optional): If True, include type hints in the parameter
+        typing: If True, include type hints in the parameter
             list.
-        is_language (bool, optional): If True, include the language argument
+        is_language: If True, include the language argument
             with a default value of Language.UNDEFINED.
-        class_func (bool, optional): If True, indicates that the function is
+        class_func: If True, indicates that the function is
             a class method.
 
     Returns:
-        list[str]: A list of parameter strings for the function definition.
+        param_list: A list of parameter strings for the function definition.
     """
     param_list = []
     if "capi" in function["targets"]:
@@ -240,9 +236,7 @@ def get_function_parameter_list(
 
 
 def get_function_return_type(function: dict, return_self: bool = False) -> str:
-    """
-    Generate the return type for a Python API function.
-    """
+    """Generate the return type for a Python API function."""
     num = 0
     if "capi" in function["targets"]:
         param_list = []
@@ -271,9 +265,7 @@ def get_function_return_type(function: dict, return_self: bool = False) -> str:
 
 
 def generate_return(function: dict, class_name: str) -> str:
-    """
-    Generate return statement for functions.
-    """
+    """Generate return statement for functions."""
     return_var = None
     return_datatype = None
     return_list = []
@@ -284,23 +276,33 @@ def generate_return(function: dict, class_name: str) -> str:
     if return_datatype == "Session":
         return_list.append("library_handle = library._library_handle")
         return_list.append("interpreter = library._interpreter")
-        return_list.append(f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})")
+        return_list.append(
+            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+        )
         return_list.append(f"return cls(library, {return_var})")
     elif return_datatype == "CommandReference":
         return_list.append("session_handle = session._session_handle")
         return_list.append("interpreter = session._interpreter")
-        return_list.append(f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})")
+        return_list.append(
+            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+        )
         return_list.append(f"return cls(session, {return_var})")
     elif return_datatype == "PropertyReference":
         return_list.append("session_handle = session._session_handle")
         return_list.append("interpreter = session._interpreter")
-        return_list.append(f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})")
+        return_list.append(
+            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+        )
         return_list.append(f"return cls(session, {return_var})")
     elif return_datatype:
-        return_list.append(f"{return_var} = self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})")
+        return_list.append(
+            f"{return_var} = self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+        )
         return_list.append(f"return {return_var}")
     else:
-        return_list.append(f"self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})")
+        return_list.append(
+            f"self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+        )
     return return_list
 
 
@@ -547,14 +549,15 @@ def is_class_func(function: dict, class_name: str) -> bool:
             result = True
         if is_capi(parameter) and is_param_output(parameter):
             if parameter["dataType"] in (
-                    "Library",
-                    "Session",
-                    "CommandReference",
-                    "PropertyReference",
-                ):
+                "Library",
+                "Session",
+                "CommandReference",
+                "PropertyReference",
+            ):
                 if parameter["dataType"] != class_name:
                     return False
     return result
+
 
 def is_classmethod(function: dict, class_name: str) -> bool:
     """Check if the function is a classmethod."""
@@ -562,14 +565,15 @@ def is_classmethod(function: dict, class_name: str) -> bool:
     for parameter in function["params"]:
         if is_capi(parameter) and is_param_output(parameter):
             if parameter["dataType"] in (
-                    "Library",
-                    "Session",
-                    "CommandReference",
-                    "PropertyReference",
-                ):
+                "Library",
+                "Session",
+                "CommandReference",
+                "PropertyReference",
+            ):
                 if parameter["dataType"] == class_name:
                     return True
     return result
+
 
 def generate_result_parser(function: dict) -> list[str]:
     """Generate the result parser for output parameters."""

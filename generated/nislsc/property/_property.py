@@ -1,15 +1,24 @@
-from typing_extensions import Self
+"""SLSC Property Management Module.
 
-from nislsc.session._session import Session
+This module provides the Property class for managing SLSC property
+references that allow access to device, physical channel, and driver
+configuration properties through property reflection.
+"""
+
+import warnings
 from types import TracebackType
 
-class Property():
-    """
-    Represent Property class for NI SLSC.
-    """
+from typing_extensions import Self
+
+from nislsc.error import SLSCResourceWarning
+from nislsc.session._session import Session
+
+
+class Property:
+    """Represent Property class for NI SLSC."""
 
     def __init__(self, session: Session, property_handle: int) -> None:
-        """Initialize a Property instance.
+        """Create a Property instance.
 
         Args:
             session: Previously initialized Session instance
@@ -41,21 +50,8 @@ class Property():
         """
         self.close()
 
-    def __del__(self) -> None:
-        """
-        Remind the user that the Property instance is not closed.
-        """
-        if self._session_handle is not None:
-            warnings.warn(
-                'Property was not closed before it was destructed. Resources on the'
-                'Property may still be reserved.',
-                SLSCResourceWarning
-            )
-
     def close(self) -> None:
-        """
-        Close the Property instance.
-        """
+        """Close the Property instance."""
         if self._property_handle is not None:
             self._interpreter.close_property(self._property_handle)
             self._property_handle = None

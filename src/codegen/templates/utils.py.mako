@@ -10,12 +10,24 @@ def remove_all_class_functions(function: dict) -> bool:
             return False
     return True
 %>\
+"""SLSC Utility Functions Module.
+
+This module provides utility functions for SLSC operations including
+interpreter selection, library version retrieval, and name formatting
+utilities for device, physical channel, and NVMEM area identifiers.
+"""
+
 from nislsc._base_interpreter import BaseInterpreter
 
 def _select_interpreter() -> BaseInterpreter:
-    """Select the appropriate interpreter based on the environment."""
+    """Select the appropriate interpreter based on the environment.
+
+    We only support Library Interpreter for now.
+    """
     from nislsc._library_interpreter import LibraryInterpreter
+
     return LibraryInterpreter()
+
 
 % for function in functions:
 % if 'capi' in function['targets']:

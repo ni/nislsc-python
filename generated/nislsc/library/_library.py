@@ -1,20 +1,27 @@
+"""SLSC Library Management Module.
+
+This module provides the Library class for managing the SLSC library 
+interface that handles driver initialization, error management, and
+language configuration for SLSC hardware operations. 
+"""
+
+from types import TracebackType
+
 from typing_extensions import Self
 
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.constants import Language
 from nislsc.utils import _select_interpreter, get_library_version
-from types import TracebackType
 
-class Library():
-    """
-    Represent Library class for NI SLSC.
-    """
+
+class Library:
+    """Represent Library class for NI SLSC."""
+    
     def __init__(self, language: Language = Language.CURRENT_THREAD_LOCALE) -> None:
-        """Create a library instance that handles session.
+        """Create a Library instance.
 
         Args:
-            language (Language): The language to use for error messages and
-                outputs.
+            language: The language to use for error messages and outputs.
         """
         self._interpreter = _select_interpreter()
         self._library_handle = self.initialize_library(get_library_version())
@@ -41,17 +48,6 @@ class Library():
         """
         self.close()
 
-    def __del__(self) -> None:
-        """
-        Remind the user that the Library instance is not finalized.
-        """
-        if self._library_handle is not None:
-            warnings.warn(
-                'Library was not finalized before it was destructed. Resources on the'
-                'Library may still be reserved.',
-                SLSCResourceWarning
-            )
-
     @property
     def language(self) -> Language:
         """Get the current language setting.
@@ -71,9 +67,7 @@ class Library():
         self._language = language
 
     def close(self) -> None:
-        """
-        Close the Library instance.
-        """
+        """Close the Library instance."""
         if self._library_handle is not None:
             self._interpreter.finalize_library(self._library_handle)
             self._library_handle = None

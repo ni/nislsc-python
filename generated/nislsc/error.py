@@ -1,12 +1,21 @@
+"""SLSC Exception and Warning Classes Module.
+
+This module provides custom exception and warning classes for handling
+SLSC API errors and warnings.
+"""
+
 from nislsc.error_codes import SLSCErrors, SLSCWarnings
 
-__all__ = ['SLSCError', 'SLSCWarning', 'SLSCResourceWarning']
+__all__ = ["SLSCError", "SLSCWarning", "SLSCResourceWarning"]
+
 
 class SLSCResourceWarning(ResourceWarning):
     pass
 
+
 class Error(Exception):
     pass
+
 
 class SLSCError(Error):
     def __init__(self, message: str, error_code: int) -> None:
@@ -18,7 +27,7 @@ class SLSCError(Error):
             self._error_type = SLSCErrors.UNKNOWN
 
         if not message:
-            message = f'Description could not be found for the status code.\n\nStatus Code: {self._error_code}'
+            message = f"Description could not be found for the status code.\n\nStatus Code: {self._error_code}"
 
         super().__init__(message)
 
@@ -30,6 +39,7 @@ class SLSCError(Error):
     def error_type(self) -> SLSCErrors:
         return self._error_type
 
+
 class SLSCWarning(Warning):
     def __init__(self, message: str, error_code: int) -> None:
         self._error_code = int(error_code)
@@ -40,7 +50,7 @@ class SLSCWarning(Warning):
             self._error_type = SLSCWarnings.UNKNOWN
 
         if not message:
-            message = f'Description could not be found for the status code.\n\nStatus Code: {self._error_code}'
+            message = f"Description could not be found for the status code.\n\nStatus Code: {self._error_code}"
 
         super().__init__(message)
 

@@ -5,7 +5,6 @@ generated Python API, including argument and return descriptions, and handling
 specific data types.
 """
 
-from utilities.function_helpers import PYTHON_DATATYPE_MAP
 from utilities.interpreter_helpers import (
     get_standardized_param_name,
     is_capi,
@@ -67,7 +66,9 @@ def wrap_text(text: str, width: int = 72, indent: str = "    ", is_doc: bool = F
     return lines
 
 
-def generate_docstrings(function: dict, ignore_type: str = "", is_classmethod: bool = False) -> list[str]:
+def generate_docstrings(
+    function: dict, ignore_type: str = "", is_classmethod: bool = False
+) -> list[str]:
     """Generate a Google style docstring for a function."""
     docstrings = []
     for doc in generate_doc(function):
@@ -146,7 +147,6 @@ def generate_returns(function: dict, is_classmethod: bool = False) -> list[str]:
             for text in wrap_text(ret_line, 72):
                 returns.append(text)
     return returns
-
 
 
 def is_returning_something(function: dict) -> bool:

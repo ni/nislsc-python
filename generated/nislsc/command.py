@@ -5,12 +5,12 @@ references that allow access to device and physical channel commands for
 execution and introspection.
 """
 
-import warnings
+from __future__ import annotations
 from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.error import SLSCResourceWarning
+from nislsc.error import SLSCError
 from nislsc.session._session import Session
 
 
@@ -52,9 +52,22 @@ class Command:
 
     def close(self) -> None:
         """Close the command instance."""
-        if self._command_handle is not None:
+        if self._command_handle != 0:
             self._interpreter.close_command(self._command_handle)
-            self._command_handle = None
+            self._command_handle = 0
+
+    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+        """Return extended error information for the last error that occurred on
+        the specified library handle.
+        
+        Args:
+            language: Language to return error information in
+        
+        Returns:
+            extended_error_info: Extended error info text
+        """
+        language = self._session._library.language if language == language.UNDEFINED else language
+        return self._session._library.get_extended_error_info(language)
 
     @classmethod
     def open_device_command(cls, session: Session, device_name: str, command_name: str) -> Self:
@@ -72,10 +85,14 @@ class Command:
         Returns:
             Self: New instance of CommandReference object.
         """
-        session_handle = session._session_handle
-        interpreter = session._interpreter
-        command_handle = interpreter.open_device_command(session_handle, device_name, command_name)
-        return cls(session, command_handle)
+        try:
+            session_handle = session._session_handle
+            interpreter = session._interpreter
+            command_handle = interpreter.open_device_command(session_handle, device_name, command_name)
+            return cls(session, command_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
     def open_physical_channel_command(cls, session: Session, physical_channel_names: str, command_name: str) -> Self:
@@ -93,10 +110,14 @@ class Command:
         Returns:
             Self: New instance of CommandReference object.
         """
-        session_handle = session._session_handle
-        interpreter = session._interpreter
-        command_handle = interpreter.open_physical_channel_command(session_handle, physical_channel_names, command_name)
-        return cls(session, command_handle)
+        try:
+            session_handle = session._session_handle
+            interpreter = session._interpreter
+            command_handle = interpreter.open_physical_channel_command(session_handle, physical_channel_names, command_name)
+            return cls(session, command_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
     def open_generic_command(cls, session: Session, resource: str, command_name: str) -> Self:
@@ -114,15 +135,23 @@ class Command:
         Returns:
             Self: New instance of CommandReference object.
         """
-        session_handle = session._session_handle
-        interpreter = session._interpreter
-        command_handle = interpreter.open_generic_command(session_handle, resource, command_name)
-        return cls(session, command_handle)
+        try:
+            session_handle = session._session_handle
+            interpreter = session._interpreter
+            command_handle = interpreter.open_generic_command(session_handle, resource, command_name)
+            return cls(session, command_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def close_command(self) -> None:
         """Close an open reference to a command.
         """
-        self._interpreter.close_command(self._command_handle)
+        try:
+            self._interpreter.close_command(self._command_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_command_property_string(self, property_name: str) -> str:
         """Get the value of the specified command reflection property.
@@ -133,6 +162,10 @@ class Command:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_command_property_string(self._command_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_command_property_string(self._command_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 

@@ -2340,5 +2340,5 @@ class LibraryInterpreter(BaseInterpreter):
             if error_code < 0:
                 raise SLSCError("", error_code)
             elif error_code > 0:
-                warnings.warn(SLSCWarning)
+                warnings.warn(SLSCWarning("", error_code))
 

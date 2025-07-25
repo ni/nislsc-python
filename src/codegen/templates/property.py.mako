@@ -1,5 +1,5 @@
 <%!
-from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_creating_handle, is_class_func, generate_return, is_classmethod, get_classmethod_parameter_list
+from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_creating_handle, is_class_func, is_classmethod, get_classmethod_parameter_list, generate_return_in_class, generate_function_call_in_class
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 from utilities.docstrings_helpers import generate_docstrings
 %>\
@@ -10,12 +10,12 @@ references that allow access to device, physical channel, and driver
 configuration properties through property reflection.
 """
 
-import warnings
+from __future__ import annotations
 from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.error import SLSCResourceWarning
+from nislsc.error import SLSCError
 from nislsc.session._session import Session
 
 
@@ -57,9 +57,22 @@ class Property:
 
     def close(self) -> None:
         """Close the Property instance."""
-        if self._property_handle is not None:
+        if self._property_handle != 0:
             self._interpreter.close_property(self._property_handle)
-            self._property_handle = None
+            self._property_handle = 0
+
+        def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+        """Return extended error information for the last error that occurred on
+        the specified library handle.
+        
+        Args:
+            language: Language to return error information in
+        
+        Returns:
+            extended_error_info: Extended error info text
+        """
+        language = self._session._library.language if language == language.UNDEFINED else language
+        return self._session._library.get_extended_error_info(language)
 
 % for function in functions:
 % if 'capi' in function['targets']:
@@ -79,9 +92,16 @@ class Property:
         ${docstrings}
 % endfor
 % endif
-% for result in generate_return(function, 'PropertyReference'):
-        ${result}
+        try:
+% for function_call in generate_function_call_in_class(function, 'PropertyReference'):
+            ${function_call}
 % endfor
+% for result in generate_return_in_class(function):
+            ${result}
+% endfor
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
 % endif
 % endif

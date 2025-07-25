@@ -5,19 +5,20 @@ sessions that handle device connections, property access, command
 execution for one or more devices, physical channels, or NVMEM areas.
 """
 
-import warnings
+from __future__ import annotations
 from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.error import SLSCResourceWarning
+from nislsc.constants import Language
+from nislsc.error import SLSCError
 from nislsc.library._library import Library
 
 
 class Session:
     """Represent Session class for NI SLSC."""
 
-    def __init__(self, library: Library, session_handle: int) -> None:
+    def __init__(self, library: Library, session_handle: int, _owns_library: bool) -> None:
         """Create a Session instance.
 
         Args:
@@ -28,6 +29,7 @@ class Session:
         self._session_handle = session_handle
         self._library = library
         self._interpreter = library._interpreter
+        self._owns_library = _owns_library
 
     def __enter__(self) -> Self:
         """Enter the runtime context related to this object.
@@ -52,12 +54,28 @@ class Session:
 
     def close(self) -> None:
         """Close the Session instance."""
-        if self._session_handle is not None:
+        if self._session_handle != 0:
             self._interpreter.close_session(self._session_handle)
-            self._session_handle = None
+            self._session_handle = 0
+        if self._owns_library:
+            self._library.close()
+            self._owns_library = False
+
+    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+        """Return extended error information for the last error that occurred on
+        the specified library handle.
+        
+        Args:
+            language: Language to return error information in
+        
+        Returns:
+            extended_error_info: Extended error info text
+        """
+        language = self._library.language if language == language.UNDEFINED else language
+        return self._library.get_extended_error_info(language)
 
     @classmethod
-    def initialize_session_with_devices(cls, library: Library, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+    def initialize_session_with_devices(cls, library: Library | None, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
         """Initialize an SLSC session with one or multiple devices.
         
         The session opens network connections for devices. If reservationAccess
@@ -90,13 +108,21 @@ class Session:
         Returns:
             Self: New instance of Session object.
         """
-        library_handle = library._library_handle
-        interpreter = library._interpreter
-        session_handle = interpreter.initialize_session_with_devices(library_handle, device_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
-        return cls(library, session_handle)
+        try:
+            owns_library = False
+            if library is None:
+                library = Library()
+                owns_library = True
+            library_handle = library._library_handle
+            interpreter = library._interpreter
+            session_handle = interpreter.initialize_session_with_devices(library_handle, device_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
+            return cls(library, session_handle, owns_library)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
-    def initialize_session_with_nvmem_areas(cls, library: Library, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+    def initialize_session_with_nvmem_areas(cls, library: Library | None, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
         """Initialize an SLSC session with one or multiple NVMEM areas.
         
         The session opens network connections for NVMEM areas. If
@@ -131,13 +157,21 @@ class Session:
         Returns:
             Self: New instance of Session object.
         """
-        library_handle = library._library_handle
-        interpreter = library._interpreter
-        session_handle = interpreter.initialize_session_with_nvmem_areas(library_handle, nvmem_area_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
-        return cls(library, session_handle)
+        try:
+            owns_library = False
+            if library is None:
+                library = Library()
+                owns_library = True
+            library_handle = library._library_handle
+            interpreter = library._interpreter
+            session_handle = interpreter.initialize_session_with_nvmem_areas(library_handle, nvmem_area_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
+            return cls(library, session_handle, owns_library)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
-    def initialize_session_with_physical_channels(cls, library: Library, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+    def initialize_session_with_physical_channels(cls, library: Library | None, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
         """Initialize an SLSC session with one or multiple physical channels.
         
         The session opens network connections for devices that correspond to the
@@ -175,13 +209,21 @@ class Session:
         Returns:
             Self: New instance of Session object.
         """
-        library_handle = library._library_handle
-        interpreter = library._interpreter
-        session_handle = interpreter.initialize_session_with_physical_channels(library_handle, physical_channel_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
-        return cls(library, session_handle)
+        try:
+            owns_library = False
+            if library is None:
+                library = Library()
+                owns_library = True
+            library_handle = library._library_handle
+            interpreter = library._interpreter
+            session_handle = interpreter.initialize_session_with_physical_channels(library_handle, physical_channel_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
+            return cls(library, session_handle, owns_library)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
-    def initialize_session_without_resources(cls, library: Library) -> Self:
+    def initialize_session_without_resources(cls, library: Library | None) -> Self:
         """Initialize an SLSC session without specifying any resources or
         opening any network connections.
         
@@ -195,10 +237,18 @@ class Session:
         Returns:
             Self: New instance of Session object.
         """
-        library_handle = library._library_handle
-        interpreter = library._interpreter
-        session_handle = interpreter.initialize_session_without_resources(library_handle)
-        return cls(library, session_handle)
+        try:
+            owns_library = False
+            if library is None:
+                library = Library()
+                owns_library = True
+            library_handle = library._library_handle
+            interpreter = library._interpreter
+            session_handle = interpreter.initialize_session_without_resources(library_handle)
+            return cls(library, session_handle, owns_library)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def abort_session(self) -> None:
         """Attempt to cancel a VI/function that blocks on network
@@ -211,7 +261,11 @@ class Session:
         
         Some operations, such as DNS lookups, cannot be aborted.
         """
-        self._interpreter.abort_session(self._session_handle)
+        try:
+            self._interpreter.abort_session(self._session_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def log_in(self, chassis_name: str, username: str, password: str, connection_timeout: float, save_credentials_to_disk: bool) -> None:
         """Attempt to connect and log in to the specified SLSC chassis.
@@ -256,7 +310,11 @@ class Session:
                 disk, false to keep them in memory for the lifetime of the
                 process
         """
-        self._interpreter.log_in(self._session_handle, chassis_name, username, password, connection_timeout, save_credentials_to_disk)
+        try:
+            self._interpreter.log_in(self._session_handle, chassis_name, username, password, connection_timeout, save_credentials_to_disk)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def log_out(self, chassis_name: str) -> None:
         """Delete any cached credentials for this chassis.
@@ -269,7 +327,11 @@ class Session:
         Args:
             chassis_name: Chassis to log out of
         """
-        self._interpreter.log_out(self._session_handle, chassis_name)
+        try:
+            self._interpreter.log_out(self._session_handle, chassis_name)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def connect_to_devices(self, device_names: str, connection_timeout: float) -> None:
         """Open network connections for the specified device(s), sharing
@@ -290,7 +352,11 @@ class Session:
                 Specify -1 to use the value of the Session.TCPIP.ConnectTimeout
                 property.
         """
-        self._interpreter.connect_to_devices(self._session_handle, device_names, connection_timeout)
+        try:
+            self._interpreter.connect_to_devices(self._session_handle, device_names, connection_timeout)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def disconnect_from_devices(self, device_names: str) -> None:
         """Close network connections for the specified devices.
@@ -304,7 +370,11 @@ class Session:
                 network connections. If you do not specify this parameter, the
                 session default devices will be used.
         """
-        self._interpreter.disconnect_from_devices(self._session_handle, device_names)
+        try:
+            self._interpreter.disconnect_from_devices(self._session_handle, device_names)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def connect_to_chassis_by_address(self, address: str, username: str, password: str, connection_timeout: float) -> str:
         """Open a network connection for a chassis by the specified IP address
@@ -324,8 +394,12 @@ class Session:
         Returns:
             chassis_name: Name of connected chassis
         """
-        chassis_name = self._interpreter.connect_to_chassis_by_address(self._session_handle, address, username, password, connection_timeout)
-        return chassis_name
+        try:
+            chassis_name = self._interpreter.connect_to_chassis_by_address(self._session_handle, address, username, password, connection_timeout)
+            return chassis_name
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def reserve_devices(self, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float) -> None:
         """Reserve the specified device(s), which prevents other sessions from
@@ -351,7 +425,11 @@ class Session:
                 Specify -1 to use the value of the Session.ReservationTimeout
                 property
         """
-        self._interpreter.reserve_devices(self._session_handle, device_names, reservation_access, reservation_group, reservation_timeout)
+        try:
+            self._interpreter.reserve_devices(self._session_handle, device_names, reservation_access, reservation_group, reservation_timeout)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def unreserve_devices(self, device_names: str) -> None:
         """Unreserve the specified device(s), allowing other sessions to access
@@ -362,7 +440,11 @@ class Session:
                 do not specify this parameter, the session default devices will
                 be used.
         """
-        self._interpreter.unreserve_devices(self._session_handle, device_names)
+        try:
+            self._interpreter.unreserve_devices(self._session_handle, device_names)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def reset_devices(self, device_names: str) -> None:
         """Reset the specified device(s) to the default state.
@@ -382,7 +464,11 @@ class Session:
                 not specify this parameter, the session default devices will be
                 used.
         """
-        self._interpreter.reset_devices(self._session_handle, device_names)
+        try:
+            self._interpreter.reset_devices(self._session_handle, device_names)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def rename_device(self, device_name: str, new_device_name: str) -> None:
         """Rename the specified device, both on the remote device and in the
@@ -397,7 +483,11 @@ class Session:
             device_name: Device to rename
             new_device_name: New name for device
         """
-        self._interpreter.rename_device(self._session_handle, device_name, new_device_name)
+        try:
+            self._interpreter.rename_device(self._session_handle, device_name, new_device_name)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def update_system_configuration_file(self, chassis_name: str, connection_timeout: float) -> None:
         """Update the information of the specified chassis and its modules in
@@ -414,7 +504,11 @@ class Session:
                 Specify -1 to use the value of the Session.TCPIP.ConnectTimeout
                 property.
         """
-        self._interpreter.update_system_configuration_file(self._session_handle, chassis_name, connection_timeout)
+        try:
+            self._interpreter.update_system_configuration_file(self._session_handle, chassis_name, connection_timeout)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def add_network_chassis(self, address: str, username: str, password: str, connection_timeout: float) -> str:
         """Connect to the specified network chassis, adds the chassis and its
@@ -438,8 +532,12 @@ class Session:
         Returns:
             chassis_name: Name of added chassis
         """
-        chassis_name = self._interpreter.add_network_chassis(self._session_handle, address, username, password, connection_timeout)
-        return chassis_name
+        try:
+            chassis_name = self._interpreter.add_network_chassis(self._session_handle, address, username, password, connection_timeout)
+            return chassis_name
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def remove_chassis(self, chassis_name: str) -> None:
         """Remove the specified chassis from the local configuration file.
@@ -450,7 +548,11 @@ class Session:
         Args:
             chassis_name: Name of chassis to remove
         """
-        self._interpreter.remove_chassis(self._session_handle, chassis_name)
+        try:
+            self._interpreter.remove_chassis(self._session_handle, chassis_name)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_bool(self, device_names: str, property_name: str) -> bool:
         """Get the value of the specified device property from one or more
@@ -468,8 +570,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_bool(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_bool(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_bool_array(self, device_names: str, property_name: str) -> list[bool]:
         """Get the value of the specified device property from one or more
@@ -487,8 +593,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_bool_array(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_bool_array(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_double(self, device_names: str, property_name: str) -> float:
         """Get the value of the specified device property from one or more
@@ -506,8 +616,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_double(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_double(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_double_array(self, device_names: str, property_name: str) -> list[float]:
         """Get the value of the specified device property from one or more
@@ -525,8 +639,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_double_array(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_double_array(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_int32(self, device_names: str, property_name: str) -> int:
         """Get the value of the specified device property from one or more
@@ -544,8 +662,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_int32(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_int32(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_int32_array(self, device_names: str, property_name: str) -> list[int]:
         """Get the value of the specified device property from one or more
@@ -563,8 +685,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_int32_array(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_int32_array(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_int64(self, device_names: str, property_name: str) -> int:
         """Get the value of the specified device property from one or more
@@ -582,8 +708,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_int64(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_int64(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_int64_array(self, device_names: str, property_name: str) -> list[int]:
         """Get the value of the specified device property from one or more
@@ -601,8 +731,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_int64_array(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_int64_array(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_string(self, device_names: str, property_name: str) -> str:
         """Get the value of the specified device property from one or more
@@ -620,8 +754,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_string(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_string(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_string_array(self, device_names: str, property_name: str) -> list[str]:
         """Get the value of the specified device property from one or more
@@ -639,8 +777,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_string_array(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_string_array(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_uint32(self, device_names: str, property_name: str) -> int:
         """Get the value of the specified device property from one or more
@@ -658,8 +800,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_uint32(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_uint32(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_uint32_array(self, device_names: str, property_name: str) -> list[int]:
         """Get the value of the specified device property from one or more
@@ -677,8 +823,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_uint32_array(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_uint32_array(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_uint64(self, device_names: str, property_name: str) -> int:
         """Get the value of the specified device property from one or more
@@ -696,8 +846,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_uint64(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_uint64(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_device_property_uint64_array(self, device_names: str, property_name: str) -> list[int]:
         """Get the value of the specified device property from one or more
@@ -715,8 +869,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_device_property_uint64_array(self._session_handle, device_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_device_property_uint64_array(self._session_handle, device_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_bool(self, device_names: str, property_name: str, property_value: bool) -> None:
         """Set the specified device property to a new value for one or more
@@ -736,7 +894,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_bool(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_bool(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_bool_array(self, device_names: str, property_name: str, property_value: list[bool]) -> None:
         """Set the specified device property to a new value for one or more
@@ -756,7 +918,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_bool_array(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_bool_array(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_double(self, device_names: str, property_name: str, property_value: float) -> None:
         """Set the specified device property to a new value for one or more
@@ -776,7 +942,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_double(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_double(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_double_array(self, device_names: str, property_name: str, property_value: list[float]) -> None:
         """Set the specified device property to a new value for one or more
@@ -796,7 +966,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_double_array(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_double_array(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_int32(self, device_names: str, property_name: str, property_value: int) -> None:
         """Set the specified device property to a new value for one or more
@@ -816,7 +990,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_int32(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_int32(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_int32_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified device property to a new value for one or more
@@ -836,7 +1014,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_int32_array(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_int32_array(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_int64(self, device_names: str, property_name: str, property_value: int) -> None:
         """Set the specified device property to a new value for one or more
@@ -856,7 +1038,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_int64(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_int64(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_int64_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified device property to a new value for one or more
@@ -876,7 +1062,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_int64_array(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_int64_array(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_string(self, device_names: str, property_name: str, property_value: str) -> None:
         """Set the specified device property to a new value for one or more
@@ -896,7 +1086,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_string(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_string(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_string_array(self, device_names: str, property_name: str, property_value: list[str]) -> None:
         """Set the specified device property to a new value for one or more
@@ -916,7 +1110,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_string_array(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_string_array(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_uint32(self, device_names: str, property_name: str, property_value: int) -> None:
         """Set the specified device property to a new value for one or more
@@ -936,7 +1134,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_uint32(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_uint32(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_uint32_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified device property to a new value for one or more
@@ -956,7 +1158,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_uint32_array(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_uint32_array(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_uint64(self, device_names: str, property_name: str, property_value: int) -> None:
         """Set the specified device property to a new value for one or more
@@ -976,7 +1182,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_uint64(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_uint64(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_device_property_uint64_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified device property to a new value for one or more
@@ -996,7 +1206,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_device_property_uint64_array(self._session_handle, device_names, property_name, property_value)
+        try:
+            self._interpreter.set_device_property_uint64_array(self._session_handle, device_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_bool(self, physical_channel_names: str, property_name: str) -> bool:
         """Get the value of the specified physical channel property from one or
@@ -1017,8 +1231,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_bool_array(self, physical_channel_names: str, property_name: str) -> list[bool]:
         """Get the value of the specified physical channel property from one or
@@ -1039,8 +1257,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_double(self, physical_channel_names: str, property_name: str) -> float:
         """Get the value of the specified physical channel property from one or
@@ -1061,8 +1283,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_double(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_double(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_double_array(self, physical_channel_names: str, property_name: str) -> list[float]:
         """Get the value of the specified physical channel property from one or
@@ -1083,8 +1309,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_int32(self, physical_channel_names: str, property_name: str) -> int:
         """Get the value of the specified physical channel property from one or
@@ -1105,8 +1335,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_int32_array(self, physical_channel_names: str, property_name: str) -> list[int]:
         """Get the value of the specified physical channel property from one or
@@ -1127,8 +1361,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_int64(self, physical_channel_names: str, property_name: str) -> int:
         """Get the value of the specified physical channel property from one or
@@ -1149,8 +1387,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_int64_array(self, physical_channel_names: str, property_name: str) -> list[int]:
         """Get the value of the specified physical channel property from one or
@@ -1171,8 +1413,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_string(self, physical_channel_names: str, property_name: str) -> str:
         """Get the value of the specified physical channel property from one or
@@ -1193,8 +1439,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_string(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_string(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_string_array(self, physical_channel_names: str, property_name: str) -> list[str]:
         """Get the value of the specified physical channel property from one or
@@ -1215,8 +1465,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_uint32(self, physical_channel_names: str, property_name: str) -> int:
         """Get the value of the specified physical channel property from one or
@@ -1237,8 +1491,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_uint32_array(self, physical_channel_names: str, property_name: str) -> list[int]:
         """Get the value of the specified physical channel property from one or
@@ -1259,8 +1517,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_uint64(self, physical_channel_names: str, property_name: str) -> int:
         """Get the value of the specified physical channel property from one or
@@ -1281,8 +1543,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_physical_channel_property_uint64_array(self, physical_channel_names: str, property_name: str) -> list[int]:
         """Get the value of the specified physical channel property from one or
@@ -1303,8 +1569,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_bool(self, physical_channel_names: str, property_name: str, property_value: bool) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1328,7 +1598,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_bool_array(self, physical_channel_names: str, property_name: str, property_value: list[bool]) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1352,7 +1626,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_double(self, physical_channel_names: str, property_name: str, property_value: float) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1376,7 +1654,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_double(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_double(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_double_array(self, physical_channel_names: str, property_name: str, property_value: list[float]) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1400,7 +1682,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_int32(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1424,7 +1710,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_int32_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1448,7 +1738,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_int64(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1472,7 +1766,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_int64_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1496,7 +1794,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_string(self, physical_channel_names: str, property_name: str, property_value: str) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1520,7 +1822,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_string(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_string(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_string_array(self, physical_channel_names: str, property_name: str, property_value: list[str]) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1544,7 +1850,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_uint32(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1568,7 +1878,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_uint32_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1592,7 +1906,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_uint64(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1616,7 +1934,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_physical_channel_property_uint64_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified physical channel property to a new value for one or
@@ -1640,7 +1962,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name, property_value)
+        try:
+            self._interpreter.set_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_properties_for_devices(self, device_names: str) -> None:
         """Commit all device or physical channels properties with pending
@@ -1655,7 +1981,11 @@ class Session:
                 properties. If you do not specify this parameter, the session
                 default devices will be used.
         """
-        self._interpreter.commit_properties_for_devices(self._session_handle, device_names)
+        try:
+            self._interpreter.commit_properties_for_devices(self._session_handle, device_names)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_properties_for_physical_channels(self, physical_channel_names: str) -> None:
         """Commit all physical channel properties with pending changes to
@@ -1671,7 +2001,11 @@ class Session:
                 If you do not specify this parameter, the session default
                 physical channels will be used.
         """
-        self._interpreter.commit_properties_for_physical_channels(self._session_handle, physical_channel_names)
+        try:
+            self._interpreter.commit_properties_for_physical_channels(self._session_handle, physical_channel_names)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_properties_for_session(self) -> None:
         """Commit all device and physical channel properties with pending
@@ -1681,7 +2015,11 @@ class Session:
         If you set a property multiple times between commits, only the last
         value is committed.
         """
-        self._interpreter.commit_properties_for_session(self._session_handle)
+        try:
+            self._interpreter.commit_properties_for_session(self._session_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_properties_generic(self, resources: str) -> None:
         """Commit all properties with pending changes to hardware for the
@@ -1696,7 +2034,11 @@ class Session:
                 Numbered physical channels may be specified as a colon-delimited
                 range, such as "Mod1/load0:3". This parameter is required.
         """
-        self._interpreter.commit_properties_generic(self._session_handle, resources)
+        try:
+            self._interpreter.commit_properties_generic(self._session_handle, resources)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_nvmem_area_property_bool(self, nvmem_area_names: str, property_name: str) -> bool:
         """Get the value of the specified NVMEM area property for one or more
@@ -1714,8 +2056,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_nvmem_area_property_bool(self._session_handle, nvmem_area_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_nvmem_area_property_bool(self._session_handle, nvmem_area_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_nvmem_area_property_bool_array(self, nvmem_area_names: str, property_name: str) -> list[bool]:
         """Get the value of the specified NVMEM area property for one or more
@@ -1733,8 +2079,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_nvmem_area_property_bool_array(self._session_handle, nvmem_area_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_nvmem_area_property_bool_array(self._session_handle, nvmem_area_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_nvmem_area_property_string(self, nvmem_area_names: str, property_name: str) -> str:
         """Get the value of the specified NVMEM area property for one or more
@@ -1752,8 +2102,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_nvmem_area_property_string(self._session_handle, nvmem_area_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_nvmem_area_property_string(self._session_handle, nvmem_area_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_nvmem_area_property_string_array(self, nvmem_area_names: str, property_name: str) -> list[str]:
         """Get the value of the specified NVMEM area property for one or more
@@ -1771,8 +2125,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_nvmem_area_property_string_array(self._session_handle, nvmem_area_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_nvmem_area_property_string_array(self._session_handle, nvmem_area_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_nvmem_area_property_uint32(self, nvmem_area_names: str, property_name: str) -> int:
         """Get the value of the specified NVMEM area property for one or more
@@ -1790,8 +2148,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_nvmem_area_property_uint32(self._session_handle, nvmem_area_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_nvmem_area_property_uint32(self._session_handle, nvmem_area_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_nvmem_area_property_uint32_array(self, nvmem_area_names: str, property_name: str) -> list[int]:
         """Get the value of the specified NVMEM area property for one or more
@@ -1809,8 +2171,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_nvmem_area_property_uint32_array(self._session_handle, nvmem_area_names, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_nvmem_area_property_uint32_array(self._session_handle, nvmem_area_names, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_session_property_double(self, property_name: str) -> float:
         """Get the value of the specified session property.
@@ -1821,8 +2187,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_session_property_double(self._session_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_session_property_double(self._session_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_session_property_string(self, property_name: str) -> str:
         """Get the value of the specified session property.
@@ -1833,8 +2203,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_session_property_string(self._session_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_session_property_string(self._session_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_session_property_string_array(self, property_name: str) -> list[str]:
         """Get the value of the specified session property.
@@ -1845,8 +2219,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_session_property_string_array(self._session_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_session_property_string_array(self._session_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_session_property_double(self, property_name: str, property_value: float) -> None:
         """Set the specified session property to a new value.
@@ -1857,7 +2235,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_session_property_double(self._session_handle, property_name, property_value)
+        try:
+            self._interpreter.set_session_property_double(self._session_handle, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_session_property_string(self, property_name: str, property_value: str) -> None:
         """Set the specified session property to a new value.
@@ -1868,7 +2250,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_session_property_string(self._session_handle, property_name, property_value)
+        try:
+            self._interpreter.set_session_property_string(self._session_handle, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_session_property_string_array(self, property_name: str, property_value: list[str]) -> None:
         """Set the specified session property to a new value.
@@ -1879,7 +2265,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_session_property_string_array(self._session_handle, property_name, property_value)
+        try:
+            self._interpreter.set_session_property_string_array(self._session_handle, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_system_property_double(self, property_name: str) -> float:
         """Get the value of the specified system property.
@@ -1890,8 +2280,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_system_property_double(self._session_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_system_property_double(self._session_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_system_property_string_array(self, property_name: str) -> list[str]:
         """Get the value of the specified system property.
@@ -1902,8 +2296,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_system_property_string_array(self._session_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_system_property_string_array(self._session_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_system_property_uint64(self, property_name: str) -> int:
         """Get the value of the specified system property.
@@ -1914,8 +2312,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_system_property_uint64(self._session_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_system_property_uint64(self._session_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_system_property_double(self, property_name: str, property_value: float) -> None:
         """Set the specified system property to a new value.
@@ -1926,7 +2328,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_system_property_double(self._session_handle, property_name, property_value)
+        try:
+            self._interpreter.set_system_property_double(self._session_handle, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_bool(self, resources: str, property_name: str) -> bool:
         """Get the value of the specified property from one or more resources,
@@ -1946,8 +2352,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_bool(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_bool(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_bool_array(self, resources: str, property_name: str) -> list[bool]:
         """Get the value of the specified property from one or more resources,
@@ -1967,8 +2377,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_bool_array(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_bool_array(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_double(self, resources: str, property_name: str) -> float:
         """Get the value of the specified property from one or more resources,
@@ -1988,8 +2402,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_double(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_double(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_double_array(self, resources: str, property_name: str) -> list[float]:
         """Get the value of the specified property from one or more resources,
@@ -2009,8 +2427,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_double_array(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_double_array(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_int32(self, resources: str, property_name: str) -> int:
         """Get the value of the specified property from one or more resources,
@@ -2030,8 +2452,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_int32(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_int32(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_int32_array(self, resources: str, property_name: str) -> list[int]:
         """Get the value of the specified property from one or more resources,
@@ -2051,8 +2477,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_int32_array(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_int32_array(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_int64(self, resources: str, property_name: str) -> int:
         """Get the value of the specified property from one or more resources,
@@ -2072,8 +2502,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_int64(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_int64(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_int64_array(self, resources: str, property_name: str) -> list[int]:
         """Get the value of the specified property from one or more resources,
@@ -2093,8 +2527,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_int64_array(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_int64_array(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_string(self, resources: str, property_name: str) -> str:
         """Get the value of the specified property from one or more resources,
@@ -2114,8 +2552,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_string(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_string(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_string_array(self, resources: str, property_name: str) -> list[str]:
         """Get the value of the specified property from one or more resources,
@@ -2135,8 +2577,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_string_array(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_string_array(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_uint32(self, resources: str, property_name: str) -> int:
         """Get the value of the specified property from one or more resources,
@@ -2156,8 +2602,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_uint32(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_uint32(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_uint32_array(self, resources: str, property_name: str) -> list[int]:
         """Get the value of the specified property from one or more resources,
@@ -2177,8 +2627,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_uint32_array(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_uint32_array(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_uint64(self, resources: str, property_name: str) -> int:
         """Get the value of the specified property from one or more resources,
@@ -2198,8 +2652,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_uint64(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_uint64(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_generic_property_uint64_array(self, resources: str, property_name: str) -> list[int]:
         """Get the value of the specified property from one or more resources,
@@ -2219,8 +2677,12 @@ class Session:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_generic_property_uint64_array(self._session_handle, resources, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_generic_property_uint64_array(self._session_handle, resources, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_bool(self, resources: str, property_name: str, property_value: bool) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2239,7 +2701,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_bool(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_bool(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_bool_array(self, resources: str, property_name: str, property_value: list[bool]) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2258,7 +2724,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_bool_array(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_bool_array(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_double(self, resources: str, property_name: str, property_value: float) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2277,7 +2747,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_double(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_double(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_double_array(self, resources: str, property_name: str, property_value: list[float]) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2296,7 +2770,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_double_array(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_double_array(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_int32(self, resources: str, property_name: str, property_value: int) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2315,7 +2793,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_int32(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_int32(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_int32_array(self, resources: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2334,7 +2816,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_int32_array(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_int32_array(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_int64(self, resources: str, property_name: str, property_value: int) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2353,7 +2839,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_int64(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_int64(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_int64_array(self, resources: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2372,7 +2862,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_int64_array(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_int64_array(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_string(self, resources: str, property_name: str, property_value: str) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2391,7 +2885,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_string(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_string(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_string_array(self, resources: str, property_name: str, property_value: list[str]) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2410,7 +2908,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_string_array(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_string_array(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_uint32(self, resources: str, property_name: str, property_value: int) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2429,7 +2931,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_uint32(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_uint32(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_uint32_array(self, resources: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2448,7 +2954,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_uint32_array(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_uint32_array(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_uint64(self, resources: str, property_name: str, property_value: int) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2467,7 +2977,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_uint64(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_uint64(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_generic_property_uint64_array(self, resources: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified property to a new value for one or more resources,
@@ -2486,7 +3000,11 @@ class Session:
             property_name: Name of property to set
             property_value: New value to set property to
         """
-        self._interpreter.set_generic_property_uint64_array(self._session_handle, resources, property_name, property_value)
+        try:
+            self._interpreter.set_generic_property_uint64_array(self._session_handle, resources, property_name, property_value)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def execute_device_command(self, device_names: str, command_name: str, timeout: float) -> None:
         """Execute the specified device command on one or more devices.
@@ -2510,7 +3028,11 @@ class Session:
             command_name: Name of command to execute
             timeout: Timeout in seconds
         """
-        self._interpreter.execute_device_command(self._session_handle, device_names, command_name, timeout)
+        try:
+            self._interpreter.execute_device_command(self._session_handle, device_names, command_name, timeout)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def execute_physical_channel_command(self, physical_channel_names: str, command_name: str, timeout: float) -> None:
         """Execute the specified physical channel command on one or more
@@ -2535,7 +3057,11 @@ class Session:
             command_name: Name of command to execute
             timeout: Timeout in seconds
         """
-        self._interpreter.execute_physical_channel_command(self._session_handle, physical_channel_names, command_name, timeout)
+        try:
+            self._interpreter.execute_physical_channel_command(self._session_handle, physical_channel_names, command_name, timeout)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def execute_generic_command(self, resources: str, command_name: str, timeout: float) -> None:
         """Execute the specified command on one or more resources.
@@ -2560,7 +3086,11 @@ class Session:
             command_name: Name of command to execute
             timeout: Timeout in seconds
         """
-        self._interpreter.execute_generic_command(self._session_handle, resources, command_name, timeout)
+        try:
+            self._interpreter.execute_generic_command(self._session_handle, resources, command_name, timeout)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def read_register_uint8(self, device_name: str, register_address: int) -> int:
         """Read the specified register.
@@ -2578,8 +3108,12 @@ class Session:
         Returns:
             data: Register data
         """
-        data = self._interpreter.read_register_uint8(self._session_handle, device_name, register_address)
-        return data
+        try:
+            data = self._interpreter.read_register_uint8(self._session_handle, device_name, register_address)
+            return data
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def read_register_uint16(self, device_name: str, register_address: int) -> int:
         """Read the specified register.
@@ -2597,8 +3131,12 @@ class Session:
         Returns:
             data: Register data
         """
-        data = self._interpreter.read_register_uint16(self._session_handle, device_name, register_address)
-        return data
+        try:
+            data = self._interpreter.read_register_uint16(self._session_handle, device_name, register_address)
+            return data
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def read_register_uint32(self, device_name: str, register_address: int) -> int:
         """Read the specified register.
@@ -2616,8 +3154,12 @@ class Session:
         Returns:
             data: Register data
         """
-        data = self._interpreter.read_register_uint32(self._session_handle, device_name, register_address)
-        return data
+        try:
+            data = self._interpreter.read_register_uint32(self._session_handle, device_name, register_address)
+            return data
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def read_register_uint64(self, device_name: str, register_address: int) -> int:
         """Read the specified register.
@@ -2635,8 +3177,12 @@ class Session:
         Returns:
             data: Register data
         """
-        data = self._interpreter.read_register_uint64(self._session_handle, device_name, register_address)
-        return data
+        try:
+            data = self._interpreter.read_register_uint64(self._session_handle, device_name, register_address)
+            return data
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def write_register_uint8(self, device_name: str, register_address: int, data: int) -> None:
         """Write data to the specified register.
@@ -2652,7 +3198,11 @@ class Session:
             register_address: Address of register
             data: New register data
         """
-        self._interpreter.write_register_uint8(self._session_handle, device_name, register_address, data)
+        try:
+            self._interpreter.write_register_uint8(self._session_handle, device_name, register_address, data)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def write_register_uint16(self, device_name: str, register_address: int, data: int) -> None:
         """Write data to the specified register.
@@ -2668,7 +3218,11 @@ class Session:
             register_address: Address of register
             data: New register data
         """
-        self._interpreter.write_register_uint16(self._session_handle, device_name, register_address, data)
+        try:
+            self._interpreter.write_register_uint16(self._session_handle, device_name, register_address, data)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def write_register_uint32(self, device_name: str, register_address: int, data: int) -> None:
         """Write data to the specified register.
@@ -2684,7 +3238,11 @@ class Session:
             register_address: Address of register
             data: New register data
         """
-        self._interpreter.write_register_uint32(self._session_handle, device_name, register_address, data)
+        try:
+            self._interpreter.write_register_uint32(self._session_handle, device_name, register_address, data)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def write_register_uint64(self, device_name: str, register_address: int, data: int) -> None:
         """Write data to the specified register.
@@ -2700,7 +3258,11 @@ class Session:
             register_address: Address of register
             data: New register data
         """
-        self._interpreter.write_register_uint64(self._session_handle, device_name, register_address, data)
+        try:
+            self._interpreter.write_register_uint64(self._session_handle, device_name, register_address, data)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_nvmem_bytes(self, nvmem_area: str, nvmem_address: int, num_byte: int) -> bytes:
         """Get a range of bytes from an NVMEM area.
@@ -2713,8 +3275,12 @@ class Session:
         Returns:
             byte: NVMEM data
         """
-        byte = self._interpreter.get_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, num_byte)
-        return byte
+        try:
+            byte = self._interpreter.get_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, num_byte)
+            return byte
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_nvmem_bytes(self, nvmem_area: str, nvmem_address: int, bytes_data: bytes, serial_number: str, password: str) -> None:
         """Set a range of bytes to write to an NVMEM area.
@@ -2736,7 +3302,11 @@ class Session:
             password: Password of the NVMEM area. Do not specify this parameter
                 if the NVMEM area is not protected.
         """
-        self._interpreter.set_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, bytes_data, serial_number, password)
+        try:
+            self._interpreter.set_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, bytes_data, serial_number, password)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_nvmem_areas(self, nvmem_area_names: str) -> None:
         """Commit pending changes to hardware for the specified NVMEM area(s).
@@ -2746,7 +3316,11 @@ class Session:
                 you do not specify this parameter, the session default NVMEM
                 areas will be used.
         """
-        self._interpreter.commit_nvmem_areas(self._session_handle, nvmem_area_names)
+        try:
+            self._interpreter.commit_nvmem_areas(self._session_handle, nvmem_area_names)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_nvmem_for_devices(self, device_names: str) -> None:
         """Commit pending changes to hardware for all NVMEM areas on the
@@ -2757,7 +3331,11 @@ class Session:
                 not specify this parameter, the session default devices will be
                 used.
         """
-        self._interpreter.commit_nvmem_for_devices(self._session_handle, device_names)
+        try:
+            self._interpreter.commit_nvmem_for_devices(self._session_handle, device_names)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_nvmem_for_session(self) -> None:
         """Commit pending changes to hardware for all NVMEM areas for all
@@ -2766,7 +3344,11 @@ class Session:
         If the session has any chassis reserved, this VI/function skips over
         them.
         """
-        self._interpreter.commit_nvmem_for_session(self._session_handle)
+        try:
+            self._interpreter.commit_nvmem_for_session(self._session_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_nvmem_generic(self, resources: str) -> None:
         """Commit pending changes to hardware for the specified resource(s).
@@ -2776,7 +3358,11 @@ class Session:
                 NVMEM, or a resource alias such as "$DefaultDevices". This
                 parameter is required.
         """
-        self._interpreter.commit_nvmem_generic(self._session_handle, resources)
+        try:
+            self._interpreter.commit_nvmem_generic(self._session_handle, resources)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_linear_scaling_parameters(self, physical_channel_names: str) -> tuple[float, float]:
         """Get scaling parameters from a linear scale that uses the equation y =
@@ -2790,8 +3376,12 @@ class Session:
             slope: Slope value to get.
             intercept: Intercept value to get.
         """
-        intercept = self._interpreter.get_linear_scaling_parameters(self._session_handle, physical_channel_names)
-        return intercept
+        try:
+            intercept = self._interpreter.get_linear_scaling_parameters(self._session_handle, physical_channel_names)
+            return intercept
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_polynomial_scaling_parameters(self, physical_channel_names: str) -> tuple[list[float], list[float]]:
         """Get scaling parameters from a polynomial scale that uses an nth order
@@ -2809,8 +3399,12 @@ class Session:
             forward_coefficient: Forward coefficients to get.
             reverse_coefficient: Reverse coefficients to get.
         """
-        reverse_coefficient = self._interpreter.get_polynomial_scaling_parameters(self._session_handle, physical_channel_names)
-        return reverse_coefficient
+        try:
+            reverse_coefficient = self._interpreter.get_polynomial_scaling_parameters(self._session_handle, physical_channel_names)
+            return reverse_coefficient
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_table_scaling_parameters(self, physical_channel_names: str) -> tuple[list[float], list[float], int]:
         """Get scaling parameters from a table scale that maps an array of
@@ -2825,8 +3419,12 @@ class Session:
             prescale_value: Prescale Values to get.
             coercion: Coercion to get.
         """
-        coercion = self._interpreter.get_table_scaling_parameters(self._session_handle, physical_channel_names)
-        return coercion
+        try:
+            coercion = self._interpreter.get_table_scaling_parameters(self._session_handle, physical_channel_names)
+            return coercion
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_user_defined_scaling_parameters(self, physical_channel_names: str) -> tuple[list[str], list[float]]:
         """Get scaling parameters from a user-defined scale.
@@ -2839,8 +3437,12 @@ class Session:
             user_defined_parameter_names: User-defined parameter names to get.
             user_defined_parameter_value: User-defined parameters to get.
         """
-        user_defined_parameter_value = self._interpreter.get_user_defined_scaling_parameters(self._session_handle, physical_channel_names)
-        return user_defined_parameter_value
+        try:
+            user_defined_parameter_value = self._interpreter.get_user_defined_scaling_parameters(self._session_handle, physical_channel_names)
+            return user_defined_parameter_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_user_defined_scaling_equation(self, physical_channel_names: str) -> str:
         """Get a scaling equation from a user-defined scale.
@@ -2852,8 +3454,12 @@ class Session:
         Returns:
             user_defined_equation: User-defined equation to get.
         """
-        user_defined_equation = self._interpreter.get_user_defined_scaling_equation(self._session_handle, physical_channel_names)
-        return user_defined_equation
+        try:
+            user_defined_equation = self._interpreter.get_user_defined_scaling_equation(self._session_handle, physical_channel_names)
+            return user_defined_equation
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_linear_scaling_parameters(self, physical_channel_names: str, slope: float, intercept: float, serial_number: str, password: str) -> None:
         """Set scaling parameters for a linear scale that uses the equation y =
@@ -2869,7 +3475,11 @@ class Session:
             password: Password of the scaling area. You do not have to specify
                 this parameter if the scaling area is not protected.
         """
-        self._interpreter.set_linear_scaling_parameters(self._session_handle, physical_channel_names, slope, intercept, serial_number, password)
+        try:
+            self._interpreter.set_linear_scaling_parameters(self._session_handle, physical_channel_names, slope, intercept, serial_number, password)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_polynomial_scaling_parameters(self, physical_channel_names: str, forward_coefficient: list[float], reverse_coefficient: list[float], serial_number: str, password: str) -> None:
         """Set scaling parameters for a polynomial scale that uses an nth order
@@ -2889,7 +3499,11 @@ class Session:
             password: Password of the scaling area. You do not have to specify
                 this parameter if the scaling area is not protected.
         """
-        self._interpreter.set_polynomial_scaling_parameters(self._session_handle, physical_channel_names, forward_coefficient, reverse_coefficient, serial_number, password)
+        try:
+            self._interpreter.set_polynomial_scaling_parameters(self._session_handle, physical_channel_names, forward_coefficient, reverse_coefficient, serial_number, password)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_table_scaling_parameters(self, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: int, serial_number: str, password: str) -> None:
         """Set scaling parameters for a table scale that maps an array of
@@ -2906,7 +3520,11 @@ class Session:
             password: Password of the scaling area. You do not have to specify
                 this parameter if the scaling area is not protected.
         """
-        self._interpreter.set_table_scaling_parameters(self._session_handle, physical_channel_names, scaled_value, prescale_value, coercion, serial_number, password)
+        try:
+            self._interpreter.set_table_scaling_parameters(self._session_handle, physical_channel_names, scaled_value, prescale_value, coercion, serial_number, password)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_user_defined_scaling_parameters(self, physical_channel_names: str, user_defined_parameter_name: list[str], user_defined_parameter_value: list[float], serial_number: str, password: str) -> None:
         """Set scaling parameters for a user-defined scale.
@@ -2921,7 +3539,11 @@ class Session:
             password: Password of the scaling area. You do not have to specify
                 this parameter if the scaling area is not protected.
         """
-        self._interpreter.set_user_defined_scaling_parameters(self._session_handle, physical_channel_names, user_defined_parameter_name, user_defined_parameter_value, serial_number, password)
+        try:
+            self._interpreter.set_user_defined_scaling_parameters(self._session_handle, physical_channel_names, user_defined_parameter_name, user_defined_parameter_value, serial_number, password)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def set_user_defined_scaling_equation(self, physical_channel_names: str, user_defined_equation: str, serial_number: str, password: str) -> None:
         """Set the scaling equation for a user-defined scale.
@@ -2935,7 +3557,11 @@ class Session:
             password: Password of the scaling area. You do not have to specify
                 this parameter if the scaling area is not protected.
         """
-        self._interpreter.set_user_defined_scaling_equation(self._session_handle, physical_channel_names, user_defined_equation, serial_number, password)
+        try:
+            self._interpreter.set_user_defined_scaling_equation(self._session_handle, physical_channel_names, user_defined_equation, serial_number, password)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def commit_scaling_for_devices(self, device_names: str) -> None:
         """Commit all scaling parameters with pending changes to all physical
@@ -2945,5 +3571,9 @@ class Session:
             device_names: Comma-delimited list of devices for which to commit
                 the scaling changes.
         """
-        self._interpreter.commit_scaling_for_devices(self._session_handle, device_names)
+        try:
+            self._interpreter.commit_scaling_for_devices(self._session_handle, device_names)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 

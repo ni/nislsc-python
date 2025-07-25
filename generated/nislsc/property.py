@@ -5,12 +5,12 @@ references that allow access to device, physical channel, and driver
 configuration properties through property reflection.
 """
 
-import warnings
+from __future__ import annotations
 from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.error import SLSCResourceWarning
+from nislsc.error import SLSCError
 from nislsc.session._session import Session
 
 
@@ -52,9 +52,22 @@ class Property:
 
     def close(self) -> None:
         """Close the Property instance."""
-        if self._property_handle is not None:
+        if self._property_handle != 0:
             self._interpreter.close_property(self._property_handle)
-            self._property_handle = None
+            self._property_handle = 0
+
+        def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+        """Return extended error information for the last error that occurred on
+        the specified library handle.
+        
+        Args:
+            language: Language to return error information in
+        
+        Returns:
+            extended_error_info: Extended error info text
+        """
+        language = self._session._library.language if language == language.UNDEFINED else language
+        return self._session._library.get_extended_error_info(language)
 
     @classmethod
     def open_device_property(cls, session: Session, device_name: str, property_name: str) -> Self:
@@ -72,10 +85,14 @@ class Property:
         Returns:
             Self: New instance of PropertyReference object.
         """
-        session_handle = session._session_handle
-        interpreter = session._interpreter
-        property_handle = interpreter.open_device_property(session_handle, device_name, property_name)
-        return cls(session, property_handle)
+        try:
+            session_handle = session._session_handle
+            interpreter = session._interpreter
+            property_handle = interpreter.open_device_property(session_handle, device_name, property_name)
+            return cls(session, property_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
     def open_physical_channel_property(cls, session: Session, physical_channel_names: str, property_name: str) -> Self:
@@ -93,10 +110,14 @@ class Property:
         Returns:
             Self: New instance of PropertyReference object.
         """
-        session_handle = session._session_handle
-        interpreter = session._interpreter
-        property_handle = interpreter.open_physical_channel_property(session_handle, physical_channel_names, property_name)
-        return cls(session, property_handle)
+        try:
+            session_handle = session._session_handle
+            interpreter = session._interpreter
+            property_handle = interpreter.open_physical_channel_property(session_handle, physical_channel_names, property_name)
+            return cls(session, property_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
     def open_driver_defined_property(cls, session: Session, property_name: str) -> Self:
@@ -112,10 +133,14 @@ class Property:
         Returns:
             Self: New instance of PropertyReference object.
         """
-        session_handle = session._session_handle
-        interpreter = session._interpreter
-        property_handle = interpreter.open_driver_defined_property(session_handle, property_name)
-        return cls(session, property_handle)
+        try:
+            session_handle = session._session_handle
+            interpreter = session._interpreter
+            property_handle = interpreter.open_driver_defined_property(session_handle, property_name)
+            return cls(session, property_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
     def open_generic_property(cls, session: Session, resource: str, property_name: str) -> Self:
@@ -133,10 +158,14 @@ class Property:
         Returns:
             Self: New instance of PropertyReference object.
         """
-        session_handle = session._session_handle
-        interpreter = session._interpreter
-        property_handle = interpreter.open_generic_property(session_handle, resource, property_name)
-        return cls(session, property_handle)
+        try:
+            session_handle = session._session_handle
+            interpreter = session._interpreter
+            property_handle = interpreter.open_generic_property(session_handle, resource, property_name)
+            return cls(session, property_handle)
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_property_property_bool(self, property_name: str) -> bool:
         """Get the value of the specified property reflection property.
@@ -147,8 +176,12 @@ class Property:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_property_property_bool(self._property_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_property_property_bool(self._property_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_property_property_int32(self, property_name: str) -> int:
         """Get the value of the specified property reflection property.
@@ -159,8 +192,12 @@ class Property:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_property_property_int32(self._property_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_property_property_int32(self._property_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_property_property_int32_array(self, property_name: str) -> list[int]:
         """Get the value of the specified property reflection property.
@@ -171,8 +208,12 @@ class Property:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_property_property_int32_array(self._property_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_property_property_int32_array(self._property_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_property_property_string(self, property_name: str) -> str:
         """Get the value of the specified property reflection property.
@@ -183,8 +224,12 @@ class Property:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_property_property_string(self._property_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_property_property_string(self._property_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
     def get_property_property_string_array(self, property_name: str) -> list[str]:
         """Get the value of the specified property reflection property.
@@ -195,6 +240,10 @@ class Property:
         Returns:
             property_value: Value of property
         """
-        property_value = self._interpreter.get_property_property_string_array(self._property_handle, property_name)
-        return property_value
+        try:
+            property_value = self._interpreter.get_property_property_string_array(self._property_handle, property_name)
+            return property_value
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 

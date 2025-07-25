@@ -4,6 +4,8 @@ This module provides custom exception and warning classes for handling
 SLSC API errors and warnings.
 """
 
+import warnings
+
 from nislsc.error_codes import SLSCErrors, SLSCWarnings
 
 __all__ = ["SLSCError", "SLSCWarning", "SLSCResourceWarning"]

@@ -1,5 +1,5 @@
 <%!
-from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_creating_handle, is_class_func, generate_return, is_classmethod, get_classmethod_parameter_list
+from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_creating_handle, is_class_func, is_classmethod, get_classmethod_parameter_list, generate_return_in_class, generate_function_call_in_class
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 from utilities.docstrings_helpers import generate_docstrings
 %>\
@@ -10,19 +10,20 @@ sessions that handle device connections, property access, command
 execution for one or more devices, physical channels, or NVMEM areas.
 """
 
-import warnings
+from __future__ import annotations
 from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.error import SLSCResourceWarning
+from nislsc.constants import Language
+from nislsc.error import SLSCError
 from nislsc.library._library import Library
 
 
 class Session:
     """Represent Session class for NI SLSC."""
 
-    def __init__(self, library: Library, session_handle: int) -> None:
+    def __init__(self, library: Library, session_handle: int, _owns_library: bool) -> None:
         """Create a Session instance.
 
         Args:
@@ -33,6 +34,7 @@ class Session:
         self._session_handle = session_handle
         self._library = library
         self._interpreter = library._interpreter
+        self._owns_library = _owns_library
 
     def __enter__(self) -> Self:
         """Enter the runtime context related to this object.
@@ -57,9 +59,25 @@ class Session:
 
     def close(self) -> None:
         """Close the Session instance."""
-        if self._session_handle is not None:
+        if self._session_handle != 0:
             self._interpreter.close_session(self._session_handle)
-            self._session_handle = None
+            self._session_handle = 0
+        if self._owns_library:
+            self._library.close()
+            self._owns_library = False
+
+    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+        """Return extended error information for the last error that occurred on
+        the specified library handle.
+        
+        Args:
+            language: Language to return error information in
+        
+        Returns:
+            extended_error_info: Extended error info text
+        """
+        language = self._library.language if language == language.UNDEFINED else language
+        return self._library.get_extended_error_info(language)
 
 % for function in functions:
 % if 'capi' in function['targets']:
@@ -79,9 +97,22 @@ class Session:
         ${docstrings}
 % endfor
 % endif
-% for result in generate_return(function, 'Session'):
-        ${result}
+        try:
+% if is_classmethod(function, "Session"):
+            owns_library = False
+            if library is None:
+                library = Library()
+                owns_library = True
+% endif
+% for function_call in generate_function_call_in_class(function, 'Session'):
+            ${function_call}
 % endfor
+% for result in generate_return_in_class(function):
+            ${result}
+% endfor
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
 % endif
 % endif

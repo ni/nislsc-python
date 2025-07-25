@@ -5,18 +5,20 @@ interface that handles driver initialization, error management, and
 language configuration for SLSC hardware operations. 
 """
 
+from __future__ import annotations
 from types import TracebackType
 
 from typing_extensions import Self
 
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.constants import Language
+from nislsc.error import SLSCError
 from nislsc.utils import _select_interpreter, get_library_version
 
 
 class Library:
     """Represent Library class for NI SLSC."""
-    
+
     def __init__(self, language: Language = Language.CURRENT_THREAD_LOCALE) -> None:
         """Create a Library instance.
 
@@ -68,9 +70,9 @@ class Library:
 
     def close(self) -> None:
         """Close the Library instance."""
-        if self._library_handle is not None:
+        if self._library_handle != 0:
             self._interpreter.finalize_library(self._library_handle)
-            self._library_handle = None
+            self._library_handle = 0
 
     def initialize_library(self, version: int) -> int:
         """Return a library handle to identify the SLSC library.
@@ -88,8 +90,11 @@ class Library:
         Returns:
             Self: New instance of Library object.
         """
-        library_handle = self._interpreter.initialize_library(version)
-        return library_handle
+        try:
+            library_handle = self._interpreter.initialize_library(version)
+            return library_handle
+        except SLSCError as e:
+            raise SLSCError(f"Failed to initialize library. Error code: {e.error_code}", e.error_code)
 
     def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
         """Return extended error information for the last error that occurred on
@@ -101,9 +106,12 @@ class Library:
         Returns:
             extended_error_info: Extended error info text
         """
-        language = self._language if language == Language.UNDEFINED else language
-        extended_error_info = self._interpreter.get_extended_error_info(self._library_handle, language)
-        return extended_error_info
+        try:
+            language = self._language if language == Language.UNDEFINED else language
+            extended_error_info = self._interpreter.get_extended_error_info(self._library_handle, language)
+            return extended_error_info
+        except SLSCError as e:
+            raise SLSCError(f"Failed to get extended error information. Error code: {e.error_code}", e.error_code)
 
     def get_error_description(self, status_code: int, language: Language = Language.UNDEFINED) -> str:
         """Return the error description for the specified status code.
@@ -115,7 +123,11 @@ class Library:
         Returns:
             error_description: Error description text
         """
-        language = self._language if language == Language.UNDEFINED else language
-        error_description = self._interpreter.get_error_description(self._library_handle, status_code, language)
-        return error_description
+        try:
+            language = self._language if language == Language.UNDEFINED else language
+            error_description = self._interpreter.get_error_description(self._library_handle, status_code, language)
+            return error_description
+        except SLSCError as e:
+            extended_info = self.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 

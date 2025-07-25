@@ -145,7 +145,7 @@ def get_classmethod_parameter_list(function: dict) -> list[str]:
                 elif parameter["dataType"] == "enum" and parameter["name"] == "language":
                     param_list.append("language: Language")
                 elif parameter["dataType"] == "Library":
-                    param_list.append("library: Library")
+                    param_list.append("library: Library | None")
                 elif parameter["dataType"] == "Session":
                     param_list.append("session: Session")
                 else:
@@ -264,7 +264,7 @@ def get_function_return_type(function: dict, return_self: bool = False) -> str:
         return f" -> tuple[{', '.join(param_list)}]"
 
 
-def generate_return(function: dict, class_name: str) -> str:
+def generate_function_call_in_class(function: dict, class_name: str) -> str:
     """Generate return statement for functions."""
     return_var = None
     return_datatype = None
@@ -279,30 +279,46 @@ def generate_return(function: dict, class_name: str) -> str:
         return_list.append(
             f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
         )
-        return_list.append(f"return cls(library, {return_var})")
     elif return_datatype == "CommandReference":
         return_list.append("session_handle = session._session_handle")
         return_list.append("interpreter = session._interpreter")
         return_list.append(
             f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
         )
-        return_list.append(f"return cls(session, {return_var})")
     elif return_datatype == "PropertyReference":
         return_list.append("session_handle = session._session_handle")
         return_list.append("interpreter = session._interpreter")
         return_list.append(
             f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
         )
-        return_list.append(f"return cls(session, {return_var})")
     elif return_datatype:
         return_list.append(
             f"{return_var} = self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
         )
-        return_list.append(f"return {return_var}")
     else:
         return_list.append(
             f"self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
         )
+    return return_list
+
+
+def generate_return_in_class(function: dict) -> list[str]:
+    """Generate return statement for functions."""
+    return_list = []
+    return_datatype = None
+    return_var = None
+    for parameter in function["params"]:
+        if is_capi(parameter) and is_param_output(parameter):
+            return_var = get_standardized_param_name(parameter)
+            return_datatype = parameter["dataType"]
+    if return_datatype == "Session":
+        return_list.append(f"return cls(library, {return_var}, owns_library)")
+    elif return_datatype == "CommandReference":
+        return_list.append(f"return cls(session, {return_var})")
+    elif return_datatype == "PropertyReference":
+        return_list.append(f"return cls(session, {return_var})")
+    elif return_datatype:
+        return_list.append(f"return {return_var}")         
     return return_list
 
 

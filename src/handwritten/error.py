@@ -18,7 +18,10 @@ class SLSCResourceWarning(ResourceWarning):
 class Error(Exception):
     pass
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 class SLSCError(Error):
     def __init__(self, message: str, error_code: int) -> None:
         self._error_code = int(error_code)

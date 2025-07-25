@@ -10,8 +10,9 @@ from types import TracebackType
 
 from typing_extensions import Self
 
+from nislsc import Session
+from nislsc.constants import Language
 from nislsc.error import SLSCError
-from nislsc.session._session import Session
 
 
 class Property:
@@ -56,7 +57,7 @@ class Property:
             self._interpreter.close_property(self._property_handle)
             self._property_handle = 0
 
-        def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
         """Return extended error information for the last error that occurred on
         the specified library handle.
         
@@ -66,7 +67,7 @@ class Property:
         Returns:
             extended_error_info: Extended error info text
         """
-        language = self._session._library.language if language == language.UNDEFINED else language
+        language = self._session._library.language if language == Language.UNDEFINED else language
         return self._session._library.get_extended_error_info(language)
 
     @classmethod
@@ -91,7 +92,7 @@ class Property:
             property_handle = interpreter.open_device_property(session_handle, device_name, property_name)
             return cls(session, property_handle)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = session.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
@@ -116,7 +117,7 @@ class Property:
             property_handle = interpreter.open_physical_channel_property(session_handle, physical_channel_names, property_name)
             return cls(session, property_handle)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = session.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
@@ -139,7 +140,7 @@ class Property:
             property_handle = interpreter.open_driver_defined_property(session_handle, property_name)
             return cls(session, property_handle)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = session.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
@@ -164,7 +165,7 @@ class Property:
             property_handle = interpreter.open_generic_property(session_handle, resource, property_name)
             return cls(session, property_handle)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = session.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
     def get_property_property_bool(self, property_name: str) -> bool:

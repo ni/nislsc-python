@@ -318,7 +318,7 @@ def generate_return_in_class(function: dict) -> list[str]:
     elif return_datatype == "PropertyReference":
         return_list.append(f"return cls(session, {return_var})")
     elif return_datatype:
-        return_list.append(f"return {return_var}")         
+        return_list.append(f"return {return_var}")
     return return_list
 
 

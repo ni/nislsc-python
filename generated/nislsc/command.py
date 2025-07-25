@@ -10,8 +10,10 @@ from types import TracebackType
 
 from typing_extensions import Self
 
+from nislsc import Session
+from nislsc.constants import Language
 from nislsc.error import SLSCError
-from nislsc.session._session import Session
+
 
 
 class Command:
@@ -66,7 +68,7 @@ class Command:
         Returns:
             extended_error_info: Extended error info text
         """
-        language = self._session._library.language if language == language.UNDEFINED else language
+        language = self._session._library.language if language == Language.UNDEFINED else language
         return self._session._library.get_extended_error_info(language)
 
     @classmethod
@@ -91,7 +93,7 @@ class Command:
             command_handle = interpreter.open_device_command(session_handle, device_name, command_name)
             return cls(session, command_handle)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = session.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
@@ -116,7 +118,7 @@ class Command:
             command_handle = interpreter.open_physical_channel_command(session_handle, physical_channel_names, command_name)
             return cls(session, command_handle)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = session.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
@@ -141,7 +143,7 @@ class Command:
             command_handle = interpreter.open_generic_command(session_handle, resource, command_name)
             return cls(session, command_handle)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = session.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
     def close_command(self) -> None:

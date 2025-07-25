@@ -15,9 +15,9 @@ from types import TracebackType
 
 from typing_extensions import Self
 
+from nislsc import Library
 from nislsc.constants import Language
 from nislsc.error import SLSCError
-from nislsc.library._library import Library
 
 
 class Session:
@@ -76,7 +76,7 @@ class Session:
         Returns:
             extended_error_info: Extended error info text
         """
-        language = self._library.language if language == language.UNDEFINED else language
+        language = self._library.language if language == Language.UNDEFINED else language
         return self._library.get_extended_error_info(language)
 
 % for function in functions:
@@ -97,23 +97,31 @@ class Session:
         ${docstrings}
 % endfor
 % endif
-        try:
 % if is_classmethod(function, "Session"):
-            owns_library = False
-            if library is None:
-                library = Library()
-                owns_library = True
+        owns_library = False
+        if library is None:
+            library = Library()
+            owns_library = True
 % endif
+        try:
 % for function_call in generate_function_call_in_class(function, 'Session'):
             ${function_call}
 % endfor
 % for result in generate_return_in_class(function):
             ${result}
 % endfor
+% if is_classmethod(function, "Session"):
+        except SLSCError as e:
+            if library is not None:
+                extended_info = library.get_extended_error_info()
+                raise SLSCError(extended_info, e.error_code) from None
+
+% else:
         except SLSCError as e:
             extended_info = self.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
+% endif
 % endif
 % endif
 % endfor

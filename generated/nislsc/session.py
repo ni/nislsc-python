@@ -10,9 +10,9 @@ from types import TracebackType
 
 from typing_extensions import Self
 
+from nislsc import Library
 from nislsc.constants import Language
 from nislsc.error import SLSCError
-from nislsc.library._library import Library
 
 
 class Session:
@@ -71,7 +71,7 @@ class Session:
         Returns:
             extended_error_info: Extended error info text
         """
-        language = self._library.language if language == language.UNDEFINED else language
+        language = self._library.language if language == Language.UNDEFINED else language
         return self._library.get_extended_error_info(language)
 
     @classmethod
@@ -108,18 +108,19 @@ class Session:
         Returns:
             Self: New instance of Session object.
         """
+        owns_library = False
+        if library is None:
+            library = Library()
+            owns_library = True
         try:
-            owns_library = False
-            if library is None:
-                library = Library()
-                owns_library = True
             library_handle = library._library_handle
             interpreter = library._interpreter
             session_handle = interpreter.initialize_session_with_devices(library_handle, device_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
             return cls(library, session_handle, owns_library)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+            if library is not None:
+                extended_info = library.get_extended_error_info()
+                raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
     def initialize_session_with_nvmem_areas(cls, library: Library | None, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
@@ -157,18 +158,19 @@ class Session:
         Returns:
             Self: New instance of Session object.
         """
+        owns_library = False
+        if library is None:
+            library = Library()
+            owns_library = True
         try:
-            owns_library = False
-            if library is None:
-                library = Library()
-                owns_library = True
             library_handle = library._library_handle
             interpreter = library._interpreter
             session_handle = interpreter.initialize_session_with_nvmem_areas(library_handle, nvmem_area_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
             return cls(library, session_handle, owns_library)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+            if library is not None:
+                extended_info = library.get_extended_error_info()
+                raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
     def initialize_session_with_physical_channels(cls, library: Library | None, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
@@ -209,18 +211,19 @@ class Session:
         Returns:
             Self: New instance of Session object.
         """
+        owns_library = False
+        if library is None:
+            library = Library()
+            owns_library = True
         try:
-            owns_library = False
-            if library is None:
-                library = Library()
-                owns_library = True
             library_handle = library._library_handle
             interpreter = library._interpreter
             session_handle = interpreter.initialize_session_with_physical_channels(library_handle, physical_channel_names, connection_timeout, reservation_access, reservation_group, reservation_timeout)
             return cls(library, session_handle, owns_library)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+            if library is not None:
+                extended_info = library.get_extended_error_info()
+                raise SLSCError(extended_info, e.error_code) from None
 
     @classmethod
     def initialize_session_without_resources(cls, library: Library | None) -> Self:
@@ -237,18 +240,19 @@ class Session:
         Returns:
             Self: New instance of Session object.
         """
+        owns_library = False
+        if library is None:
+            library = Library()
+            owns_library = True
         try:
-            owns_library = False
-            if library is None:
-                library = Library()
-                owns_library = True
             library_handle = library._library_handle
             interpreter = library._interpreter
             session_handle = interpreter.initialize_session_without_resources(library_handle)
             return cls(library, session_handle, owns_library)
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+            if library is not None:
+                extended_info = library.get_extended_error_info()
+                raise SLSCError(extended_info, e.error_code) from None
 
     def abort_session(self) -> None:
         """Attempt to cancel a VI/function that blocks on network

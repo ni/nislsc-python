@@ -15,8 +15,9 @@ from types import TracebackType
 
 from typing_extensions import Self
 
+from nislsc import Session
+from nislsc.constants import Language
 from nislsc.error import SLSCError
-from nislsc.session._session import Session
 
 
 class Property:
@@ -61,7 +62,7 @@ class Property:
             self._interpreter.close_property(self._property_handle)
             self._property_handle = 0
 
-        def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
         """Return extended error information for the last error that occurred on
         the specified library handle.
         
@@ -71,7 +72,7 @@ class Property:
         Returns:
             extended_error_info: Extended error info text
         """
-        language = self._session._library.language if language == language.UNDEFINED else language
+        language = self._session._library.language if language == Language.UNDEFINED else language
         return self._session._library.get_extended_error_info(language)
 
 % for function in functions:
@@ -99,10 +100,17 @@ class Property:
 % for result in generate_return_in_class(function):
             ${result}
 % endfor
+% if is_classmethod(function, "PropertyReference"):
+        except SLSCError as e:
+            extended_info = session.get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
+
+% else:
         except SLSCError as e:
             extended_info = self.get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
+% endif
 % endif
 % endif
 % endfor

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """SLSC Exception and Warning Classes Module.
 
 This module provides custom exception and warning classes for handling
@@ -15,19 +14,11 @@ __all__ = ["SLSCError", "SLSCWarning", "SLSCResourceWarning"]
 class SLSCResourceWarning(ResourceWarning):
     pass
 
-=======
-from nislsc.error_codes import SLSCErrors, SLSCWarnings
-
-__all__ = ['SLSCError', 'SLSCWarning']
->>>>>>> origin/main
 
 class Error(Exception):
     pass
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
 class SLSCError(Error):
     def __init__(self, message: str, error_code: int) -> None:
         self._error_code = int(error_code)
@@ -38,11 +29,7 @@ class SLSCError(Error):
             self._error_type = SLSCErrors.UNKNOWN
 
         if not message:
-<<<<<<< HEAD
             message = f"Description could not be found for the status code.\n\nStatus Code: {self._error_code}"
-=======
-            message = f'Description could not be found for the status code.\n\nStatus Code: {self._error_code}'
->>>>>>> origin/main
 
         super().__init__(message)
 
@@ -54,17 +41,9 @@ class SLSCError(Error):
     def error_type(self) -> SLSCErrors:
         return self._error_type
 
-<<<<<<< HEAD
 
 class SLSCWarning(Warning):
     def __init__(self, message: str, error_code: int) -> None:
-=======
-class SLSCWarning(Warning):
-    def __init__(self, message: str, error_code: int) -> None:
-        super().__init__(
-            f'\nWarning {error_code} occurred.\n\n{message}')
-
->>>>>>> origin/main
         self._error_code = int(error_code)
 
         try:
@@ -72,14 +51,11 @@ class SLSCWarning(Warning):
         except ValueError:
             self._error_type = SLSCWarnings.UNKNOWN
 
-<<<<<<< HEAD
         if not message:
             message = f"Description could not be found for the status code.\n\nStatus Code: {self._error_code}"
 
         super().__init__(message)
 
-=======
->>>>>>> origin/main
     @property
     def error_code(self) -> int:
         return self._error_code

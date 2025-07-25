@@ -1,12 +1,9 @@
-<<<<<<< HEAD
 """SLSC Error Codes and Warning Definitions Module.
 
 This module provides enumeration classes that define error codes and
 warning codes returned by SLSC API operations.
 """
 
-=======
->>>>>>> origin/main
 from enum import Enum
 
 __all__ = ['SLSCErrors', 'SLSCWarnings']

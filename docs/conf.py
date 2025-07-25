@@ -47,7 +47,7 @@ autoapi_options = list(autoapi.extension._DEFAULT_OPTIONS)
 autoapi_options.remove("private-members")  # note: remove this to include "_" members in docs
 autoapi_options.append("inherited-members")
 autoapi_dirs = [root_path / "generated" / "nislsc"]
-autoapi_own_page_level = "class"
+# autoapi_own_page_level = "class"
 autoapi_type = "python"
 autodoc_typehints = "both"
 # Uncomment for debugging

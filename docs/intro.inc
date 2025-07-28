@@ -12,7 +12,7 @@ NI created and supports this package.
 Operating System Support
 ------------------------
 
-``nislsc`` supports Windows and Linux operating systems.
+``nislsc`` supports Windows and NI Linux RT operating systems.
 
 Python Version Support
 ----------------------

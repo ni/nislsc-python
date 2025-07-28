@@ -3,7 +3,7 @@ from utilities.function_helpers import get_function_parameter_list, get_function
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 from utilities.docstrings_helpers import generate_docstrings
 %>\
-"""SLSC Property Management Module.
+"""Access SLSC property references and configuration settings.
 
 This module provides the Property class for managing SLSC property
 references that allow access to device, physical channel, and driver
@@ -15,13 +15,19 @@ from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc import Session
 from nislsc.constants import Language
 from nislsc.error import SLSCError
+from nislsc.session import Session
 
 
 class Property:
-    """Represent Property class for NI SLSC."""
+    """Access SLSC property references for configuration and introspection.
+    
+    Create property handles to read, write, and inspect device, physical
+    channel, and driver properties. Use this class to programmatically
+    discover property Information and perform property reflection 
+    operations.
+    """
 
     def __init__(self, session: Session, property_handle: int) -> None:
         """Create a Property instance.
@@ -39,7 +45,7 @@ class Property:
         """Enter the runtime context related to this object.
 
         Returns:
-            Self: The property object itself.
+            The property object itself.
         """
         return self
   
@@ -62,18 +68,18 @@ class Property:
             self._interpreter.close_property(self._property_handle)
             self._property_handle = 0
 
-    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+    def _get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
         """Return extended error information for the last error that occurred on
         the specified library handle.
         
         Args:
-            language: Language to return error information in
+            language: Language to return error information in.
         
         Returns:
-            extended_error_info: Extended error info text
+            Extended error info text.
         """
         language = self._session._library.language if language == Language.UNDEFINED else language
-        return self._session._library.get_extended_error_info(language)
+        return self._session._library._get_extended_error_info(language)
 
 % for function in functions:
 % if 'capi' in function['targets']:
@@ -102,12 +108,12 @@ class Property:
 % endfor
 % if is_classmethod(function, "PropertyReference"):
         except SLSCError as e:
-            extended_info = session.get_extended_error_info()
+            extended_info = session._get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
 % else:
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = self._get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
 % endif

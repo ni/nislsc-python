@@ -1,4 +1,4 @@
-"""Code generation utility for NI SLSC Python API.
+"""Generate Python API code for NI SLSC from metadata.
 
 This script automates the process of generating Python source files from JSON and XML metadata
 using Mako templates. It also copies any handwritten source files to the output directory.

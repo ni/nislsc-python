@@ -1,4 +1,4 @@
-"""SLSC Library Management Module.
+"""Initialize and manage the SLSC library interface.
 
 This module provides the Library class for managing the SLSC library 
 interface that handles driver initialization, error management, and
@@ -17,7 +17,12 @@ from nislsc.utils import _select_interpreter, get_library_version
 
 
 class Library:
-    """Represent Library class for NI SLSC."""
+    """Initialize SLSC driver software interface.
+    
+    Create a library handle to access SLSC driver functionality and manage
+    driver resources. This class provides the foundation for creating
+    sessions that connect to actual hardware devices.
+    """
 
     def __init__(self, language: Language = Language.CURRENT_THREAD_LOCALE) -> None:
         """Create a Library instance.
@@ -33,7 +38,7 @@ class Library:
         """Enter the runtime context related to this object.
 
         Returns:
-            Self: The library object itself.
+           The library object itself.
         """
         return self
   
@@ -55,7 +60,7 @@ class Library:
         """Get the current language setting.
 
         Returns:
-            Language: An enum representing the current language.
+            An enum representing the current language.
         """
         return self._language
 
@@ -88,7 +93,7 @@ class Library:
                 application. Pass NISLSC_LIBRARY_VERSION for this parameter.
         
         Returns:
-            Self: New instance of Library object.
+            New instance of Library object.
         """
         try:
             library_handle = self._interpreter.initialize_library(version)
@@ -96,15 +101,15 @@ class Library:
         except SLSCError as e:
             raise SLSCError(f"Failed to initialize library. Error code: {e.error_code}", e.error_code)
 
-    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+    def _get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
         """Return extended error information for the last error that occurred on
         the specified library handle.
         
         Args:
-            language: Language to return error information in
+            language: Language to return error information in.
         
         Returns:
-            extended_error_info: Extended error info text
+            Extended error info text.
         """
         try:
             language = self._language if language == Language.UNDEFINED else language
@@ -117,17 +122,17 @@ class Library:
         """Return the error description for the specified status code.
         
         Args:
-            status_code: Status code to look up
-            language: Language to return error information in
+            status_code: Status code to look up.
+            language: Language to return error information in.
         
         Returns:
-            error_description: Error description text
+            Error description text.
         """
         try:
             language = self._language if language == Language.UNDEFINED else language
             error_description = self._interpreter.get_error_description(self._library_handle, status_code, language)
             return error_description
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = self._get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 

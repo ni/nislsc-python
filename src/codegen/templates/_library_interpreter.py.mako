@@ -2,7 +2,7 @@
 from utilities.interpreter_helpers import get_python_function_name, get_capi_function_name, get_standardized_param_name
 from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_conditional_for_validation
 %>\
-"""SLSC Library Interpreter Implementation Module.
+"""Provide ctypes-based SLSC library implementation.
 
 This module provides the LibraryInterpreter class, a concrete
 implementation of the BaseInterpreter abstract interface that uses
@@ -37,15 +37,15 @@ class LibraryInterpreter(BaseInterpreter):
 % if is_size_unknown(function):
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_size(function))})
         if ${generate_conditional_for_validation(function)}:
-            self.check_for_code(status)
+            self._check_for_code(status)
 % for add_param in generate_additional_variable_declaration(function):
         ${add_param}
 % endfor
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
-        self.check_for_code(status)
+        self._check_for_code(status)
 % else:
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
-        self.check_for_code(status)
+        self._check_for_code(status)
 % endif
 % for result in generate_result_parser(function):
         ${result}
@@ -54,7 +54,7 @@ class LibraryInterpreter(BaseInterpreter):
 
 % endif
 % endfor
-    def check_for_code(self, error_code: int) -> None:
+    def _check_for_code(self, error_code: int) -> None:
         if error_code != 0:
             if error_code < 0:
                 raise SLSCError("", error_code)

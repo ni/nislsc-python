@@ -1,4 +1,4 @@
-"""Utilities functions for the code generation that handles functions.
+"""Create function declarations and parameter handling for C API bindings.
 
 These functions help with generating the necessary code for function
 declarations, parameter handling, and return value processing in the

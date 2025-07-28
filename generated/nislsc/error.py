@@ -1,4 +1,4 @@
-"""SLSC Exception and Warning Classes Module.
+"""Handle SLSC exceptions and warnings.
 
 This module provides custom exception and warning classes for handling
 SLSC API errors and warnings.
@@ -12,14 +12,20 @@ __all__ = ["SLSCError", "SLSCWarning", "SLSCResourceWarning"]
 
 
 class SLSCResourceWarning(ResourceWarning):
+    """Warn about SLSC resource management issues."""
+
     pass
 
 
 class Error(Exception):
+    """Represent base exceptions for SLSC operations."""
+
     pass
 
 
 class SLSCError(Error):
+    """Handle NI-SLSC method errors."""
+
     def __init__(self, message: str, error_code: int) -> None:
         self._error_code = int(error_code)
 
@@ -43,6 +49,8 @@ class SLSCError(Error):
 
 
 class SLSCWarning(Warning):
+    """Warn about NI-SLSC method issues."""
+
     def __init__(self, message: str, error_code: int) -> None:
         self._error_code = int(error_code)
 

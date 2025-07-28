@@ -8,7 +8,7 @@ def remove_k_prefix(s: str) -> str:
         return s[10:]
     return s
 %>\
-"""SLSC Error Codes and Warning Definitions Module.
+"""Define SLSC constants and enumerations.
 
 This module provides enumeration classes that define error codes and
 warning codes returned by SLSC API operations.
@@ -19,6 +19,8 @@ from enum import Enum
 __all__ = ['SLSCErrors', 'SLSCWarnings']
 
 class SLSCErrors(Enum):
+    """Define SLSC error codes and their numeric values."""
+
     UNKNOWN = -1
 %for error in errors:
 % if error['code'] < 0:
@@ -27,6 +29,8 @@ class SLSCErrors(Enum):
 %endfor
 
 class SLSCWarnings(Enum):
+    """Define SLSC warning codes and their numeric values."""
+    
     UNKNOWN = -1
 %for error in errors:
 % if error['code'] > 0:

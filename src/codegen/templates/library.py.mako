@@ -3,7 +3,7 @@ from utilities.function_helpers import get_function_parameter_list, get_function
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 from utilities.docstrings_helpers import generate_docstrings
 %>\
-"""SLSC Library Management Module.
+"""Initialize and manage the SLSC library interface.
 
 This module provides the Library class for managing the SLSC library 
 interface that handles driver initialization, error management, and
@@ -22,7 +22,12 @@ from nislsc.utils import _select_interpreter, get_library_version
 
 
 class Library:
-    """Represent Library class for NI SLSC."""
+    """Initialize SLSC driver software interface.
+    
+    Create a library handle to access SLSC driver functionality and manage
+    driver resources. This class provides the foundation for creating
+    sessions that connect to actual hardware devices.
+    """
 
     def __init__(self, language: Language = Language.CURRENT_THREAD_LOCALE) -> None:
         """Create a Library instance.
@@ -38,7 +43,7 @@ class Library:
         """Enter the runtime context related to this object.
 
         Returns:
-            Self: The library object itself.
+           The library object itself.
         """
         return self
   
@@ -60,7 +65,7 @@ class Library:
         """Get the current language setting.
 
         Returns:
-            Language: An enum representing the current language.
+            An enum representing the current language.
         """
         return self._language
 
@@ -82,7 +87,7 @@ class Library:
 % for function in functions:
 % if 'capi' in function['targets']:
 % if is_class_func(function, "Library") and function["name"] != "FinalizeLibrary":
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Library", True, True)])})${get_function_return_type(function)}:
+    def ${get_python_function_name(function, True)}(${", ".join([param for param in get_function_parameter_list(function, "Library", True, True)])})${get_function_return_type(function)}:
 % for docstrings in generate_docstrings(function, "Library"):
         ${docstrings}
 % endfor
@@ -104,7 +109,7 @@ class Library:
             raise SLSCError(f"Failed to initialize library. Error code: {e.error_code}", e.error_code)
 % else:
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = self._get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 % endif
 

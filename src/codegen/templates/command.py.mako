@@ -3,9 +3,9 @@ from utilities.function_helpers import get_function_parameter_list, get_function
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 from utilities.docstrings_helpers import generate_docstrings
 %>\
-"""SLSC Command Management Module.
+"""Open and execute SLSC device and physical channel commands.
 
-This module provides the Command class for managing SLSC command
+This module provides a Command class for managing SLSC command
 references that allow access to device and physical channel commands for
 execution and introspection.
 """
@@ -15,14 +15,19 @@ from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc import Session
 from nislsc.constants import Language
 from nislsc.error import SLSCError
+from nislsc.session import Session
 
 
 
 class Command:
-    """Represent Command class for NI SLSC."""
+    """Execute and manage SLSC device and physical channel commands.
+    
+    Create command handles to execute device operations, retrieve command
+    information, and perform command introspection. Use this class to run
+    commands on SLSC hardware and access command metadata.
+    """
 
     def __init__(self, session: Session, command_handle: int) -> None:
         """Create a Command instance.
@@ -40,7 +45,7 @@ class Command:
         """Enter the runtime context.
 
         Returns:
-            Self: The command object itself.
+            The command object itself.
         """
         return self
   
@@ -63,18 +68,18 @@ class Command:
             self._interpreter.close_command(self._command_handle)
             self._command_handle = 0
 
-    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+    def _get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
         """Return extended error information for the last error that occurred on
         the specified library handle.
         
         Args:
-            language: Language to return error information in
+            language: Language to return error information in.
         
         Returns:
-            extended_error_info: Extended error info text
+            Extended error info text.
         """
         language = self._session._library.language if language == Language.UNDEFINED else language
-        return self._session._library.get_extended_error_info(language)
+        return self._session._library._get_extended_error_info(language)
 
 % for function in functions:
 % if 'capi' in function['targets']:
@@ -103,12 +108,12 @@ class Command:
 % endfor
 % if is_classmethod(function, "CommandReference"):
         except SLSCError as e:
-            extended_info = session.get_extended_error_info()
+            extended_info = session._get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
 % else:
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = self._get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
 % endif

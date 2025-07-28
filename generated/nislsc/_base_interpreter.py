@@ -1,4 +1,4 @@
-"""SLSC Base Interpreter Abstract Interface Module.
+"""Define the SLSC interpreter interface contract.
 
 This module defines the BaseInterpreter abstract base class that
 specifies the complete interface contract for SLSC driver 

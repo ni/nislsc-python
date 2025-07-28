@@ -10,7 +10,7 @@ def remove_all_class_functions(function: dict) -> bool:
             return False
     return True
 %>\
-"""SLSC Utility Functions Module.
+"""Provide SLSC utility functions.
 
 This module provides utility functions for SLSC operations including
 interpreter selection, library version retrieval, and name formatting

@@ -1,9 +1,11 @@
-"""Utility functions for generating Google style docstrings in code generation.
+"""Generate docstrings for code generation.
 
 These functions help generate properly wrapped and formatted docstrings for the
 generated Python API, including argument and return descriptions, and handling
 specific data types.
 """
+
+import re
 
 from utilities.interpreter_helpers import (
     get_standardized_param_name,
@@ -81,7 +83,15 @@ def generate_docstrings(
         docstrings.append("")
         for ret in generate_returns(function, is_classmethod):
             docstrings.append(ret)
-    docstrings.append('"""')
+
+    for i, line in enumerate(docstrings):
+        if "\\" in line:
+            docstrings[i] = re.sub(r"\\", r"\\\\", line)
+
+    if len(docstrings) == 1:
+        docstrings[0] = docstrings[0] + '"""'
+    else:
+        docstrings.append('"""')
     return docstrings
 
 
@@ -123,6 +133,8 @@ def generate_args(function: dict, ignore_type: str, is_classmethod: bool = False
                 args_line = f"session: Previously initialized Session instance."
             else:
                 args_line = f"{get_standardized_param_name(param)}: {param['doc']}"
+                if not args_line.endswith("."):
+                    args_line = args_line + "."
             for text in wrap_text(args_line, 72):
                 args.append(text)
     return args
@@ -131,6 +143,7 @@ def generate_args(function: dict, ignore_type: str, is_classmethod: bool = False
 def generate_returns(function: dict, is_classmethod: bool = False) -> list[str]:
     """Generate the Returns section of the docstring."""
     returns = []
+    ret_line = []
     if is_returning_something(function):
         returns.append("Returns:")
     for param in function["params"]:
@@ -141,11 +154,34 @@ def generate_returns(function: dict, is_classmethod: bool = False) -> list[str]:
                 "CommandReference",
                 "PropertyReference",
             ):
-                ret_line = f"Self: New instance of " + param["dataType"] + " object."
+                ret_line.append(f"New instance of " + param["dataType"] + " object")
             else:
-                ret_line = f"{get_standardized_param_name(param)}: {param['doc']}"
-            for text in wrap_text(ret_line, 72):
-                returns.append(text)
+                if param["doc"].endswith("."):
+                    ret_line.append(f"{param['doc'][:-1]}".lower())
+                else:
+                    ret_line.append(f"{param['doc']}".lower())
+    if len(ret_line) == 1:
+        one_line = ret_line[0]
+        if not one_line.endswith("."):
+            one_line = one_line + "."
+
+        if not one_line[0].isupper():
+            one_line = one_line.capitalize()
+
+        for text in wrap_text(one_line, 72):
+            returns.append(text)
+
+    elif len(ret_line) == 2:
+        tuple_line = f"A tuple containing " + ret_line[0] + " and " + ret_line[1] + "."
+        for text in wrap_text(tuple_line, 72):
+            returns.append(text)
+    elif len(ret_line) > 2:
+        tuple_line = (
+            f"A tuple containing " + ", ".join(ret_line[:-1]) + " and " + ret_line[-1] + "."
+        )
+        for text in wrap_text(tuple_line, 72):
+            returns.append(text)
+
     return returns
 
 

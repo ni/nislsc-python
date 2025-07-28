@@ -1,4 +1,4 @@
-"""NI-SLSC Python API.
+"""Control NI SLSC hardware through Python.
 
 This package provides a Python interface for NI SLSC hardware. Import
 the main classes to interact with SLSC devices, sessions, properties,

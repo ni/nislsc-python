@@ -3,7 +3,7 @@ from utilities.function_helpers import get_function_parameter_list, get_function
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 from utilities.docstrings_helpers import generate_docstrings
 %>\
-"""SLSC Session Management Module.
+"""Establish sessions with SLSC devices, channels, and NVMEM areas.
 
 This module provides the Session class for managing SLSC hardware
 sessions that handle device connections, property access, command 
@@ -15,13 +15,19 @@ from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc import Library
 from nislsc.constants import Language
 from nislsc.error import SLSCError
+from nislsc.library import Library
 
 
 class Session:
-    """Represent Session class for NI SLSC."""
+    """Establish sessions with SLSC hardware for device control.
+    
+    Create sessions to establish network connections, reserve devices,
+    access properties, execute commands, and manage NVMEM areas. Use this
+    class to interact with SLSC devices, physical channels, and perform all
+    hardware operations.
+    """
 
     def __init__(self, library: Library, session_handle: int, _owns_library: bool) -> None:
         """Create a Session instance.
@@ -40,7 +46,7 @@ class Session:
         """Enter the runtime context related to this object.
 
         Returns:
-            Self: The session object itself.
+            The session object itself.
         """
         return self
   
@@ -66,7 +72,7 @@ class Session:
             self._library.close()
             self._owns_library = False
 
-    def get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
+    def _get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
         """Return extended error information for the last error that occurred on
         the specified library handle.
         
@@ -74,10 +80,10 @@ class Session:
             language: Language to return error information in
         
         Returns:
-            extended_error_info: Extended error info text
+           Extended error info text.
         """
         language = self._library.language if language == Language.UNDEFINED else language
-        return self._library.get_extended_error_info(language)
+        return self._library._get_extended_error_info(language)
 
 % for function in functions:
 % if 'capi' in function['targets']:
@@ -112,13 +118,12 @@ class Session:
 % endfor
 % if is_classmethod(function, "Session"):
         except SLSCError as e:
-            if library is not None:
-                extended_info = library.get_extended_error_info()
-                raise SLSCError(extended_info, e.error_code) from None
+            extended_info = library._get_extended_error_info()
+            raise SLSCError(extended_info, e.error_code) from None
 
 % else:
         except SLSCError as e:
-            extended_info = self.get_extended_error_info()
+            extended_info = self._get_extended_error_info()
             raise SLSCError(extended_info, e.error_code) from None
 
 % endif

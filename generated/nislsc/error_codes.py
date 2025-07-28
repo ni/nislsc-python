@@ -1,4 +1,4 @@
-"""SLSC Error Codes and Warning Definitions Module.
+"""Define SLSC constants and enumerations.
 
 This module provides enumeration classes that define error codes and
 warning codes returned by SLSC API operations.
@@ -9,6 +9,8 @@ from enum import Enum
 __all__ = ['SLSCErrors', 'SLSCWarnings']
 
 class SLSCErrors(Enum):
+    """Define SLSC error codes and their numeric values."""
+
     UNKNOWN = -1
     INTERNAL = -250800
     OUT_OF_MEMORY = -250801
@@ -135,5 +137,7 @@ class SLSCErrors(Enum):
     COMMAND_INSUFFICIENT_REMAIN_TIMEOUT = -250922
 
 class SLSCWarnings(Enum):
+    """Define SLSC warning codes and their numeric values."""
+    
     UNKNOWN = -1
     SCALING_TIMESTAMP_OUTDATED = 250800

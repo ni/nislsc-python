@@ -1,4 +1,4 @@
-"""SLSC Utility Functions Module.
+"""Provide SLSC utility functions.
 
 This module provides utility functions for SLSC operations including
 interpreter selection, library version retrieval, and name formatting
@@ -21,7 +21,7 @@ def get_library_version() -> int:
     """Return the version of the SLSC runtime library.
     
     Returns:
-        version: Version of the SLSC library that is installed.
+        Version of the slsc library that is installed.
     """
     _interpreter = _select_interpreter()
     return _interpreter.get_library_version()
@@ -38,11 +38,11 @@ def flatten_names(names_in: list[str]) -> str:
     ["Mod1","Mod2","Chassis"] -> "Mod1,Mod2,Chassis"
     
     Args:
-        names_in: Array of device, NVMEM area, or physical channel names
+        names_in: Array of device, NVMEM area, or physical channel names.
     
     Returns:
-        names_out: Resulting comma-delimited list of device, NVMEM area, or
-            physical channel names
+        Resulting comma-delimited list of device, nvmem area, or physical
+            channel names.
     """
     _interpreter = _select_interpreter()
     return _interpreter.flatten_names(names_in)
@@ -59,11 +59,10 @@ def unflatten_names(names_in: str) -> list[str]:
     
     Args:
         names_in: Comma-delimited list of device, NVMEM area, or physical
-            channel names
+            channel names.
     
     Returns:
-        names_out: Resulting array of device, NVMEM area, or physical
-            channel names
+        Resulting array of device, nvmem area, or physical channel names.
     """
     _interpreter = _select_interpreter()
     return _interpreter.unflatten_names(names_in)

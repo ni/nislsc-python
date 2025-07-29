@@ -12,7 +12,7 @@ from types import TracebackType
 from typing_extensions import Self
 
 from nislsc.constants import Language
-from nislsc.error import SLSCError, SLSCWarning
+from nislsc.error import SLSCError
 from nislsc.library import Library
 
 

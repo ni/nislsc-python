@@ -45,7 +45,7 @@ IMPERATIVE_DOCSTRINGS_MAP = {
 
 
 def wrap_text(text: str, width: int = 72, indent: str = "    ", is_doc: bool = False) -> list[str]:
-    """Wraps text at a given width."""
+    """Wrap text at a given width."""
     words = text.split()
     lines = []
     current_line = ""
@@ -128,9 +128,9 @@ def generate_args(function: dict, ignore_type: str, is_classmethod: bool = False
             if param["dataType"] == ignore_type:
                 continue
             elif param["dataType"] == "Library" and is_classmethod:
-                args_line = f"library: Previously initialized Library instance."
+                args_line = "library: Previously initialized Library instance."
             elif param["dataType"] == "Session" and is_classmethod:
-                args_line = f"session: Previously initialized Session instance."
+                args_line = "session: Previously initialized Session instance."
             else:
                 args_line = f"{get_standardized_param_name(param)}: {param['doc']}"
                 if not args_line.endswith("."):
@@ -154,7 +154,7 @@ def generate_returns(function: dict, is_classmethod: bool = False) -> list[str]:
                 "CommandReference",
                 "PropertyReference",
             ):
-                ret_line.append(f"New instance of " + param["dataType"] + " object")
+                ret_line.append("New instance of " + param["dataType"] + " object")
             else:
                 if param["doc"].endswith("."):
                     ret_line.append(f"{param['doc'][:-1]}".lower())
@@ -172,12 +172,12 @@ def generate_returns(function: dict, is_classmethod: bool = False) -> list[str]:
             returns.append(text)
 
     elif len(ret_line) == 2:
-        tuple_line = f"A tuple containing " + ret_line[0] + " and " + ret_line[1] + "."
+        tuple_line = "A tuple containing " + ret_line[0] + " and " + ret_line[1] + "."
         for text in wrap_text(tuple_line, 72):
             returns.append(text)
     elif len(ret_line) > 2:
         tuple_line = (
-            f"A tuple containing " + ", ".join(ret_line[:-1]) + " and " + ret_line[-1] + "."
+            "A tuple containing " + ", ".join(ret_line[:-1]) + " and " + ret_line[-1] + "."
         )
         for text in wrap_text(tuple_line, 72):
             returns.append(text)

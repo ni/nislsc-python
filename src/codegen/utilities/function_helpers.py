@@ -248,7 +248,7 @@ def get_function_return_type(function: dict, return_self: bool = False) -> str:
                     "CommandReference",
                     "PropertyReference",
                 ):
-                    return f" -> Self"
+                    return " -> Self"
                 else:
                     param_list.append(f"{PYTHON_DATATYPE_MAP.get(parameter['dataType'])}")
                     num += 1
@@ -404,18 +404,18 @@ def generate_function_call_for_size(function: dict) -> list[str]:
                 if parameter["dataType"] == "string[]":
                     var_list.append(f"ctypes.byref({get_standardized_param_name(parameter)}_ptr)")
                     var_list.append(f"ctypes.byref(num_{get_standardized_param_name(parameter)})")
-                    var_list.append(f"None")
-                    var_list.append(f"0")
-                    var_list.append(f"ctypes.byref(required_buffer_size)")
+                    var_list.append("None")
+                    var_list.append("0")
+                    var_list.append("ctypes.byref(required_buffer_size)")
                 elif parameter["dataType"] in ARRAY_VAR:
-                    var_list.append(f"None")
-                    var_list.append(f"0")
+                    var_list.append("None")
+                    var_list.append("0")
                     var_list.append(
                         f"ctypes.byref({get_standardized_param_name(parameter)}_actual_size)"
                     )
             elif parameter["dataType"] in STRING_LIST:
-                var_list.append(f"None")
-                var_list.append(f"0")
+                var_list.append("None")
+                var_list.append("0")
                 var_list.append(
                     f"ctypes.byref({get_standardized_param_name(parameter)}_actual_size)"
                 )
@@ -463,7 +463,7 @@ def generate_additional_variable_declaration(function: dict) -> list[str]:
             if "[]" in parameter["dataType"]:
                 if parameter["dataType"] == "string[]":
                     decl_list.append(
-                        f"buffer = ctypes.create_string_buffer(required_buffer_size.value)"
+                        "buffer = ctypes.create_string_buffer(required_buffer_size.value)"
                     )
                 else:
                     decl_list.append(
@@ -486,21 +486,21 @@ def generate_function_call_for_result(function: dict) -> list[str]:
                 if parameter["dataType"] == "string[]":
                     var_list.append(f"ctypes.byref({get_standardized_param_name(parameter)}_ptr)")
                     var_list.append(f"ctypes.byref(num_{get_standardized_param_name(parameter)})")
-                    var_list.append(f"buffer")
-                    var_list.append(f"required_buffer_size.value")
-                    var_list.append(f"None")
+                    var_list.append("buffer")
+                    var_list.append("required_buffer_size.value")
+                    var_list.append("None")
                 elif parameter["dataType"] in ARRAY_VAR:
                     var_list.append(f"{get_standardized_param_name(parameter)}_c")
                     var_list.append(f"{get_standardized_param_name(parameter)}_actual_size.value")
-                    var_list.append(f"None")
+                    var_list.append("None")
                 elif parameter["dataType"] == "uint8[]":
                     var_list.append(f"{get_standardized_param_name(parameter)}_array")
                     var_list.append(f"num_{get_standardized_param_name(parameter)}")
             else:
                 if parameter["dataType"] in STRING_LIST:
-                    var_list.append(f"buffer")
+                    var_list.append("buffer")
                     var_list.append(f"{get_standardized_param_name(parameter)}_actual_size.value")
-                    var_list.append(f"None")
+                    var_list.append("None")
                 else:
                     var_list.append(f"ctypes.byref({get_standardized_param_name(parameter)}_c)")
 

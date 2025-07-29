@@ -71,7 +71,7 @@ DATATYPE_MAP = {
     "enum": "ctypes.c_int32",
 }
 
-INTERPRETER_IGNORED_FUNCTIONS = [
+PRIVATIZE_FUNCTIONS = [
     "get_extended_error_info",
 ]
 
@@ -134,11 +134,11 @@ def get_python_function_name(function: dict, convert_private: bool = False) -> s
         if "capi" in function["targets"]:
             if "capiname" in function:
                 function_name = convert_to_snake_case(function["capiname"])
-                if function_name in INTERPRETER_IGNORED_FUNCTIONS:
+                if function_name in PRIVATIZE_FUNCTIONS:
                     return convert_to_private(function_name)
                 return function_name
         function_name = convert_to_snake_case(function["name"])
-        if function_name in INTERPRETER_IGNORED_FUNCTIONS:
+        if function_name in PRIVATIZE_FUNCTIONS:
             return convert_to_private(function_name)
         return function_name
     else:

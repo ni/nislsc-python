@@ -16,7 +16,6 @@ from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc._base_interpreter import BaseInterpreter
 from nislsc.constants import Language
 from nislsc.error import SLSCError, SLSCWarning
 from nislsc.utils import _select_interpreter, get_library_version

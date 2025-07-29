@@ -52,17 +52,16 @@ class SLSCWarning(Warning):
     """Warn about NI-SLSC method issues."""
 
     def __init__(self, message: str, error_code: int) -> None:
+        super().__init__(
+            f'\nWarning {error_code} occurred.\n\n{message}')
+
         self._error_code = int(error_code)
+
 
         try:
             self._error_type = SLSCWarnings(self._error_code)
         except ValueError:
             self._error_type = SLSCWarnings.UNKNOWN
-
-        if not message:
-            message = f"Description could not be found for the status code.\n\nStatus Code: {self._error_code}"
-
-        super().__init__(message)
 
     @property
     def error_code(self) -> int:

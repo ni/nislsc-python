@@ -176,9 +176,7 @@ def generate_returns(function: dict, is_classmethod: bool = False) -> list[str]:
         for text in wrap_text(tuple_line, 72):
             returns.append(text)
     elif len(ret_line) > 2:
-        tuple_line = (
-            "A tuple containing " + ", ".join(ret_line[:-1]) + " and " + ret_line[-1] + "."
-        )
+        tuple_line = "A tuple containing " + ", ".join(ret_line[:-1]) + " and " + ret_line[-1] + "."
         for text in wrap_text(tuple_line, 72):
             returns.append(text)
 

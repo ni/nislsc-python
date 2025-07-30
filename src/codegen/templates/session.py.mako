@@ -17,6 +17,7 @@ from typing_extensions import Self
 
 from nislsc.library import Library
 
+
 class Session:
     """Establish sessions with SLSC hardware for device control.
     

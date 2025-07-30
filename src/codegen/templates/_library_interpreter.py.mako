@@ -29,8 +29,7 @@ lib.niSLSC_${get_capi_function_name(function)}.argtypes = [${", ".join([param fo
 class LibraryInterpreter(BaseInterpreter):
 
     def __init__(self) -> None:
-        self._library_handle = 0
-        self._language = Language.CURRENT_THREAD_LOCALE
+        super().__init__()
 
     def _check_for_error(self, error_code: int) -> None:
         if error_code != 0:

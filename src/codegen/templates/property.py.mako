@@ -11,13 +11,10 @@ configuration properties through property reflection.
 """
 
 from __future__ import annotations
-import warnings
 from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.constants import Language
-from nislsc.error import SLSCError, SLSCWarning
 from nislsc.session import Session
 
 
@@ -69,27 +66,6 @@ class Property:
             self._interpreter.close_property(self._property_handle)
             self._property_handle = 0
 
-    def _get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
-        """Return extended error information for the last error that occurred on
-        the specified library handle.
-        
-        Args:
-            language: Language to return error information in.
-        
-        Returns:
-            Extended error info text.
-        """
-        language = self._session._library.language if language == Language.UNDEFINED else language
-        return self._session._library._get_extended_error_info(language)
-
-    def _get_warning_description(self, warning_lists: list[warnings.WarningMessage]) -> None:
-        """Get warning description for SLSC warnings.
-        
-        Args:
-            warning_lists: List of warnings captured during the operation.
-        """
-        self._session._get_warning_description(warning_lists)
-
 % for function in functions:
 % if 'capi' in function['targets']:
 % if is_class_func(function, "PropertyReference") and function["name"] != "CloseProperty":
@@ -108,33 +84,13 @@ class Property:
         ${docstrings}
 % endfor
 % endif
-        try:
-            with warnings.catch_warnings(record=True) as warning_list:
-                warnings.simplefilter("always")
 % for function_call in generate_function_call_in_class(function, 'PropertyReference'):
-                ${function_call}
+        ${function_call}
 % endfor
-% if is_classmethod(function, "PropertyReference"):
-            if warning_list:
-                session._get_warning_description(warning_list)
-% else:
-            if warning_list:
-                self._get_warning_description(warning_list)
-% endif
 % for result in generate_return_in_class(function):
-            ${result}
+        ${result}
 % endfor
-% if is_classmethod(function, "PropertyReference"):
-        except SLSCError as e:
-            extended_info = session._get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
 
-% else:
-        except SLSCError as e:
-            extended_info = self._get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
-
-% endif
 % endif
 % endif
 % endfor

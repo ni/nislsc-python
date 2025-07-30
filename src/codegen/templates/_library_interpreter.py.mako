@@ -28,6 +28,19 @@ lib.niSLSC_${get_capi_function_name(function)}.argtypes = [${", ".join([param fo
 % endfor
 class LibraryInterpreter(BaseInterpreter):
 
+    def __init__(self) -> None:
+        self._library_handle = 0
+        self._language = Language.CURRENT_THREAD_LOCALE
+
+    def _check_for_error(self, error_code: int) -> None:
+        if error_code != 0:
+            if error_code < 0:
+                error_description = self.get_extended_error_info(self._library_handle, self._language)
+                raise SLSCError(error_description, error_code)
+            elif error_code > 0:
+                warning_description = self.get_error_description(self._library_handle, error_code, self._language)
+                warnings.warn(SLSCWarning(warning_description, error_code))
+
 % for function in functions:
 % if "capi" in function["targets"]:
     def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function)])})${get_function_return_type(function)}:
@@ -37,15 +50,38 @@ class LibraryInterpreter(BaseInterpreter):
 % if is_size_unknown(function):
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_size(function))})
         if ${generate_conditional_for_validation(function)}:
-            self._check_for_code(status)
+% if function["name"] == "GetExtendedErrorInfo":
+            raise SLSCError("GetExtendedErrorInfo is not supported in this context.", -1)
+% elif function["name"] == "GetErrorDescription":
+            if status < 0:
+                self._check_for_error(status)
+% else:
+            self._check_for_error(status)
+% endif
 % for add_param in generate_additional_variable_declaration(function):
         ${add_param}
 % endfor
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
-        self._check_for_code(status)
+% if function["name"] == "GetExtendedErrorInfo":
+        if status < 0:
+            raise SLSCError("GetExtendedErrorInfo is not supported in this context.", -1)
+% elif function["name"] == "GetErrorDescription":
+        if status < 0:
+            self._check_for_error(status)
+% else:
+        self._check_for_error(status)
+% endif
 % else:
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})
-        self._check_for_code(status)
+% if function["name"] == "GetExtendedErrorInfo":
+        if status < 0:
+            self._check_for_error(status)
+% elif function["name"] == "GetErrorDescription":
+        if status < 0:
+            self._check_for_error(status)
+% else:
+        self._check_for_error(status)
+% endif
 % endif
 % for result in generate_result_parser(function):
         ${result}
@@ -54,10 +90,3 @@ class LibraryInterpreter(BaseInterpreter):
 
 % endif
 % endfor
-    def _check_for_code(self, error_code: int) -> None:
-        if error_code != 0:
-            if error_code < 0:
-                raise SLSCError("", error_code)
-            elif error_code > 0:
-                warnings.warn(SLSCWarning("", error_code))
-

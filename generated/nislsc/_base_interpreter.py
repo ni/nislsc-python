@@ -12,6 +12,10 @@ from nislsc.constants import Language
 
 class BaseInterpreter(abc.ABC):
 
+    def __init__(self) -> None:
+        self._library_handle = 0
+        self._language = Language.CURRENT_THREAD_LOCALE
+
     @abc.abstractmethod
     def initialize_library(self, version: int) -> int:
         pass

@@ -16,6 +16,10 @@ from nislsc.constants import Language
 
 class BaseInterpreter(abc.ABC):
 
+    def __init__(self) -> None:
+        self._library_handle = 0
+        self._language = Language.CURRENT_THREAD_LOCALE
+
 % for function in functions:
 % if 'capi' in function["targets"]:
     @abc.abstractmethod

@@ -6,15 +6,11 @@ execution and introspection.
 """
 
 from __future__ import annotations
-import warnings
 from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.constants import Language
-from nislsc.error import SLSCError, SLSCWarning
 from nislsc.session import Session
-
 
 
 class Command:
@@ -64,27 +60,6 @@ class Command:
             self._interpreter.close_command(self._command_handle)
             self._command_handle = 0
 
-    def _get_extended_error_info(self, language: Language = Language.UNDEFINED) -> str:
-        """Return extended error information for the last error that occurred on
-        the specified library handle.
-        
-        Args:
-            language: Language to return error information in.
-        
-        Returns:
-            Extended error info text.
-        """
-        language = self._session._library.language if language == Language.UNDEFINED else language
-        return self._session._library._get_extended_error_info(language)
-
-    def _get_warning_description(self, warning_lists: list[warnings.WarningMessage]) -> None:
-        """Get warning description for SLSC warnings.
-        
-        Args:
-            warning_lists: List of warnings captured during the operation.
-        """
-        self._session._get_warning_description(warning_lists)
-
     @classmethod
     def open_device_command(cls, session: Session, device_name: str, command_name: str) -> Self:
         """Open a reference to a device command.
@@ -101,18 +76,10 @@ class Command:
         Returns:
             New instance of CommandReference object.
         """
-        try:
-            with warnings.catch_warnings(record=True) as warning_list:
-                warnings.simplefilter("always")            
-                session_handle = session._session_handle
-                interpreter = session._interpreter
-                command_handle = interpreter.open_device_command(session_handle, device_name, command_name)
-            if warning_list:
-                session._get_warning_description(warning_list)
-            return cls(session, command_handle)
-        except SLSCError as e:
-            extended_info = session._get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+        session_handle = session._session_handle
+        interpreter = session._interpreter
+        command_handle = interpreter.open_device_command(session_handle, device_name, command_name)
+        return cls(session, command_handle)
 
     @classmethod
     def open_physical_channel_command(cls, session: Session, physical_channel_names: str, command_name: str) -> Self:
@@ -130,18 +97,10 @@ class Command:
         Returns:
             New instance of CommandReference object.
         """
-        try:
-            with warnings.catch_warnings(record=True) as warning_list:
-                warnings.simplefilter("always")            
-                session_handle = session._session_handle
-                interpreter = session._interpreter
-                command_handle = interpreter.open_physical_channel_command(session_handle, physical_channel_names, command_name)
-            if warning_list:
-                session._get_warning_description(warning_list)
-            return cls(session, command_handle)
-        except SLSCError as e:
-            extended_info = session._get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+        session_handle = session._session_handle
+        interpreter = session._interpreter
+        command_handle = interpreter.open_physical_channel_command(session_handle, physical_channel_names, command_name)
+        return cls(session, command_handle)
 
     @classmethod
     def open_generic_command(cls, session: Session, resource: str, command_name: str) -> Self:
@@ -159,30 +118,14 @@ class Command:
         Returns:
             New instance of CommandReference object.
         """
-        try:
-            with warnings.catch_warnings(record=True) as warning_list:
-                warnings.simplefilter("always")            
-                session_handle = session._session_handle
-                interpreter = session._interpreter
-                command_handle = interpreter.open_generic_command(session_handle, resource, command_name)
-            if warning_list:
-                session._get_warning_description(warning_list)
-            return cls(session, command_handle)
-        except SLSCError as e:
-            extended_info = session._get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+        session_handle = session._session_handle
+        interpreter = session._interpreter
+        command_handle = interpreter.open_generic_command(session_handle, resource, command_name)
+        return cls(session, command_handle)
 
     def close_command(self) -> None:
         """Close an open reference to a command."""
-        try:
-            with warnings.catch_warnings(record=True) as warning_list:
-                warnings.simplefilter("always")            
-                self._interpreter.close_command(self._command_handle)
-            if warning_list:
-                self._get_warning_description(warning_list)
-        except SLSCError as e:
-            extended_info = self._get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+        self._interpreter.close_command(self._command_handle)
 
     def get_command_property_string(self, property_name: str) -> str:
         """Get the value of the specified command reflection property.
@@ -193,14 +136,6 @@ class Command:
         Returns:
             Value of property.
         """
-        try:
-            with warnings.catch_warnings(record=True) as warning_list:
-                warnings.simplefilter("always")            
-                property_value = self._interpreter.get_command_property_string(self._command_handle, property_name)
-            if warning_list:
-                self._get_warning_description(warning_list)
-            return property_value
-        except SLSCError as e:
-            extended_info = self._get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
+        property_value = self._interpreter.get_command_property_string(self._command_handle, property_name)
+        return property_value
 

@@ -11,13 +11,11 @@ language configuration for SLSC hardware operations.
 """
 
 from __future__ import annotations
-import warnings
 from types import TracebackType
 
 from typing_extensions import Self
 
 from nislsc.constants import Language
-from nislsc.error import SLSCError, SLSCWarning
 from nislsc.utils import _select_interpreter, get_library_version
 
 
@@ -36,8 +34,8 @@ class Library:
             language: The language to use for error messages and outputs.
         """
         self._interpreter = _select_interpreter()
-        self._library_handle = self.initialize_library(get_library_version())
-        self._language = language
+        self._interpreter._library_handle = self.initialize_library(get_library_version())
+        self._interpreter._language = language
 
     def __enter__(self) -> Self:
         """Enter the runtime context related to this object.
@@ -67,7 +65,7 @@ class Library:
         Returns:
             An enum representing the current language.
         """
-        return self._language
+        return self._interpreter._language
 
     @language.setter
     def language(self, language: Language) -> None:
@@ -76,71 +74,30 @@ class Library:
         Args:
             language: The language to set.
         """
-        self._language = language
+        self._interpreter._language = language
 
     def close(self) -> None:
         """Close the Library instance."""
-        if self._library_handle != 0:
-            self._interpreter.finalize_library(self._library_handle)
-            self._library_handle = 0
-
-    def _get_warning_description(self, warning_lists: list[warnings.WarningMessage]) -> None:
-        """Get warning description for SLSC warnings.
-        
-        Args:
-            warning_lists: List of warnings captured during the operation.
-        """
-        for warning_list in warning_lists:
-            if isinstance(warning_list.message, SLSCWarning):
-                error_code = warning_list.message.error_code
-                message = self.get_error_description(
-                    warning_list.message.error_code
-                )
-                if message:
-                    warnings.warn(SLSCWarning(message, error_code))
-                else:
-                    warnings.warn(warning_list.message)
+        if self._interpreter._library_handle != 0:
+            self._interpreter.finalize_library(self._interpreter._library_handle)
+            self._interpreter._library_handle = 0
 
 % for function in functions:
 % if 'capi' in function['targets']:
-% if is_class_func(function, "Library") and function["name"] != "FinalizeLibrary":
+% if is_class_func(function, "Library") and function["name"] != "FinalizeLibrary" and function["name"] != "GetExtendedErrorInfo":
     def ${get_python_function_name(function, True)}(${", ".join([param for param in get_function_parameter_list(function, "Library", True, True)])})${get_function_return_type(function)}:
 % for docstrings in generate_docstrings(function, "Library"):
         ${docstrings}
 % endfor
-        try:
 % if is_defining_language(function):
-            language = self._language if language == Language.UNDEFINED else language
+        language = self._interpreter._language if language == Language.UNDEFINED else language
 % endif
-% if function["name"] == "GetExtendedErrorInfo":
-            with warnings.catch_warnings(record=True) as warning_list:
-                warnings.simplefilter("always")
 % for function_call in generate_function_call_in_class(function, 'Library'):
-                ${function_call}
+        ${function_call}
 % endfor
-% else:
-% for function_call in generate_function_call_in_class(function, 'Library'):
-            ${function_call}
-% endfor
-% endif
-% if function["name"] == "GetExtendedErrorInfo":
-            if warning_list:
-                self._get_warning_description(warning_list)
-% endif
 % for result in generate_return_in_class(function):
-            ${result}
+        ${result}
 % endfor
-% if function["name"] == "GetExtendedErrorInfo":
-        except SLSCError as e:
-            raise SLSCError(f"Failed to get extended error information. Error code: {e.error_code}", e.error_code)
-% elif function["name"] == "InitializeLibrary":
-        except SLSCError as e:
-            raise SLSCError(f"Failed to initialize library. Error code: {e.error_code}", e.error_code)
-% else:
-        except SLSCError as e:
-            extended_info = self._get_extended_error_info()
-            raise SLSCError(extended_info, e.error_code) from None
-% endif
 
 % endif
 % endif

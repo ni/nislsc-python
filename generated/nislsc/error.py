@@ -32,8 +32,11 @@ class SLSCError(Error):
         except ValueError:
             self._error_type = SLSCErrors.UNKNOWN
 
-        if not message:
+        if not message or message.strip() == "":
             message = f"Description could not be found for the status code.\n\nStatus Code: {self._error_code}"
+
+        if str(self._error_code) not in message:
+            message = f'{message}\n\nStatus Code: {self._error_code}'
 
         super().__init__(message)
 

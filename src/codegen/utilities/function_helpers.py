@@ -180,7 +180,7 @@ def get_function_parameter_list(
         is_language: If True, include the language argument
             with a default value of Language.UNDEFINED.
         class_func: If True, indicates that the function is
-            a class method.
+            a class function.
 
     Returns:
         param_list: A list of parameter strings for the function definition.
@@ -222,6 +222,10 @@ def get_function_parameter_list(
                 ):
                     if parameter["dataType"] == "uint8[]":
                         param_list.append(f"{get_standardized_param_name(parameter)}s_data")
+                    elif parameter["dataType"] == class_name and class_name == "Library":
+                        param_list.append(
+                            f"self._interpreter._{get_standardized_param_name(parameter)}"
+                        )
                     elif parameter["dataType"] == class_name:
                         param_list.append(f"self._{get_standardized_param_name(parameter)}")
                     else:
@@ -274,8 +278,8 @@ def generate_function_call_in_class(function: dict, class_name: str) -> str:
             return_var = get_standardized_param_name(parameter)
             return_datatype = parameter["dataType"]
     if return_datatype == "Session":
-        return_list.append("library_handle = library._library_handle")
         return_list.append("interpreter = library._interpreter")
+        return_list.append("library_handle = library._interpreter._library_handle")
         return_list.append(
             f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
         )

@@ -1,4 +1,4 @@
-"""Code generation utility for NI SLSC Python API.
+"""Generate Python API code for NI SLSC from metadata.
 
 This script automates the process of generating Python source files from JSON and XML metadata
 using Mako templates. It also copies any handwritten source files to the output directory.
@@ -31,7 +31,7 @@ def _parse_errors(errors_path: Path) -> dict:
         code = int(code_element.get("code"))
         symbol = code_element.get("symbol")
         if code in code_set:
-            raise RuntimeError("Duplicate error code {0} for symbol {1}".format(code, symbol))
+            raise RuntimeError(f"Duplicate error code {code} for symbol {symbol}")
         code_set.add(code)
         assert re.match(r"^kError|^kWarning", symbol)
         errors.append({"symbol": symbol, "code": code})
@@ -40,6 +40,7 @@ def _parse_errors(errors_path: Path) -> dict:
 
 def _copy_handwritten_files(source: Path, dest: Path) -> None:
     """Copy handwritten files from source to destination."""
+    dest.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source, dest, dirs_exist_ok=True)
 
 
@@ -62,10 +63,10 @@ def _generate_code(json: dict, error: dict, source: Path, dest: Path) -> None:
 
 
 def main() -> None:
-    """Coordinates the code generation process.
+    """Coordinate the code generation process.
 
-    Loads metadata and error definitions, generates code using templates,
-    and copies handwritten files to the output directory.
+    Load metadata and error definitions, generates code using templates,
+    and copy handwritten files to the output directory.
     """
     parent_dir = Path(__file__).parent.parent.parent
     json_file = parent_dir / "src" / "codegen" / "metadata" / "nislscapi_full.json"

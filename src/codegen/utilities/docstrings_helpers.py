@@ -1,11 +1,12 @@
-"""Utility functions for generating Google style docstrings in code generation.
+"""Generate docstrings for code generation.
 
 These functions help generate properly wrapped and formatted docstrings for the
 generated Python API, including argument and return descriptions, and handling
 specific data types.
 """
 
-from utilities.function_helpers import PYTHON_DATATYPE_MAP
+import re
+
 from utilities.interpreter_helpers import (
     get_standardized_param_name,
     is_capi,
@@ -20,9 +21,31 @@ CLASS_DOCSTRINGS_MAP = {
     "CommandReference": "Command: An instance of the Command class.",
 }
 
+IMPERATIVE_DOCSTRINGS_MAP = {
+    "Gets": "Get",
+    "Sets": "Set",
+    "Executes": "Execute",
+    "Commits": "Commit",
+    "Writes": "Write",
+    "Initializes": "Initialize",
+    "Returns": "Return",
+    "Attempts": "Attempt",
+    "Deletes": "Delete",
+    "Opens": "Open",
+    "Closes": "Close",
+    "Reserves": "Reserve",
+    "Unreserves": "Unreserve",
+    "Resets": "Reset",
+    "Renames": "Rename",
+    "Updates": "Update",
+    "Connects": "Connect",
+    "Removes": "Remove",
+    "Reads": "Read",
+}
+
 
 def wrap_text(text: str, width: int = 72, indent: str = "    ", is_doc: bool = False) -> list[str]:
-    """Wraps text at a given width."""
+    """Wrap text at a given width."""
     words = text.split()
     lines = []
     current_line = ""
@@ -45,20 +68,30 @@ def wrap_text(text: str, width: int = 72, indent: str = "    ", is_doc: bool = F
     return lines
 
 
-def generate_docstrings(function: dict, ignore_type: str = "") -> list[str]:
+def generate_docstrings(
+    function: dict, ignore_type: str = "", is_classmethod: bool = False
+) -> list[str]:
     """Generate a Google style docstring for a function."""
     docstrings = []
     for doc in generate_doc(function):
         docstrings.append(doc)
-    if len(generate_args(function, ignore_type)) != 0:
+    if len(generate_args(function, ignore_type, is_classmethod)) != 0:
         docstrings.append("")
-        for arg in generate_args(function, ignore_type):
+        for arg in generate_args(function, ignore_type, is_classmethod):
             docstrings.append(arg)
-    if len(generate_returns(function)) != 0:
+    if len(generate_returns(function, is_classmethod)) != 0:
         docstrings.append("")
-        for ret in generate_returns(function):
+        for ret in generate_returns(function, is_classmethod):
             docstrings.append(ret)
-    docstrings.append('"""')
+
+    for i, line in enumerate(docstrings):
+        if "\\" in line:
+            docstrings[i] = re.sub(r"\\", r"\\\\", line)
+
+    if len(docstrings) == 1:
+        docstrings[0] = docstrings[0] + '"""'
+    else:
+        docstrings.append('"""')
     return docstrings
 
 
@@ -67,7 +100,10 @@ def generate_doc(function: dict) -> list[str]:
     doc = []
     first_split = function["doc"].split(".", 1)
     first_sentence = first_split[0] + "."
-    summary_wrapped = wrap_text(first_sentence, 72, "", True)
+    words = first_sentence.split()
+    first_word = IMPERATIVE_DOCSTRINGS_MAP.get(words[0], "Error")
+    new_sentence = first_word + " " + " ".join(words[1:])
+    summary_wrapped = wrap_text(new_sentence, 72, "", True)
     doc.append(summary_wrapped[0])
     for line in summary_wrapped[1:]:
         doc.append(line)
@@ -82,7 +118,7 @@ def generate_doc(function: dict) -> list[str]:
     return doc
 
 
-def generate_args(function: dict, ignore_type: str) -> list[str]:
+def generate_args(function: dict, ignore_type: str, is_classmethod: bool = False) -> list[str]:
     """Generate the Args section of the docstring."""
     args = []
     if is_inputting_something(function, ignore_type):
@@ -91,15 +127,23 @@ def generate_args(function: dict, ignore_type: str) -> list[str]:
         if is_capi(param) and is_param_input(param):
             if param["dataType"] == ignore_type:
                 continue
-            args_line = f"{get_standardized_param_name(param)} ({PYTHON_DATATYPE_MAP.get(param['dataType'])}): {param['doc']}"
+            elif param["dataType"] == "Library" and is_classmethod:
+                args_line = "library: Previously initialized Library instance."
+            elif param["dataType"] == "Session" and is_classmethod:
+                args_line = "session: Previously initialized Session instance."
+            else:
+                args_line = f"{get_standardized_param_name(param)}: {param['doc']}"
+                if not args_line.endswith("."):
+                    args_line = args_line + "."
             for text in wrap_text(args_line, 72):
                 args.append(text)
     return args
 
 
-def generate_returns(function: dict) -> list[str]:
+def generate_returns(function: dict, is_classmethod: bool = False) -> list[str]:
     """Generate the Returns section of the docstring."""
     returns = []
+    ret_line = []
     if is_returning_something(function):
         returns.append("Returns:")
     for param in function["params"]:
@@ -110,11 +154,32 @@ def generate_returns(function: dict) -> list[str]:
                 "CommandReference",
                 "PropertyReference",
             ):
-                ret_line = CLASS_DOCSTRINGS_MAP.get(param["dataType"])
+                ret_line.append("New instance of " + param["dataType"] + " object")
             else:
-                ret_line = f"{get_standardized_param_name(param)} ({PYTHON_DATATYPE_MAP.get(param['dataType'])}): {param['doc']}"
-            for text in wrap_text(ret_line, 72):
-                returns.append(text)
+                if param["doc"].endswith("."):
+                    ret_line.append(f"{param['doc'][:-1]}".lower())
+                else:
+                    ret_line.append(f"{param['doc']}".lower())
+    if len(ret_line) == 1:
+        one_line = ret_line[0]
+        if not one_line.endswith("."):
+            one_line = one_line + "."
+
+        if not one_line[0].isupper():
+            one_line = one_line.capitalize()
+
+        for text in wrap_text(one_line, 72):
+            returns.append(text)
+
+    elif len(ret_line) == 2:
+        tuple_line = "A tuple containing " + ret_line[0] + " and " + ret_line[1] + "."
+        for text in wrap_text(tuple_line, 72):
+            returns.append(text)
+    elif len(ret_line) > 2:
+        tuple_line = "A tuple containing " + ", ".join(ret_line[:-1]) + " and " + ret_line[-1] + "."
+        for text in wrap_text(tuple_line, 72):
+            returns.append(text)
+
     return returns
 
 

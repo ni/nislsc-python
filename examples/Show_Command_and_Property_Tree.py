@@ -10,13 +10,13 @@ import json
 
 import click
 
+from example_helper import _get_session_generic_property
 from nislsc import Command, Property, Session
 from nislsc.constants import (
     DataType,
     PropertyAccess,
     ReservationAccess,
 )
-from nislsc.example_helper import _get_session_generic_property
 
 
 def show_command_and_property_tree(device_names: str) -> str:

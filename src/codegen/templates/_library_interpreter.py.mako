@@ -88,3 +88,4 @@ class LibraryInterpreter(BaseInterpreter):
         return ${", ".join(generate_return_parameter(function))}
 
 % endif
+% endfor

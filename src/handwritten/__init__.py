@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-from nislsc._nislsc import NISLSC
-
-__all__ = ["Command", "Library", "Property", "Session", "NISLSC"]
-=======
 """Control NI SLSC hardware through Python.
 
 This package provides a Python interface for NI SLSC hardware. Import
@@ -16,4 +11,3 @@ from nislsc.property import Property
 from nislsc.session import Session
 
 __all__ = ["Command", "Library", "Property", "Session"]
->>>>>>> origin/main

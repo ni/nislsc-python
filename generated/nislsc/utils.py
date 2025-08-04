@@ -1,36 +1,68 @@
-from nislsc.constants import DataType
-from nislsc.session import Session
-from typing import Any
+"""Provide SLSC utility functions.
 
-def get_property(session: Session, resource: str, property: str, datatype: DataType) -> Any:
-    """Retrieve the current value of a property based on its data type."""
-    if datatype == DataType.BOOL:
-        return session.get_generic_property_bool(resource, property)
-    elif datatype == DataType.DOUBLE:
-        return session.get_generic_property_double(resource, property)
-    elif datatype == DataType.INT32:
-        return session.get_generic_property_int32(resource, property)
-    elif datatype == DataType.INT64:
-        return session.get_generic_property_int64(resource, property)
-    elif datatype == DataType.STRING:
-        return session.get_generic_property_string(resource, property)
-    elif datatype == DataType.UINT32:
-        return session.get_generic_property_uint32(resource, property)
-    elif datatype == DataType.UINT64:
-        return session.get_generic_property_uint64(resource, property)
-    elif datatype == DataType.BOOL_ARRAY:
-        return session.get_generic_property_bool_array(resource, property)
-    elif datatype == DataType.DOUBLE_ARRAY:
-        return session.get_generic_property_double_array(resource, property)
-    elif datatype == DataType.INT32_ARRAY:
-        return session.get_generic_property_int32_array(resource, property)
-    elif datatype == DataType.INT64_ARRAY:
-        return session.get_generic_property_int64_array(resource, property)
-    elif datatype == DataType.STRING_ARRAY:
-        return session.get_generic_property_string_array(resource, property)
-    elif datatype == DataType.UINT32_ARRAY:
-        return session.get_generic_property_uint32_array(resource, property)
-    elif datatype == DataType.UINT64_ARRAY:
-        return session.get_generic_property_uint64_array(resource, property)
-    else:
-        return "Unsupported DataType"
+This module provides utility functions for SLSC operations including
+interpreter selection, library version retrieval, and name formatting
+utilities for device, physical channel, and NVMEM area identifiers.
+"""
+
+from nislsc._base_interpreter import BaseInterpreter
+
+def _select_interpreter() -> BaseInterpreter:
+    """Select the appropriate interpreter based on the environment.
+
+    We only support Library Interpreter for now.
+    """
+    from nislsc._library_interpreter import LibraryInterpreter
+
+    return LibraryInterpreter()
+
+def get_library_version() -> int:
+    """Return the version of the SLSC runtime library.
+    
+    Returns:
+        Version of the slsc library that is installed.
+    """
+    _interpreter = _select_interpreter()
+    return _interpreter.get_library_version()
+
+def flatten_names(names_in: list[str]) -> str:
+    """Error an array of device, NVMEM area, or physical channel names into
+    a comma-delimited list of names.
+    
+    If the array contains physical channel-style names with consecutive
+    numeric suffixes, they will be collapsed into a colon-delimited range.
+    Example: ["Mod1/load0","Mod1/load1","Mod1/load2"] -> "Mod1/load0:2"
+    
+    All other names will be collapsed into comma-delimited lists. Example:
+    ["Mod1","Mod2","Chassis"] -> "Mod1,Mod2,Chassis"
+    
+    Args:
+        names_in: Array of device, NVMEM area, or physical channel names.
+    
+    Returns:
+        Resulting comma-delimited list of device, nvmem area, or physical
+            channel names.
+    """
+    _interpreter = _select_interpreter()
+    return _interpreter.flatten_names(names_in)
+
+def unflatten_names(names_in: str) -> list[str]:
+    """Error a comma-delimited list or range of device, NVMEM area, or
+    physical channel names into an array of names.
+    
+    Colon-delimited ranges will be expanded. Example: "Mod1/load0:2" ->
+    ["Mod1/load0","Mod1/load1","Mod1/load2"]
+    
+    Comma-delimited lists will be expanded. Example: "Mod1,Mod2,Chassis" ->
+    ["Mod1","Mod2","Chassis"]
+    
+    Args:
+        names_in: Comma-delimited list of device, NVMEM area, or physical
+            channel names.
+    
+    Returns:
+        Resulting array of device, nvmem area, or physical channel names.
+    """
+    _interpreter = _select_interpreter()
+    return _interpreter.unflatten_names(names_in)
+

@@ -1,4 +1,4 @@
-"""Utility functions for the interpreter code generation process.
+"""Process parameter types and names for code generation.
 
 These functions help with converting names, determining parameter types,
 and handling data types in the context of generating C API bindings for
@@ -30,6 +30,13 @@ NAME_EXPANSION = {
     "commandRefOut": "commandHandle",
     "propertyRef": "propertyHandle",
     "propertyRefOut": "propertyHandle",
+}
+
+CLASSNAME_MAP = {
+    "Session": "Session",
+    "Library": "Library",
+    "CommandReference": "Command",
+    "PropertyReference": "Property",
 }
 
 DATATYPE_MAP = {
@@ -64,12 +71,26 @@ DATATYPE_MAP = {
     "enum": "ctypes.c_int32",
 }
 
+PRIVATIZE_FUNCTIONS = [
+    "get_extended_error_info",
+]
+
+
+def convert_to_private(name: str) -> str:
+    """Convert a function name to its private version."""
+    return "_" + name
+
 
 def convert_to_snake_case(name: str) -> str:
     """Convert a camelCase or PascalCase name to snake_case."""
     for regex in INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES:
         name = regex.sub(r"\1_\2", name)
     return name.lower().replace("u_int", "uint")
+
+
+def convert_to_class_name(name: str) -> str:
+    """Convert a property to its corresponding class name."""
+    return CLASSNAME_MAP.get(name)
 
 
 def is_param_input(param: dict) -> bool:
@@ -107,9 +128,21 @@ def get_capi_function_name(function: dict) -> str:
     return function["name"]
 
 
-def get_python_function_name(function: dict) -> str:
+def get_python_function_name(function: dict, convert_private: bool = False) -> str:
     """Get the Python function name, converting to snake_case."""
-    if "capi" in function["targets"]:
-        if "capiname" in function:
-            return convert_to_snake_case(function["capiname"])
-    return convert_to_snake_case(function["name"])
+    if convert_private:
+        if "capi" in function["targets"]:
+            if "capiname" in function:
+                function_name = convert_to_snake_case(function["capiname"])
+                if function_name in PRIVATIZE_FUNCTIONS:
+                    return convert_to_private(function_name)
+                return function_name
+        function_name = convert_to_snake_case(function["name"])
+        if function_name in PRIVATIZE_FUNCTIONS:
+            return convert_to_private(function_name)
+        return function_name
+    else:
+        if "capi" in function["targets"]:
+            if "capiname" in function:
+                return convert_to_snake_case(function["capiname"])
+        return convert_to_snake_case(function["name"])

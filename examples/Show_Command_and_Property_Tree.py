@@ -6,8 +6,9 @@ information into a structured JSON format. The module supports querying
 both device-level and physical channel-level commands and properties.
 """
 
-import click
 import json
+
+import click
 
 from nislsc import Command, Property, Session
 from nislsc.constants import (
@@ -31,7 +32,7 @@ def show_command_and_property_tree(device_names: str) -> str:
         connection_timeout,
         reservation_access,
         reservation_group,
-        reservation_timeout
+        reservation_timeout,
     ) as session:
 
         data = {
@@ -40,13 +41,9 @@ def show_command_and_property_tree(device_names: str) -> str:
             "Properties": [],
         }
 
-        device_commands = session.get_device_property_string_array(
-            device_names, "Dev.Commands"
-        )
+        device_commands = session.get_device_property_string_array(device_names, "Dev.Commands")
 
-        device_properties = session.get_device_property_string_array(
-            device_names, "Dev.Properties"
-        )
+        device_properties = session.get_device_property_string_array(device_names, "Dev.Properties")
 
         device_physical_channels = session.get_device_property_string_array(
             device_names, "Dev.PhysChans"
@@ -105,10 +102,8 @@ def show_command_and_property_tree(device_names: str) -> str:
             physical_channel_commands = session.get_physical_channel_property_string_array(
                 physical_channel, "PhysChan.Commands"
             )
-            physical_channel_properties = (
-                session.get_physical_channel_property_string_array(
-                    physical_channel, "PhysChan.Properties"
-                )
+            physical_channel_properties = session.get_physical_channel_property_string_array(
+                physical_channel, "PhysChan.Properties"
             )
 
             for physical_channel_command in physical_channel_commands:
@@ -117,9 +112,7 @@ def show_command_and_property_tree(device_names: str) -> str:
                 ) as command:
                     name = physical_channel_command
                     description = command.get_command_property_string("Cmd.Descr")
-                    access = ReservationAccess(
-                        command.get_command_property_int32("Cmd.Access")
-                    )
+                    access = ReservationAccess(command.get_command_property_int32("Cmd.Access"))
                     data[physical_channel]["Commands"].append(
                         {"name": name, "description": description, "access": access.name}
                     )
@@ -129,17 +122,13 @@ def show_command_and_property_tree(device_names: str) -> str:
                     session, physical_channel, physical_channel_property
                 ) as property:
                     name = physical_channel_property
-                    datatype = DataType(
-                        property.get_property_property_int32("Prop.DataType")
-                    )
+                    datatype = DataType(property.get_property_property_int32("Prop.DataType"))
 
                     current_value = _get_session_generic_property(
                         session, physical_channel, physical_channel_property, datatype
                     )
 
-                    access = PropertyAccess(
-                        property.get_property_property_int32("Prop.Access")
-                    )
+                    access = PropertyAccess(property.get_property_property_int32("Prop.Access"))
 
                     description = property.get_property_property_string("Prop.Descr")
 
@@ -168,13 +157,14 @@ def show_command_and_property_tree(device_names: str) -> str:
         complete_data = json.dumps(data, indent=4)
         return complete_data
 
+
 @click.command()
 @click.argument("device_names", type=str)
 def main(device_names: str) -> None:
-    """Create a command and property tree.
+    r"""Create a command and property tree.
 
     DEVICE_NAMES: Name of the SLSC device to query.
-    
+
     \b
     Examples:
         "SLSC-12001-03146D67"
@@ -187,7 +177,7 @@ def main(device_names: str) -> None:
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
         raise click.Abort()
-    
+
 
 if __name__ == "__main__":
     main()

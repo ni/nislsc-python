@@ -9,8 +9,8 @@ both device-level and physical channel-level commands and properties.
 import json
 
 import click
-
 from example_helper import _get_session_generic_property
+
 from nislsc import Command, Property, Session
 from nislsc.constants import (
     DataType,

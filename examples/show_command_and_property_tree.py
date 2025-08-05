@@ -7,9 +7,9 @@ both device-level and physical channel-level commands and properties.
 """
 
 import json
+from typing import Any
 
 import click
-from example_helper import _get_session_generic_property
 
 from nislsc import Command, Property, Session
 from nislsc.constants import (
@@ -19,8 +19,38 @@ from nislsc.constants import (
 )
 
 
-def show_command_and_property_tree(device_names: str) -> str:
-    """Show the command and property tree of the NISLSC library."""
+def _get_session_generic_property(
+    session: Session, resource: str, property: str, datatype: DataType
+) -> Any:
+    """Retrieve the current value of a property based on its data type.
+
+    Args:
+        session: SLSC session instance.
+        resource: Device or physical channel name.
+        property: Property name to retrieve.
+        datatype: DataType enum indicating the property's data type.
+
+    Returns:
+        Property value in its native type, or "Unsupported DataType" if
+            invalid.
+    """
+    if datatype == DataType.NONE:
+        raise ValueError(f"Invalid data type: {datatype}")
+    else:
+        method_name = f"get_generic_property_{datatype.name.lower()}"
+        method = getattr(session, method_name)
+        return method(resource, property)
+
+
+def show_command_and_property_tree(device_name: str) -> str:
+    """Show the command and property tree of the NISLSC library.
+
+    Args:
+        device_name: Name of the SLSC device to query.
+
+    Returns:
+        JSON string containing the command and property tree of the device.
+    """
     connection_timeout = 10.0
     reservation_access = 1
     reservation_group = "admin"
@@ -28,7 +58,7 @@ def show_command_and_property_tree(device_names: str) -> str:
 
     with Session.initialize_session_with_devices(
         None,
-        device_names,
+        device_name,
         connection_timeout,
         reservation_access,
         reservation_group,
@@ -36,24 +66,24 @@ def show_command_and_property_tree(device_names: str) -> str:
     ) as session:
 
         data = {
-            "Name": device_names,
+            "Name": device_name,
             "Commands": [],
             "Properties": [],
         }
 
-        device_commands = session.get_device_property_string_array(device_names, "Dev.Commands")
+        device_commands = session.get_device_property_string_array(device_name, "Dev.Commands")
 
-        device_properties = session.get_device_property_string_array(device_names, "Dev.Properties")
+        device_properties = session.get_device_property_string_array(device_name, "Dev.Properties")
 
         device_physical_channels = session.get_device_property_string_array(
-            device_names, "Dev.PhysChans"
+            device_name, "Dev.PhysChans"
         )
 
         for physical_channel in device_physical_channels:
             data[physical_channel] = {"Commands": [], "Properties": []}
 
         for device_command in device_commands:
-            with Command.open_device_command(session, device_names, device_command) as command:
+            with Command.open_device_command(session, device_name, device_command) as command:
                 name = device_command
                 description = command.get_command_property_string("Cmd.Descr")
                 access = ReservationAccess(command.get_command_property_int32("Cmd.Access"))
@@ -62,13 +92,13 @@ def show_command_and_property_tree(device_names: str) -> str:
                 )
 
         for device_property in device_properties:
-            with Property.open_device_property(session, device_names, device_property) as property:
+            with Property.open_device_property(session, device_name, device_property) as property:
                 name = device_property
 
                 datatype = DataType(property.get_property_property_int32("Prop.DataType"))
 
                 current_value = _get_session_generic_property(
-                    session, device_names, device_property, datatype
+                    session, device_name, device_property, datatype
                 )
 
                 access = PropertyAccess(property.get_property_property_int32("Prop.Access"))
@@ -159,23 +189,22 @@ def show_command_and_property_tree(device_names: str) -> str:
 
 
 @click.command()
-@click.argument("device_names", type=str)
-def main(device_names: str) -> None:
-    r"""Create a command and property tree.
+@click.argument("device_name", type=str)
+def main(device_name: str) -> None:
+    """Create a command and property tree.
 
-    DEVICE_NAMES: Name of the SLSC device to query.
+    device_name: Name of the SLSC device to query.
 
-    \b
     Examples:
         "SLSC-12001-03146D67"
         "SLSC-12001-03146D67-Mod1"
         "SLSC-12001-03146D67-Mod2"
     """
     try:
-        data = show_command_and_property_tree(device_names)
+        data = show_command_and_property_tree(device_name)
         print(data)
     except Exception as e:
-        click.echo(f"Error: {e}", err=True)
+        click.echo(f"Input Error: {e}", err=True)
         raise click.Abort()
 
 

@@ -42,14 +42,14 @@ def _get_session_generic_property(
         return method(resource, property)
 
 
-def get_command_and_property_tree(device_name: str) -> str:
+def get_command_and_property_tree(device_name: str) -> dict:
     """Show the command and property tree of the NISLSC library.
 
     Args:
         device_name: Name of the SLSC device to query.
 
     Returns:
-        JSON string containing the command and property tree of the device.
+        Dictionary containing the command and property tree of the device.
     """
     connection_timeout = 10.0
     reservation_access = 1

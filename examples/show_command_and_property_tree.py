@@ -42,7 +42,7 @@ def _get_session_generic_property(
         return method(resource, property)
 
 
-def show_command_and_property_tree(device_name: str) -> str:
+def get_command_and_property_tree(device_name: str) -> str:
     """Show the command and property tree of the NISLSC library.
 
     Args:
@@ -184,8 +184,7 @@ def show_command_and_property_tree(device_name: str) -> str:
                         }
                     )
 
-        complete_data = json.dumps(data, indent=4)
-        return complete_data
+        return data
 
 
 @click.command()
@@ -201,8 +200,8 @@ def main(device_name: str) -> None:
         "SLSC-12001-03146D67-Mod2"
     """
     try:
-        data = show_command_and_property_tree(device_name)
-        print(data)
+        data = get_command_and_property_tree(device_name)
+        print(json.dumps(data, indent=4))
     except Exception as e:
         click.echo(f"Input Error: {e}", err=True)
         raise click.Abort()

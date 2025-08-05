@@ -19,7 +19,7 @@ The package is implemented in Python as an object-oriented wrapper around the NI
 
 ### Operating System Support
 
-**nislsc** supports Windows and Linux operating systems where the NI-SLSC driver is sipported. Refer to [NI Hardware and Operating System Compatibility](https://www.ni.com/r/hw-support) for which versions of the driver support your hardware on a given operating system.
+**nislsc** supports Windows and Linux operating systems where the NI-SLSC driver is supported. Refer to [NI Hardware and Operating System Compatibility](https://www.ni.com/r/hw-support) for which versions of the driver support your hardware on a given operating system.
 
 ### Python Version Support
 
@@ -35,7 +35,7 @@ The package is implemented in Python as an object-oriented wrapper around the NI
 
 ## Python Examples
 
-- TODO: Create Python Examples and document here.
+You can find the examples for **NI-SLSC Python** in the [nislsc-python examples](https://github.com/ni/nislsc-python/tree/main/examples) directory. For best results, use the examples that correspond to your current **nislsc** version. For example, if you are using version 1.0.0, then check out the examples directory in the 1.0.0 tag. Newer examples may demonstrate features that are not available in previous versions of **nislsc**.
 
 ## Usage
 
@@ -62,7 +62,7 @@ Please include **all** of the following information when opening an issue:
     python -m pip list
     ```
 
-- The version of the NI-DAQmx driver used. Follow [this KB article](http://digital.ni.com/express.nsf/bycode/ex8amn) to determine the version of NI-SLSC you have installed.
+- The version of the NI-SLSC driver used. Follow [this KB article](http://digital.ni.com/express.nsf/bycode/ex8amn) to determine the version of NI-SLSC you have installed.
 - The operating system and version, for example Windows 7, CentOS 7.2, ...
 
 ## License

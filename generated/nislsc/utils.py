@@ -16,7 +16,6 @@ def _select_interpreter() -> BaseInterpreter:
 
     return LibraryInterpreter()
 
-
 def get_library_version() -> int:
     """Return the version of the SLSC runtime library.
     

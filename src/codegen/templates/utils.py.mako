@@ -28,7 +28,6 @@ def _select_interpreter() -> BaseInterpreter:
 
     return LibraryInterpreter()
 
-
 % for function in functions:
 % if 'capi' in function['targets']:
 % if remove_all_class_functions(function):

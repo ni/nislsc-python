@@ -704,4 +704,3 @@ class BaseInterpreter(abc.ABC):
     def get_property_property_string_array(self, property_handle: int, property_name: str) -> list[str]:
         pass
 
-

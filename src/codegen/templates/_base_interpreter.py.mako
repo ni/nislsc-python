@@ -28,4 +28,3 @@ class BaseInterpreter(abc.ABC):
 
 % endif
 % endfor
-

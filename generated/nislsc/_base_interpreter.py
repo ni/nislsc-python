@@ -1,13 +1,13 @@
 """Define the SLSC interpreter interface contract.
 
 This module defines the BaseInterpreter abstract base class that
-specifies the complete interface contract for SLSC driver 
+specifies the complete interface contract for SLSC driver
 implementations.
 """
 
 import abc
 
-from nislsc.constants import Language
+from nislsc.constants import Language, ReservationAccess, TableScaleCoercion
 
 
 class BaseInterpreter(abc.ABC):
@@ -45,15 +45,15 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
+    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> int:
         pass
 
     @abc.abstractmethod
-    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
+    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> int:
         pass
 
     @abc.abstractmethod
-    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
+    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> int:
         pass
 
     @abc.abstractmethod
@@ -89,7 +89,7 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def reserve_devices(self, session_handle: int, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float) -> None:
+    def reserve_devices(self, session_handle: int, device_names: str, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> None:
         pass
 
     @abc.abstractmethod
@@ -629,7 +629,7 @@ class BaseInterpreter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def set_table_scaling_parameters(self, session_handle: int, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: int, serial_number: str, password: str) -> None:
+    def set_table_scaling_parameters(self, session_handle: int, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: TableScaleCoercion, serial_number: str, password: str) -> None:
         pass
 
     @abc.abstractmethod

@@ -13,7 +13,7 @@ import ctypes
 import warnings
 
 from nislsc._base_interpreter import BaseInterpreter
-from nislsc.constants import Language
+from nislsc.constants import Language, ReservationAccess, TableScaleCoercion
 from nislsc.error import SLSCError, SLSCWarning
 
 

@@ -9,7 +9,7 @@ import ctypes
 import warnings
 
 from nislsc._base_interpreter import BaseInterpreter
-from nislsc.constants import Language
+from nislsc.constants import Language, ReservationAccess, TableScaleCoercion
 from nislsc.error import SLSCError, SLSCWarning
 
 
@@ -624,36 +624,36 @@ class LibraryInterpreter(BaseInterpreter):
             names_out_array.append(ctypes.string_at(names_out_ptr[i]).decode('utf-8'))
         return names_out_array
 
-    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
+    def initialize_session_with_devices(self, library_handle: int, device_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> int:
         library_handle_c = ctypes.c_void_p(library_handle)
         session_handle_c = ctypes.c_void_p()
         device_names_bytes = device_names.encode('utf-8')
         connection_timeout_c = ctypes.c_double(connection_timeout)
-        reservation_access_c = ctypes.c_int32(reservation_access)
+        reservation_access_c = ctypes.c_int32(reservation_access.value)
         reservation_group_bytes = reservation_group.encode('utf-8')
         reservation_timeout_c = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithDevices(library_handle_c, ctypes.byref(session_handle_c), device_names_bytes, connection_timeout_c, reservation_access_c, reservation_group_bytes, reservation_timeout_c)
         self._check_for_error(status)
         return session_handle_c.value or 0
 
-    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
+    def initialize_session_with_nvmem_areas(self, library_handle: int, nvmem_area_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> int:
         library_handle_c = ctypes.c_void_p(library_handle)
         session_handle_c = ctypes.c_void_p()
         nvmem_area_names_bytes = nvmem_area_names.encode('utf-8')
         connection_timeout_c = ctypes.c_double(connection_timeout)
-        reservation_access_c = ctypes.c_int32(reservation_access)
+        reservation_access_c = ctypes.c_int32(reservation_access.value)
         reservation_group_bytes = reservation_group.encode('utf-8')
         reservation_timeout_c = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithNVMEMAreas(library_handle_c, ctypes.byref(session_handle_c), nvmem_area_names_bytes, connection_timeout_c, reservation_access_c, reservation_group_bytes, reservation_timeout_c)
         self._check_for_error(status)
         return session_handle_c.value or 0
 
-    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> int:
+    def initialize_session_with_physical_channels(self, library_handle: int, physical_channel_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> int:
         library_handle_c = ctypes.c_void_p(library_handle)
         session_handle_c = ctypes.c_void_p()
         physical_channel_names_bytes = physical_channel_names.encode('utf-8')
         connection_timeout_c = ctypes.c_double(connection_timeout)
-        reservation_access_c = ctypes.c_int32(reservation_access)
+        reservation_access_c = ctypes.c_int32(reservation_access.value)
         reservation_group_bytes = reservation_group.encode('utf-8')
         reservation_timeout_c = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_InitializeSessionWithPhysicalChannels(library_handle_c, ctypes.byref(session_handle_c), physical_channel_names_bytes, connection_timeout_c, reservation_access_c, reservation_group_bytes, reservation_timeout_c)
@@ -728,10 +728,10 @@ class LibraryInterpreter(BaseInterpreter):
         chassis_name_value = buffer.value.decode('utf-8')
         return chassis_name_value
 
-    def reserve_devices(self, session_handle: int, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float) -> None:
+    def reserve_devices(self, session_handle: int, device_names: str, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> None:
         session_handle_c = ctypes.c_void_p(session_handle)
         device_names_bytes = device_names.encode('utf-8')
-        reservation_access_c = ctypes.c_int32(reservation_access)
+        reservation_access_c = ctypes.c_int32(reservation_access.value)
         reservation_group_bytes = reservation_group.encode('utf-8')
         reservation_timeout_c = ctypes.c_double(reservation_timeout)
         status = lib.niSLSC_ReserveDevices(session_handle_c, device_names_bytes, reservation_access_c, reservation_group_bytes, reservation_timeout_c)
@@ -2159,14 +2159,14 @@ class LibraryInterpreter(BaseInterpreter):
         self._check_for_error(status)
         return 
 
-    def set_table_scaling_parameters(self, session_handle: int, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: int, serial_number: str, password: str) -> None:
+    def set_table_scaling_parameters(self, session_handle: int, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: TableScaleCoercion, serial_number: str, password: str) -> None:
         session_handle_c = ctypes.c_void_p(session_handle)
         physical_channel_names_bytes = physical_channel_names.encode('utf-8')
         scaled_value_array = (ctypes.c_double * len(scaled_value))(*scaled_value)
         scaled_value_array_size = len(scaled_value)
         prescale_value_array = (ctypes.c_double * len(prescale_value))(*prescale_value)
         prescale_value_array_size = len(prescale_value)
-        coercion_c = ctypes.c_int32(coercion)
+        coercion_c = ctypes.c_int32(coercion.value)
         serial_number_bytes = serial_number.encode('utf-8')
         password_bytes = password.encode('utf-8')
         status = lib.niSLSC_SetTableScalingParameters(session_handle_c, physical_channel_names_bytes, scaled_value_array, scaled_value_array_size, prescale_value_array, prescale_value_array_size, coercion_c, serial_number_bytes, password_bytes)

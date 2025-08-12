@@ -1,7 +1,7 @@
 """Establish sessions with SLSC devices, channels, and NVMEM areas.
 
 This module provides the Session class for managing SLSC hardware
-sessions that handle device connections, property access, command 
+sessions that handle device connections, property access, command
 execution for one or more devices, physical channels, or NVMEM areas.
 """
 
@@ -10,12 +10,13 @@ from types import TracebackType
 
 from typing_extensions import Self
 
+from nislsc.constants import ReservationAccess, TableScaleCoercion
 from nislsc.library import Library
 
 
 class Session:
     """Establish sessions with SLSC hardware for device control.
-    
+
     Create sessions to establish network connections, reserve devices,
     access properties, execute commands, and manage NVMEM areas. Use this
     class to interact with SLSC devices, physical channels, and perform all
@@ -42,16 +43,16 @@ class Session:
             The session object itself.
         """
         return self
-  
+
     def __exit__(self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None) -> None:
         """Exit the runtime context and close the Session instance.
 
         Args:
-            type: The exception type, if an exception was raised, otherwise 
+            type: The exception type, if an exception was raised, otherwise
                 None.
             value: The exception value, if an exception was raised, otherwise
                 None.
-            traceback: The traceback, if an exception was raised, otherwise 
+            traceback: The traceback, if an exception was raised, otherwise
                 None.
         """
         self.close()
@@ -66,7 +67,7 @@ class Session:
             self._owns_library = False
 
     @classmethod
-    def initialize_session_with_devices(cls, library: Library | None, device_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+    def initialize_session_with_devices(cls, library: Library | None, device_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> Self:
         """Initialize an SLSC session with one or multiple devices.
         
         The session opens network connections for devices. If reservationAccess
@@ -109,7 +110,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_with_nvmem_areas(cls, library: Library | None, nvmem_area_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+    def initialize_session_with_nvmem_areas(cls, library: Library | None, nvmem_area_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> Self:
         """Initialize an SLSC session with one or multiple NVMEM areas.
         
         The session opens network connections for NVMEM areas. If
@@ -154,7 +155,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_with_physical_channels(cls, library: Library | None, physical_channel_names: str, connection_timeout: float, reservation_access: int, reservation_group: str, reservation_timeout: float) -> Self:
+    def initialize_session_with_physical_channels(cls, library: Library | None, physical_channel_names: str, connection_timeout: float, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> Self:
         """Initialize an SLSC session with one or multiple physical channels.
         
         The session opens network connections for devices that correspond to the
@@ -352,7 +353,7 @@ class Session:
         chassis_name = self._interpreter.connect_to_chassis_by_address(self._session_handle, address, username, password, connection_timeout)
         return chassis_name
 
-    def reserve_devices(self, device_names: str, reservation_access: int, reservation_group: str, reservation_timeout: float) -> None:
+    def reserve_devices(self, device_names: str, reservation_access: ReservationAccess, reservation_group: str, reservation_timeout: float) -> None:
         """Reserve the specified device(s), which prevents other sessions from
         accessing them.
         
@@ -2914,7 +2915,7 @@ class Session:
         """
         self._interpreter.set_polynomial_scaling_parameters(self._session_handle, physical_channel_names, forward_coefficient, reverse_coefficient, serial_number, password)
 
-    def set_table_scaling_parameters(self, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: int, serial_number: str, password: str) -> None:
+    def set_table_scaling_parameters(self, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: TableScaleCoercion, serial_number: str, password: str) -> None:
         """Set scaling parameters for a table scale that maps an array of
         pre-scaled values to an array of corresponding scaled values.
         

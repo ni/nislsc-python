@@ -4,6 +4,7 @@ Selecting a chassis will reset all the modules, not reboot the chassis.
 """
 
 import click
+
 from nislsc import Session
 from nislsc.constants import ReservationAccess
 

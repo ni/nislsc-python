@@ -52,7 +52,7 @@ def get_command_and_property_tree(device_name: str) -> dict:
         Dictionary containing the command and property tree of the device.
     """
     connection_timeout = 10.0
-    reservation_access = 1
+    reservation_access = ReservationAccess.READ_ONLY
     reservation_group = "admin"
     reservation_timeout = 10.0
 

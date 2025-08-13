@@ -6,7 +6,7 @@ from utilities.docstrings_helpers import generate_docstrings
 """Establish sessions with SLSC devices, channels, and NVMEM areas.
 
 This module provides the Session class for managing SLSC hardware
-sessions that handle device connections, property access, command 
+sessions that handle device connections, property access, command
 execution for one or more devices, physical channels, or NVMEM areas.
 """
 
@@ -15,12 +15,13 @@ from types import TracebackType
 
 from typing_extensions import Self
 
+from nislsc.constants import ReservationAccess, TableScaleCoercion
 from nislsc.library import Library
 
 
 class Session:
     """Establish sessions with SLSC hardware for device control.
-    
+
     Create sessions to establish network connections, reserve devices,
     access properties, execute commands, and manage NVMEM areas. Use this
     class to interact with SLSC devices, physical channels, and perform all
@@ -47,16 +48,16 @@ class Session:
             The session object itself.
         """
         return self
-  
+
     def __exit__(self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None) -> None:
         """Exit the runtime context and close the Session instance.
 
         Args:
-            type: The exception type, if an exception was raised, otherwise 
+            type: The exception type, if an exception was raised, otherwise
                 None.
             value: The exception value, if an exception was raised, otherwise
                 None.
-            traceback: The traceback, if an exception was raised, otherwise 
+            traceback: The traceback, if an exception was raised, otherwise
                 None.
         """
         self.close()

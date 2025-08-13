@@ -142,8 +142,10 @@ def get_classmethod_parameter_list(function: dict) -> list[str]:
             if is_capi(parameter) and is_param_input(parameter) and "Size" not in parameter["name"]:
                 if parameter["dataType"] == "uint8[]":
                     param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
-                elif parameter["dataType"] == "enum" and parameter["name"] == "language":
-                    param_list.append("language: Language")
+                elif parameter["dataType"] == "enum":
+                    param_list.append(
+                        f"{get_standardized_param_name(parameter)}: {parameter['enumType']}"
+                    )
                 elif parameter["dataType"] == "Library":
                     param_list.append("library: Library | None")
                 elif parameter["dataType"] == "Session":
@@ -201,8 +203,10 @@ def get_function_parameter_list(
                         param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
                     elif parameter["name"] == "language" and is_language:
                         param_list.append("language: Language = Language.UNDEFINED")
-                    elif parameter["dataType"] == "enum" and parameter["name"] == "language":
-                        param_list.append("language: Language")
+                    elif parameter["dataType"] == "enum":
+                        param_list.append(
+                            f"{get_standardized_param_name(parameter)}: {parameter['enumType']}"
+                        )
                     else:
                         param_list.append(
                             f"{get_standardized_param_name(parameter)}: {PYTHON_DATATYPE_MAP.get(parameter['dataType'])}"
@@ -388,7 +392,7 @@ def generate_variable_declaration(function: dict) -> list[str]:
                     var_list.append(
                         f"{get_standardized_param_name(parameter)}_bytes = {get_standardized_param_name(parameter)}.encode('utf-8')"
                     )
-                elif parameter["name"] == "language":
+                elif parameter["dataType"] == "enum":
                     var_list.append(
                         f"{get_standardized_param_name(parameter)}_c = {get_param_datatype_in_ctypes(parameter)}({get_standardized_param_name(parameter)}.value)"
                     )

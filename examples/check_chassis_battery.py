@@ -7,6 +7,7 @@ and displays the health information.
 from typing import Any
 
 import click
+
 from nislsc import Session
 from nislsc.constants import ReservationAccess
 

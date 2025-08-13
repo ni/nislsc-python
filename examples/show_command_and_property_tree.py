@@ -13,8 +13,12 @@ import click
 
 from nislsc import Command, Property, Session
 from nislsc.constants import (
+    CommandProperty,
     DataType,
+    DeviceProperty,
+    PhysicalChannelProperty,
     PropertyAccess,
+    PropertyProperty,
     ReservationAccess,
 )
 
@@ -71,12 +75,19 @@ def get_command_and_property_tree(device_name: str) -> dict:
             "Properties": [],
         }
 
-        device_commands = session.get_device_property_string_array(device_name, "Dev.Commands")
+        device_commands = session.get_device_property_string_array(
+            device_name,
+            DeviceProperty.COMMANDS,
+        )
 
-        device_properties = session.get_device_property_string_array(device_name, "Dev.Properties")
+        device_properties = session.get_device_property_string_array(
+            device_name,
+            DeviceProperty.PROPERTIES,
+        )
 
         device_physical_channels = session.get_device_property_string_array(
-            device_name, "Dev.PhysChans"
+            device_name,
+            DeviceProperty.PHYSICAL_CHANNELS,
         )
 
         for physical_channel in device_physical_channels:
@@ -85,30 +96,33 @@ def get_command_and_property_tree(device_name: str) -> dict:
         for device_command in device_commands:
             with Command.open_device_command(session, device_name, device_command) as command:
                 name = device_command
-                description = command.get_command_property_string("Cmd.Descr")
-                access = ReservationAccess(command.get_command_property_int32("Cmd.Access"))
-                data["Commands"].append(
-                    {"name": name, "description": description, "access": access.name}
-                )
+                description = command.get_command_property_string(CommandProperty.DESCRIPTION)
+                data["Commands"].append({"name": name, "description": description})
 
         for device_property in device_properties:
             with Property.open_device_property(session, device_name, device_property) as property:
                 name = device_property
 
-                datatype = DataType(property.get_property_property_int32("Prop.DataType"))
+                datatype = DataType(
+                    property.get_property_property_int32(PropertyProperty.DATA_TYPE)
+                )
 
                 current_value = _get_session_generic_property(
                     session, device_name, device_property, datatype
                 )
 
-                access = PropertyAccess(property.get_property_property_int32("Prop.Access"))
+                access = PropertyAccess(
+                    property.get_property_property_int32(PropertyProperty.ACCESS)
+                )
 
-                description = property.get_property_property_string("Prop.Descr")
+                description = property.get_property_property_string(PropertyProperty.DESCRIPTION)
 
-                documentation = property.get_property_property_string("Prop.Doc")
+                documentation = property.get_property_property_string(
+                    PropertyProperty.DOCUMENTATION
+                )
 
-                min_value = property.get_property_property_string("Prop.MinValue")
-                max_value = property.get_property_property_string("Prop.MaxValue")
+                min_value = property.get_property_property_string(PropertyProperty.MINIMUM_VALUE)
+                max_value = property.get_property_property_string(PropertyProperty.MAXIMUM_VALUE)
 
                 if len(min_value) == 0 and len(max_value) == 0:
                     range_value = ""
@@ -130,10 +144,10 @@ def get_command_and_property_tree(device_name: str) -> dict:
         for physical_channel in device_physical_channels:
 
             physical_channel_commands = session.get_physical_channel_property_string_array(
-                physical_channel, "PhysChan.Commands"
+                physical_channel, PhysicalChannelProperty.COMMANDS
             )
             physical_channel_properties = session.get_physical_channel_property_string_array(
-                physical_channel, "PhysChan.Properties"
+                physical_channel, PhysicalChannelProperty.PROPERTIES
             )
 
             for physical_channel_command in physical_channel_commands:
@@ -141,10 +155,9 @@ def get_command_and_property_tree(device_name: str) -> dict:
                     session, physical_channel, physical_channel_command
                 ) as command:
                     name = physical_channel_command
-                    description = command.get_command_property_string("Cmd.Descr")
-                    access = ReservationAccess(command.get_command_property_int32("Cmd.Access"))
+                    description = command.get_command_property_string(CommandProperty.DESCRIPTION)
                     data[physical_channel]["Commands"].append(
-                        {"name": name, "description": description, "access": access.name}
+                        {"name": name, "description": description}
                     )
 
             for physical_channel_property in physical_channel_properties:
@@ -152,20 +165,32 @@ def get_command_and_property_tree(device_name: str) -> dict:
                     session, physical_channel, physical_channel_property
                 ) as property:
                     name = physical_channel_property
-                    datatype = DataType(property.get_property_property_int32("Prop.DataType"))
+                    datatype = DataType(
+                        property.get_property_property_int32(PropertyProperty.DATA_TYPE)
+                    )
 
                     current_value = _get_session_generic_property(
                         session, physical_channel, physical_channel_property, datatype
                     )
 
-                    access = PropertyAccess(property.get_property_property_int32("Prop.Access"))
+                    access = PropertyAccess(
+                        property.get_property_property_int32(PropertyProperty.ACCESS)
+                    )
 
-                    description = property.get_property_property_string("Prop.Descr")
+                    description = property.get_property_property_string(
+                        PropertyProperty.DESCRIPTION
+                    )
 
-                    documentation = property.get_property_property_string("Prop.Doc")
+                    documentation = property.get_property_property_string(
+                        PropertyProperty.DOCUMENTATION
+                    )
 
-                    min_value = property.get_property_property_string("Prop.MinValue")
-                    max_value = property.get_property_property_string("Prop.MaxValue")
+                    min_value = property.get_property_property_string(
+                        PropertyProperty.MINIMUM_VALUE
+                    )
+                    max_value = property.get_property_property_string(
+                        PropertyProperty.MAXIMUM_VALUE
+                    )
 
                     if len(min_value) == 0 and len(max_value) == 0:
                         range_value = ""

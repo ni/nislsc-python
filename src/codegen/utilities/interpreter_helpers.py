@@ -32,6 +32,10 @@ NAME_EXPANSION = {
     "propertyRefOut": "propertyHandle",
 }
 
+PROPERTY_NAME_SCOPE_EXPANSION = {
+    "PhysChan": "PhysicalChannel",
+}
+
 CLASSNAME_MAP = {
     "Session": "Session",
     "Library": "Library",
@@ -81,11 +85,17 @@ def convert_to_private(name: str) -> str:
     return "_" + name
 
 
-def convert_to_snake_case(name: str) -> str:
+def convert_camel_pascal_to_snake_case(name: str) -> str:
     """Convert a camelCase or PascalCase name to snake_case."""
     for regex in INTERPRETER_CAMEL_TO_SNAKE_CASE_REGEXES:
         name = regex.sub(r"\1_\2", name)
     return name.lower().replace("u_int", "uint")
+
+
+def convert_to_screaming_snake_case(name: str) -> str:
+    """Convert a string to screaming snake case."""
+    name = re.sub(r"[^0-9a-zA-Z]+", "_", name)
+    return name.upper()
 
 
 def convert_to_class_name(name: str) -> str:
@@ -110,7 +120,12 @@ def is_capi(param: dict) -> bool:
 
 def get_standardized_param_name(param: dict) -> str:
     """Get the standardized parameter name, expanding known names."""
-    return convert_to_snake_case(NAME_EXPANSION.get(param["name"], param["name"]))
+    return convert_camel_pascal_to_snake_case(NAME_EXPANSION.get(param["name"], param["name"]))
+
+
+def get_standardized_property_scope_name(name: str) -> str:
+    """Get the standardized property scope name, expanding known names."""
+    return PROPERTY_NAME_SCOPE_EXPANSION.get(name, name)
 
 
 def get_param_datatype_in_ctypes(param: dict) -> str:
@@ -133,16 +148,16 @@ def get_python_function_name(function: dict, convert_private: bool = False) -> s
     if convert_private:
         if "capi" in function["targets"]:
             if "capiname" in function:
-                function_name = convert_to_snake_case(function["capiname"])
+                function_name = convert_camel_pascal_to_snake_case(function["capiname"])
                 if function_name in PRIVATIZE_FUNCTIONS:
                     return convert_to_private(function_name)
                 return function_name
-        function_name = convert_to_snake_case(function["name"])
+        function_name = convert_camel_pascal_to_snake_case(function["name"])
         if function_name in PRIVATIZE_FUNCTIONS:
             return convert_to_private(function_name)
         return function_name
     else:
         if "capi" in function["targets"]:
             if "capiname" in function:
-                return convert_to_snake_case(function["capiname"])
-        return convert_to_snake_case(function["name"])
+                return convert_camel_pascal_to_snake_case(function["capiname"])
+        return convert_camel_pascal_to_snake_case(function["name"])

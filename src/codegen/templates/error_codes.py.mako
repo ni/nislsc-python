@@ -1,5 +1,5 @@
 <%!
-from utilities.interpreter_helpers import convert_to_snake_case
+from utilities.interpreter_helpers import convert_camel_pascal_to_snake_case
 
 def remove_k_prefix(s: str) -> str:
     if s.upper().startswith("K_ERROR"):
@@ -24,16 +24,16 @@ class SLSCErrors(Enum):
     UNKNOWN = -1
 %for error in errors:
 % if error['code'] < 0:
-    ${remove_k_prefix(convert_to_snake_case(error['symbol']).upper())} = ${error['code']}
+    ${remove_k_prefix(convert_camel_pascal_to_snake_case(error['symbol']).upper())} = ${error['code']}
 % endif
 %endfor
 
 class SLSCWarnings(Enum):
     """Define SLSC warning codes and their numeric values."""
-    
+
     UNKNOWN = -1
 %for error in errors:
 % if error['code'] > 0:
-    ${remove_k_prefix(convert_to_snake_case(error['symbol']).upper())} = ${error['code']}
+    ${remove_k_prefix(convert_camel_pascal_to_snake_case(error['symbol']).upper())} = ${error['code']}
 % endif
 %endfor

@@ -59,9 +59,7 @@ def main(chassis_name: str) -> None:
     """
     try:
         battery_status = get_battery_status(chassis_name)
-        needs_replacement = (
-            battery_status["SensorReading"] < battery_status["SensorLowerCritical"]
-        )
+        needs_replacement = battery_status["SensorReading"] < battery_status["SensorLowerCritical"]
 
         print(f"Battery Health State: {battery_status['HealthState']}")
         print(f"Sensor Reading: {battery_status['SensorReading']}")

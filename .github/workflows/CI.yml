@@ -11,15 +11,12 @@ jobs:
   build:
     name: Build
     uses: ./.github/workflows/build.yml
-  # name: Check docs
-  #   uses: ./.github/workflows/check_docs.yml
+  check_docs:
+    name: Check docs
+    uses: ./.github/workflows/check_docs.yml
   # run_unit_tests:
   #   name: Run unit tests
   #   uses: ./.github/workflows/run_unit_tests.yml
-  #   needs: [build]
-  # generate_docs:
-  #   name: Generate docs
-  #   uses: ./.github/workflows/generate_docs.yml
   #   needs: [build]
   # run_system_tests:
   #   name: Run system tests

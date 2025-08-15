@@ -259,11 +259,8 @@ class Session:
         exist in memory, they are deleted. - Windows: SLSC stores credentials in
         your Windows Credential Manager vault. These are encrypted with your
         Windows login information. You can view/manage/delete your credentials
-        via Control Panel >> User Accounts >> Credential Manager. - Pharlap ETS:
-        SLSC stores credentials in a cleartext JSON file in
-        c:\\ni-rt\\system\\niwebcer\\certstore\\nislsc\\loginCache. Each SLSC chassis
-        has a separate file. Note: this path is not accessible over FTP. - NI
-        Linux Real-Time: SLSC stores credentials in a cleartext JSON file in
+        via Control Panel >> User Accounts >> Credential Manager. - NI Linux
+        Real-Time: SLSC stores credentials in a cleartext JSON file in
         /home/lvuser/.config/nislsc/loginCache. Each SLSC chassis has a separate
         file.
         

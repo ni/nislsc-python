@@ -138,6 +138,6 @@ class SLSCErrors(Enum):
 
 class SLSCWarnings(Enum):
     """Define SLSC warning codes and their numeric values."""
-    
+
     UNKNOWN = -1
     SCALING_TIMESTAMP_OUTDATED = 250800

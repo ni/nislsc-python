@@ -256,13 +256,16 @@ class Session:
         
         If you set 'saveCredentialsToDisk' to true, LogIn saves the credentials
         in a platform-specific disk location and format. If cached credentials
-        exist in memory, they are deleted. - Windows: SLSC stores credentials in
-        your Windows Credential Manager vault. These are encrypted with your
-        Windows login information. You can view/manage/delete your credentials
-        via Control Panel >> User Accounts >> Credential Manager. - NI Linux
-        Real-Time: SLSC stores credentials in a cleartext JSON file in
-        /home/lvuser/.config/nislsc/loginCache. Each SLSC chassis has a separate
-        file.
+        exist in memory, they are deleted.
+        
+        - Windows: SLSC stores credentials in your Windows Credential Manager
+          vault. These are encrypted with your Windows login information. You
+          can view/manage/delete your credentials via Control Panel >> User
+          Accounts >> Credential Manager.
+        
+        - NI Linux Real-Time: SLSC stores credentials in a cleartext JSON file
+          in /home/lvuser/.config/nislsc/loginCache. Each SLSC chassis has a
+          separate file.
         
         If you set 'saveCredentialsToDisk' to false, LogIn saves the credentials
         in the memory of the calling process. If cached credentials exist on
@@ -1025,9 +1028,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1047,9 +1050,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1069,9 +1072,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1091,9 +1094,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1113,9 +1116,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1135,9 +1138,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1157,9 +1160,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1179,9 +1182,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1201,9 +1204,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1223,9 +1226,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1245,9 +1248,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1267,9 +1270,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1289,9 +1292,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1311,9 +1314,9 @@ class Session:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
-        To get a property from multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To get a property from multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         Args:
             physical_channel_names: Comma-delimited list of physical channels
@@ -1333,9 +1336,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1357,9 +1360,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1381,9 +1384,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1405,9 +1408,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1429,9 +1432,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1453,9 +1456,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1477,9 +1480,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1501,9 +1504,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1525,9 +1528,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1549,9 +1552,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1573,9 +1576,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1597,9 +1600,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1621,9 +1624,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -1645,9 +1648,9 @@ class Session:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
-        To set a property for multiple physical channels, specify a
-        comma-delimited list or colon-delimited range of physical channels and
-        use an array version of this VI/function.
+        To set a property for multiple physical channels, specify a comma-
+        delimited list or colon-delimited range of physical channels and use an
+        array version of this VI/function.
         
         If the property is defined by the SLSC driver, the change takes effect
         immediately. If the property is defined by the device(s), the change
@@ -2835,8 +2838,8 @@ class Session:
         return reverse_coefficient
 
     def get_table_scaling_parameters(self, physical_channel_names: str) -> tuple[list[float], list[float], int]:
-        """Get scaling parameters from a table scale that maps an array of
-        pre-scaled values to an array of corresponding scaled values.
+        """Get scaling parameters from a table scale that maps an array of pre-
+        scaled values to an array of corresponding scaled values.
         
         Args:
             physical_channel_names: Physical channel where the Scaling is
@@ -2857,8 +2860,8 @@ class Session:
                 located, or a resource alias such as "$DefaultPhysChans".
         
         Returns:
-            A tuple containing user-defined parameter names to get and
-                user-defined parameters to get.
+            A tuple containing user-defined parameter names to get and user-
+                defined parameters to get.
         """
         user_defined_parameter_value = self._interpreter.get_user_defined_scaling_parameters(self._session_handle, physical_channel_names)
         return user_defined_parameter_value
@@ -2913,8 +2916,8 @@ class Session:
         self._interpreter.set_polynomial_scaling_parameters(self._session_handle, physical_channel_names, forward_coefficient, reverse_coefficient, serial_number, password)
 
     def set_table_scaling_parameters(self, physical_channel_names: str, scaled_value: list[float], prescale_value: list[float], coercion: TableScaleCoercion, serial_number: str, password: str) -> None:
-        """Set scaling parameters for a table scale that maps an array of
-        pre-scaled values to an array of corresponding scaled values.
+        """Set scaling parameters for a table scale that maps an array of pre-
+        scaled values to an array of corresponding scaled values.
         
         Args:
             physical_channel_names: Physical channel where the Scaling is

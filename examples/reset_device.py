@@ -1,7 +1,4 @@
-"""Demonstrate how to reset a SLSC module.
-
-Selecting a chassis will reset all the modules, not reboot the chassis.
-"""
+"""Demonstrate how to reset a SLSC module."""
 
 import click
 
@@ -10,17 +7,20 @@ from nislsc.constants import ReservationAccess
 
 
 @click.command()
-@click.argument("device_names", type=str)
+@click.argument("device-names", type=str)
 def main(device_names: str) -> None:
     """Reset the specified SLSC devices/chassis.
 
-    device_names: Comma-separated list of SLSC devices/chassis to reset.
+    Providing a chassis name will reset all the modules, but not reboot the chassis.
 
+    DEVICE_NAMES is a comma-separated list of SLSC devices/chassis to reset.
+
+    \b
     Examples:
-        "SLSC-12001-03146D67"
-        "SLSC-12001-03146D67-Mod1"
-        "SLSC-12001-03146D67-Mod1,SLSC-12001-03146D67-Mod2"
-    """
+        "reset_device SLSC-12001-XXXXXXXX"
+        "reset_device SLSC-12001-XXXXXXXX-Mod1"
+        "reset_device SLSC-12001-XXXXXXXX-Mod1,SLSC-12001-XXXXXXXX-Mod2"
+    """  # NOQA: D301
     try:
         connection_timeout = 10.0
         reservation_access = ReservationAccess.READ_ONLY
@@ -38,7 +38,7 @@ def main(device_names: str) -> None:
             session.reset_devices(device_names)
             print(f"Reset command sent to device(s) {device_names}")
     except Exception as e:
-        click.echo(f"Input Error: {e}", err=True)
+        click.echo(f"Error: {e}", err=True)
         raise click.Abort()
 
 

@@ -78,3 +78,35 @@ html_theme_options = {
 
 # Napoleon settings
 napoleon_numpy_docstring = False
+
+
+def skip_aliases(app, what, name, obj, skip, options):
+    """Skip documentation for classes that are exported from multiple modules."""
+    if name in [
+        "nislsc.Command",
+        "nislsc.Library",
+        "nislsc.Property",
+        "nislsc.Session",
+    ]:
+        skip = True
+
+    return skip
+
+
+def skip_str_enum(app, what, name, obj, skip, options):
+    """Skip documentation for the StrEnum polyfill class."""
+    if name == "nislsc.constants.StrEnum":
+        skip = True
+    return skip
+
+
+def autoapi_skip_member_callback(app, what, name, obj, skip, options):
+    """Skip documentation for certain members."""
+    skip = skip_str_enum(app, what, name, obj, skip, options)
+    skip = skip_aliases(app, what, name, obj, skip, options)
+    return skip
+
+
+def setup(sphinx):
+    """Sphinx setup callback."""
+    sphinx.connect("autoapi-skip-member", autoapi_skip_member_callback)

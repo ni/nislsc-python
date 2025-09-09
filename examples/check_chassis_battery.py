@@ -18,8 +18,8 @@ def main(chassis_name: str) -> None:
 
     \b
     Examples:
-        "check_chassis_battery SLSC-12001-XXXXXXXX"
-    """  # NOQA: D301
+        check_chassis_battery SLSC-12001-XXXXXXXX
+    """  # noqa: D301
     try:
         physical_channel_names = f"{chassis_name}/BatteryVoltageSensor"
         connection_timeout = 10.0

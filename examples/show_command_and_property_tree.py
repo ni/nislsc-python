@@ -222,10 +222,10 @@ def main(device_name: str) -> None:
 
     \b
     Examples:
-        "show_command_and_property_tree SLSC-12001-XXXXXXXX"
-        "show_command_and_property_tree SLSC-12001-XXXXXXXX-Mod1"
-        "show_command_and_property_tree SLSC-12001-XXXXXXXX-Mod2"
-    """  # NOQA: D301
+        show_command_and_property_tree SLSC-12001-XXXXXXXX
+        show_command_and_property_tree SLSC-12001-XXXXXXXX-Mod1
+        show_command_and_property_tree SLSC-12001-XXXXXXXX-Mod2
+    """  # noqa: D301
     try:
         data = get_command_and_property_tree(device_name)
         print(json.dumps(data, indent=4))

@@ -1,10 +1,4 @@
-"""Demonstrate how to query and display the command and property tree.
-
-It connects to the specified SLSC device, retrieves its available
-commands, properties, and physical channels, and organizes this
-information into a structured JSON format. The module supports querying
-both device-level and physical channel-level commands and properties.
-"""
+"""Demonstrate how to query and display the command and property tree."""
 
 import json
 from typing import Any
@@ -213,22 +207,30 @@ def get_command_and_property_tree(device_name: str) -> dict:
 
 
 @click.command()
-@click.argument("device_name", type=str)
+@click.argument("device-name", type=str)
 def main(device_name: str) -> None:
     """Create a command and property tree.
 
-    device_name: Name of the SLSC device to query.
+    Connects to the specified SLSC device, retrieves its available
+    commands, properties, and physical channels, and organizes this
+    information into a structured JSON format.
 
+    The module supports querying both device-level and physical
+    channel-level commands and properties.
+
+    DEVICE_NAME is the name of the SLSC device to query.
+
+    \b
     Examples:
-        "SLSC-12001-03146D67"
-        "SLSC-12001-03146D67-Mod1"
-        "SLSC-12001-03146D67-Mod2"
-    """
+        show_command_and_property_tree SLSC-12001-XXXXXXXX
+        show_command_and_property_tree SLSC-12001-XXXXXXXX-Mod1
+        show_command_and_property_tree SLSC-12001-XXXXXXXX-Mod2
+    """  # noqa: D301
     try:
         data = get_command_and_property_tree(device_name)
         print(json.dumps(data, indent=4))
     except Exception as e:
-        click.echo(f"Input Error: {e}", err=True)
+        click.echo(f"Error: {e}", err=True)
         raise click.Abort()
 
 

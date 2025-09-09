@@ -17,10 +17,10 @@ def main(device_names: str) -> None:
 
     \b
     Examples:
-        "reset_device SLSC-12001-XXXXXXXX"
-        "reset_device SLSC-12001-XXXXXXXX-Mod1"
-        "reset_device SLSC-12001-XXXXXXXX-Mod1,SLSC-12001-XXXXXXXX-Mod2"
-    """  # NOQA: D301
+        reset_device SLSC-12001-XXXXXXXX
+        reset_device SLSC-12001-XXXXXXXX-Mod1
+        reset_device SLSC-12001-XXXXXXXX-Mod1,SLSC-12001-XXXXXXXX-Mod2
+    """  # noqa: D301
     try:
         connection_timeout = 10.0
         reservation_access = ReservationAccess.READ_ONLY

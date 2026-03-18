@@ -4,9 +4,9 @@ version = "0.1.0"
 description = "NI-SLSC Python API"
 authors = ["NI <opensource@ni.com>"]
 maintainers = [
-  "Brad Keryan <brad.keryan@emerson.com>",
   "Jun Ying Tan <jun.ying.tan@emerson.com>",
   "Kae Woei Kang <kae.woei.kang@emerson.com>",
+  "Brad Keryan <brad.keryan@emerson.com>",
 ]
 license = "MIT"
 readme = "README.md"

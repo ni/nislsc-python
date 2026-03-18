@@ -5,9 +5,11 @@
 The **nislsc** package allows you to develop instrumentation, acquisition, and control applications with NI Switch Load and Signal Conditioning (SLSC) devices in Python.
 NI created and supports this package.
 
+<!--
 ### Documentation
 
 - TODO: Add documentation here.
+-->
 
 ### Implementation
 
@@ -15,7 +17,7 @@ The package is implemented in Python as an object-oriented wrapper around the NI
 
 ### Supported NI-SLSC Driver Versions
 
-- TODO: List supported NI-SLSC Driver versions
+This package requires the NI-SLSC C API, which was introduced in NI-SLSC 20.0.
 
 ### Operating System Support
 
@@ -27,19 +29,28 @@ The package is implemented in Python as an object-oriented wrapper around the NI
 
 ## Installation
 
-- TODO: Insert installation instructions here.
+You can use [pip](http://pypi.python.org/pypi/pip>) to download **nislsc** from
+[PyPI](https://pypi.org/project/nislsc/) and install it:
 
+```bash
+$ python -m pip install nislsc
+```
+
+<!--
 ## Getting Started
 
 - TODO: Insert getting started documentation here.
+-->
 
 ## Python Examples
 
 You can find the examples for **NI-SLSC Python** in the [nislsc-python examples](https://github.com/ni/nislsc-python/tree/main/examples) directory. For best results, use the examples that correspond to your current **nislsc** version. For example, if you are using version 1.0.0, then check out the examples directory in the 1.0.0 tag. Newer examples may demonstrate features that are not available in previous versions of **nislsc**.
 
+<!--
 ## Usage
 
 - TODO: Insert usage instructions here.
+-->
 
 ## Bugs / Feature Requests
 
@@ -63,7 +74,7 @@ Please include **all** of the following information when opening an issue:
     ```
 
 - The version of the NI-SLSC driver used. Follow [this KB article](http://digital.ni.com/express.nsf/bycode/ex8amn) to determine the version of NI-SLSC you have installed.
-- The operating system and version, for example Windows 7, CentOS 7.2, ...
+- The operating system and version, for example Windows 11, Ubuntu 24.04, ...
 
 ## License
 

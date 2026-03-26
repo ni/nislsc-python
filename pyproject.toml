@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nislsc"
-version = "0.1.0"
+version = "0.1.1"
 description = "NI-SLSC Python API"
 authors = ["NI <opensource@ni.com>"]
 maintainers = [

@@ -49,7 +49,7 @@ During finalization, we create a release branch (e.g. `releases/1.2`) in order t
 - Patch fixes for an existing release should be cherry‑picked into the appropriate release branch.
 
 **Tagging**
-- Git tags for pre-releases are version numbers in the form `1.2.3-dev4`.
+- Git tags for pre-releases are version numbers in the form `1.2.3.dev4`.
 - Git tags for releases are version numbers in the form `1.2 or 1.2.3`.
 - This project does not prefix Git tags with the letter `v`.
 
@@ -66,9 +66,7 @@ During finalization, we create a release branch (e.g. `releases/1.2`) in order t
        `releases/1.2`.
   4. If it is a pre-release, check **Set as a pre-release**. If it is an official release,
      uncheck **Set as a pre-release** and check **Set as the latest release**.
-  5. Click **Generate release notes** and edit the generated release notes for brevity and style.
-     If it is an official release, consider copy/pasting the release notes from the pre-releases
-     leading up to this release and merging them together.
+  5. Release notes can be copied from the most recent entry in CHANGELOG.md corresponding to the version being released.
   6. Click **Save draft**. Consider sharing the link to the draft release with the other repo maintainers.
   7. Once the versions and release notes are ready, click **Publish release**.
   8. Publishing a release automatically triggers the [publish.yml](https://github.com/ni/nislsc-python/blob/main/.github/workflows/publish.yml)

@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "nislsc"
-version = "0.1.0"
+version = "0.2.0.dev0"
 description = "NI-SLSC Python API"
 authors = ["NI <opensource@ni.com>"]
 maintainers = [
+  "Jun Liang Tan <junliang.tan@emerson.com>",
   "Jun Ying Tan <jun.ying.tan@emerson.com>",
   "Kae Woei Kang <kae.woei.kang@emerson.com>",
   "Brad Keryan <brad.keryan@emerson.com>",

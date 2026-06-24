@@ -413,733 +413,127 @@ def test___session_opened___update_system_configuration_file___interpreter_calle
     )
 
 
-def test___session_opened___get_device_property_bool___returns_value(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("get_device_property_bool", "Dev.IsPresent", True),
+        ("get_device_property_bool_array", "Dev.Flags", [True, False, True]),
+        ("get_device_property_double", "Dev.Temperature", 3.14),
+        ("get_device_property_double_array", "Dev.Values", [1.0, 2.0, 3.0]),
+        ("get_device_property_int32", "Dev.NumSlots", 7),
+        ("get_device_property_int32_array", "Dev.Indices", [1, 2, 3]),
+        ("get_device_property_int64", "Dev.Timestamp", 9999999999),
+        ("get_device_property_int64_array", "Dev.Timestamps", [100, 200, 300]),
+        ("get_device_property_string", "Dev.ProductName", "SLSC-99999"),
+        ("get_device_property_string_array", "Dev.Modules", ["Mod1", "Mod2"]),
+        ("get_device_property_uint32", "Dev.Count", 255),
+        ("get_device_property_uint32_array", "Dev.Counts", [10, 20, 30]),
+        ("get_device_property_uint64", "Dev.LargeCount", 18446744073709551615),
+        ("get_device_property_uint64_array", "Dev.LargeCounts", [111, 222, 333]),
+    ],
+)
+def test___session_opened___get_device_property___returns_value(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
-    interpreter.get_device_property_bool.return_value = True
+    getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = session.get_device_property_bool("Dev1", "Dev.IsPresent")
+    result = getattr(session, method)("Dev1", prop)
 
-    interpreter.get_device_property_bool.assert_called_once_with(
-        session_handle, "Dev1", "Dev.IsPresent"
-    )
-    assert result is True
+    getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", prop)
+    assert result == value
 
 
-def test___session_opened___get_device_property_bool_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_bool_array.return_value = [True, False, True]
-    session_handle = session._session_handle
-
-    result = session.get_device_property_bool_array("Dev1", "Dev.Flags")
-
-    interpreter.get_device_property_bool_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Flags"
-    )
-    assert result == [True, False, True]
-
-
-def test___session_opened___get_device_property_double___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_double.return_value = 3.14
-    session_handle = session._session_handle
-
-    result = session.get_device_property_double("Dev1", "Dev.Temperature")
-
-    interpreter.get_device_property_double.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Temperature"
-    )
-    assert result == 3.14
-
-
-def test___session_opened___get_device_property_double_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_double_array.return_value = [1.0, 2.0, 3.0]
-    session_handle = session._session_handle
-
-    result = session.get_device_property_double_array("Dev1", "Dev.Values")
-
-    interpreter.get_device_property_double_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Values"
-    )
-    assert result == [1.0, 2.0, 3.0]
-
-
-def test___session_opened___get_device_property_int32___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_int32.return_value = 7
-    session_handle = session._session_handle
-
-    result = session.get_device_property_int32("Dev1", "Dev.NumSlots")
-
-    interpreter.get_device_property_int32.assert_called_once_with(
-        session_handle, "Dev1", "Dev.NumSlots"
-    )
-    assert result == 7
-
-
-def test___session_opened___get_device_property_int32_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_int32_array.return_value = [1, 2, 3]
-    session_handle = session._session_handle
-
-    result = session.get_device_property_int32_array("Dev1", "Dev.Indices")
-
-    interpreter.get_device_property_int32_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Indices"
-    )
-    assert result == [1, 2, 3]
-
-
-def test___session_opened___get_device_property_int64___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_int64.return_value = 9999999999
-    session_handle = session._session_handle
-
-    result = session.get_device_property_int64("Dev1", "Dev.Timestamp")
-
-    interpreter.get_device_property_int64.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timestamp"
-    )
-    assert result == 9999999999
-
-
-def test___session_opened___get_device_property_int64_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_int64_array.return_value = [100, 200, 300]
-    session_handle = session._session_handle
-
-    result = session.get_device_property_int64_array("Dev1", "Dev.Timestamps")
-
-    interpreter.get_device_property_int64_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timestamps"
-    )
-    assert result == [100, 200, 300]
-
-
-def test___session_opened___get_device_property_string___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_string.return_value = "SLSC-99999"
-    session_handle = session._session_handle
-
-    result = session.get_device_property_string("Dev1", "Dev.ProductName")
-
-    interpreter.get_device_property_string.assert_called_once_with(
-        session_handle, "Dev1", "Dev.ProductName"
-    )
-    assert result == "SLSC-99999"
-
-
-def test___session_opened___get_device_property_string_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_string_array.return_value = ["Mod1", "Mod2"]
-    session_handle = session._session_handle
-
-    result = session.get_device_property_string_array("Dev1", "Dev.Modules")
-
-    interpreter.get_device_property_string_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Modules"
-    )
-    assert result == ["Mod1", "Mod2"]
-
-
-def test___session_opened___get_device_property_uint32___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_uint32.return_value = 255
-    session_handle = session._session_handle
-
-    result = session.get_device_property_uint32("Dev1", "Dev.Count")
-
-    interpreter.get_device_property_uint32.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Count"
-    )
-    assert result == 255
-
-
-def test___session_opened___get_device_property_uint32_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_uint32_array.return_value = [10, 20, 30]
-    session_handle = session._session_handle
-
-    result = session.get_device_property_uint32_array("Dev1", "Dev.Counts")
-
-    interpreter.get_device_property_uint32_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Counts"
-    )
-    assert result == [10, 20, 30]
-
-
-def test___session_opened___get_device_property_uint64___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_uint64.return_value = 18446744073709551615
-    session_handle = session._session_handle
-
-    result = session.get_device_property_uint64("Dev1", "Dev.LargeCount")
-
-    interpreter.get_device_property_uint64.assert_called_once_with(
-        session_handle, "Dev1", "Dev.LargeCount"
-    )
-    assert result == 18446744073709551615
-
-
-def test___session_opened___get_device_property_uint64_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_device_property_uint64_array.return_value = [111, 222, 333]
-    session_handle = session._session_handle
-
-    result = session.get_device_property_uint64_array("Dev1", "Dev.LargeCounts")
-
-    interpreter.get_device_property_uint64_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.LargeCounts"
-    )
-    assert result == [111, 222, 333]
-
-
-def test___session_opened___set_device_property_bool___interpreter_called_with_args(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("set_device_property_bool", "Dev.Enabled", True),
+        ("set_device_property_bool_array", "Dev.Flags", [True, False]),
+        ("set_device_property_double", "Dev.Timeout", 5.0),
+        ("set_device_property_double_array", "Dev.Values", [1.0, 2.0]),
+        ("set_device_property_int32", "Dev.Index", 42),
+        ("set_device_property_int32_array", "Dev.Indices", [1, 2, 3]),
+        ("set_device_property_int64", "Dev.Timestamp", 9999999999),
+        ("set_device_property_int64_array", "Dev.Timestamps", [100, 200]),
+        ("set_device_property_string", "Dev.Name", "NewName"),
+        ("set_device_property_string_array", "Dev.Labels", ["a", "b"]),
+        ("set_device_property_uint32", "Dev.Count", 255),
+        ("set_device_property_uint32_array", "Dev.Counts", [10, 20]),
+        ("set_device_property_uint64", "Dev.LargeCount", 18446744073709551615),
+        ("set_device_property_uint64_array", "Dev.LargeCounts", [111, 222]),
+    ],
+)
+def test___session_opened___set_device_property___interpreter_called_with_args(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
     session_handle = session._session_handle
 
-    session.set_device_property_bool("Dev1", "Dev.Enabled", True)
+    getattr(session, method)("Dev1", prop, value)
 
-    interpreter.set_device_property_bool.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Enabled", True
+    getattr(interpreter, method).assert_called_once_with(
+        session_handle, "Dev1", prop, value
     )
 
 
-def test___session_opened___set_device_property_bool_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, resource, prop, value",
+    [
+        ("get_physical_channel_property_bool", "Dev1/phys0", "PhysChan.IsActive", False),
+        ("get_physical_channel_property_bool_array", "Dev1/phys0", "PhysChan.Flags", [True, False]),
+        ("get_physical_channel_property_double", "Dev1/phys0", "PhysChan.Gain", 3.14),
+        ("get_physical_channel_property_double_array", "Dev1/phys0", "PhysChan.Gains", [1.0, 2.0]),
+        ("get_physical_channel_property_int32", "Dev1/phys0", "PhysChan.Index", 4),
+        ("get_physical_channel_property_int32_array", "Dev1/phys0", "PhysChan.Indices", [1, 2, 3]),
+        ("get_physical_channel_property_int64", "Dev1/phys0", "PhysChan.Timestamp", 9999999999),
+        ("get_physical_channel_property_int64_array", "Dev1/phys0", "PhysChan.Timestamps", [100, 200]),
+        ("get_physical_channel_property_string", "Dev1/phys0", "PhysChan.Name", "load0"),
+        ("get_physical_channel_property_string_array", "Dev1", "PhysChan.PhysicalChannels", ["load0", "load1"]),
+        ("get_physical_channel_property_uint32", "Dev1/phys0", "PhysChan.Count", 255),
+        ("get_physical_channel_property_uint32_array", "Dev1/phys0", "PhysChan.Counts", [10, 20]),
+        ("get_physical_channel_property_uint64", "Dev1/phys0", "PhysChan.LargeCount", 18446744073709551615),
+        ("get_physical_channel_property_uint64_array", "Dev1/phys0", "PhysChan.LargeCounts", [111, 222]),
+    ],
+)
+def test___session_opened___get_physical_channel_property___returns_value(
+    interpreter: Mock, session: Session, method: str, resource: str, prop: str, value: object
+) -> None:
+    getattr(interpreter, method).return_value = value
+    session_handle = session._session_handle
+
+    result = getattr(session, method)(resource, prop)
+
+    getattr(interpreter, method).assert_called_once_with(session_handle, resource, prop)
+    assert result == value
+
+
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("set_physical_channel_property_bool", "PhysChan.Enabled", True),
+        ("set_physical_channel_property_bool_array", "PhysChan.Flags", [True, False]),
+        ("set_physical_channel_property_double", "PhysChan.Gain", 3.14),
+        ("set_physical_channel_property_double_array", "PhysChan.Gains", [1.0, 2.0]),
+        ("set_physical_channel_property_int32", "PhysChan.Index", 7),
+        ("set_physical_channel_property_int32_array", "PhysChan.Indices", [1, 2]),
+        ("set_physical_channel_property_int64", "PhysChan.Timestamp", 9999999999),
+        ("set_physical_channel_property_int64_array", "PhysChan.Timestamps", [100, 200]),
+        ("set_physical_channel_property_string", "PhysChan.Label", "MyLabel"),
+        ("set_physical_channel_property_string_array", "PhysChan.Labels", ["x", "y"]),
+        ("set_physical_channel_property_uint32", "PhysChan.Count", 255),
+        ("set_physical_channel_property_uint32_array", "PhysChan.Counts", [10, 20]),
+        ("set_physical_channel_property_uint64", "PhysChan.LargeCount", 18446744073709551615),
+        ("set_physical_channel_property_uint64_array", "PhysChan.LargeCounts", [111, 222]),
+    ],
+)
+def test___session_opened___set_physical_channel_property___interpreter_called_with_args(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
     session_handle = session._session_handle
 
-    session.set_device_property_bool_array("Dev1", "Dev.Flags", [True, False])
+    getattr(session, method)("Dev1/phys0", prop, value)
 
-    interpreter.set_device_property_bool_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Flags", [True, False]
-    )
-
-
-def test___session_opened___set_device_property_double___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_double("Dev1", "Dev.Timeout", 5.0)
-
-    interpreter.set_device_property_double.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timeout", 5.0
-    )
-
-
-def test___session_opened___set_device_property_double_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_double_array("Dev1", "Dev.Values", [1.0, 2.0])
-
-    interpreter.set_device_property_double_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Values", [1.0, 2.0]
-    )
-
-
-def test___session_opened___set_device_property_int32___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_int32("Dev1", "Dev.Index", 42)
-
-    interpreter.set_device_property_int32.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Index", 42
-    )
-
-
-def test___session_opened___set_device_property_int32_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_int32_array("Dev1", "Dev.Indices", [1, 2, 3])
-
-    interpreter.set_device_property_int32_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Indices", [1, 2, 3]
-    )
-
-
-def test___session_opened___set_device_property_int64___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_int64("Dev1", "Dev.Timestamp", 9999999999)
-
-    interpreter.set_device_property_int64.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timestamp", 9999999999
-    )
-
-
-def test___session_opened___set_device_property_int64_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_int64_array("Dev1", "Dev.Timestamps", [100, 200])
-
-    interpreter.set_device_property_int64_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timestamps", [100, 200]
-    )
-
-
-def test___session_opened___set_device_property_string___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_string("Dev1", "Dev.Name", "NewName")
-
-    interpreter.set_device_property_string.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Name", "NewName"
-    )
-
-
-def test___session_opened___set_device_property_string_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_string_array("Dev1", "Dev.Labels", ["a", "b"])
-
-    interpreter.set_device_property_string_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Labels", ["a", "b"]
-    )
-
-
-def test___session_opened___set_device_property_uint32___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_uint32("Dev1", "Dev.Count", 255)
-
-    interpreter.set_device_property_uint32.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Count", 255
-    )
-
-
-def test___session_opened___set_device_property_uint32_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_uint32_array("Dev1", "Dev.Counts", [10, 20])
-
-    interpreter.set_device_property_uint32_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Counts", [10, 20]
-    )
-
-
-def test___session_opened___set_device_property_uint64___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_uint64("Dev1", "Dev.LargeCount", 18446744073709551615)
-
-    interpreter.set_device_property_uint64.assert_called_once_with(
-        session_handle, "Dev1", "Dev.LargeCount", 18446744073709551615
-    )
-
-
-def test___session_opened___set_device_property_uint64_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_device_property_uint64_array("Dev1", "Dev.LargeCounts", [111, 222])
-
-    interpreter.set_device_property_uint64_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.LargeCounts", [111, 222]
-    )
-
-
-def test___session_opened___get_physical_channel_property_bool___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_bool.return_value = False
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_bool("Dev1/phys0", "PhysChan.IsActive")
-
-    interpreter.get_physical_channel_property_bool.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.IsActive"
-    )
-    assert result is False
-
-
-def test___session_opened___get_physical_channel_property_bool_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_bool_array.return_value = [True, False]
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_bool_array("Dev1/phys0", "PhysChan.Flags")
-
-    interpreter.get_physical_channel_property_bool_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Flags"
-    )
-    assert result == [True, False]
-
-
-def test___session_opened___get_physical_channel_property_double___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_double.return_value = 3.14
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_double("Dev1/phys0", "PhysChan.Gain")
-
-    interpreter.get_physical_channel_property_double.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Gain"
-    )
-    assert result == 3.14
-
-
-def test___session_opened___get_physical_channel_property_double_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_double_array.return_value = [1.0, 2.0]
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_double_array("Dev1/phys0", "PhysChan.Gains")
-
-    interpreter.get_physical_channel_property_double_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Gains"
-    )
-    assert result == [1.0, 2.0]
-
-
-def test___session_opened___get_physical_channel_property_int32___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_int32.return_value = 4
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_int32("Dev1/phys0", "PhysChan.Index")
-
-    interpreter.get_physical_channel_property_int32.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Index"
-    )
-    assert result == 4
-
-
-def test___session_opened___get_physical_channel_property_int32_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_int32_array.return_value = [1, 2, 3]
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_int32_array("Dev1/phys0", "PhysChan.Indices")
-
-    interpreter.get_physical_channel_property_int32_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Indices"
-    )
-    assert result == [1, 2, 3]
-
-
-def test___session_opened___get_physical_channel_property_int64___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_int64.return_value = 9999999999
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_int64("Dev1/phys0", "PhysChan.Timestamp")
-
-    interpreter.get_physical_channel_property_int64.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Timestamp"
-    )
-    assert result == 9999999999
-
-
-def test___session_opened___get_physical_channel_property_int64_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_int64_array.return_value = [100, 200]
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_int64_array("Dev1/phys0", "PhysChan.Timestamps")
-
-    interpreter.get_physical_channel_property_int64_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Timestamps"
-    )
-    assert result == [100, 200]
-
-
-def test___session_opened___get_physical_channel_property_string___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_string.return_value = "load0"
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_string("Dev1/phys0", "PhysChan.Name")
-
-    interpreter.get_physical_channel_property_string.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Name"
-    )
-    assert result == "load0"
-
-
-def test___session_opened___get_physical_channel_property_string_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_string_array.return_value = ["load0", "load1"]
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_string_array(
-        "Dev1", "PhysChan.PhysicalChannels"
-    )
-
-    interpreter.get_physical_channel_property_string_array.assert_called_once_with(
-        session_handle, "Dev1", "PhysChan.PhysicalChannels"
-    )
-    assert result == ["load0", "load1"]
-
-
-def test___session_opened___get_physical_channel_property_uint32___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_uint32.return_value = 255
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_uint32("Dev1/phys0", "PhysChan.Count")
-
-    interpreter.get_physical_channel_property_uint32.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Count"
-    )
-    assert result == 255
-
-
-def test___session_opened___get_physical_channel_property_uint32_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_uint32_array.return_value = [10, 20]
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_uint32_array("Dev1/phys0", "PhysChan.Counts")
-
-    interpreter.get_physical_channel_property_uint32_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Counts"
-    )
-    assert result == [10, 20]
-
-
-def test___session_opened___get_physical_channel_property_uint64___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_uint64.return_value = 18446744073709551615
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_uint64("Dev1/phys0", "PhysChan.LargeCount")
-
-    interpreter.get_physical_channel_property_uint64.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.LargeCount"
-    )
-    assert result == 18446744073709551615
-
-
-def test___session_opened___get_physical_channel_property_uint64_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_physical_channel_property_uint64_array.return_value = [111, 222]
-    session_handle = session._session_handle
-
-    result = session.get_physical_channel_property_uint64_array("Dev1/phys0", "PhysChan.LargeCounts")
-
-    interpreter.get_physical_channel_property_uint64_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.LargeCounts"
-    )
-    assert result == [111, 222]
-
-
-def test___session_opened___set_physical_channel_property_bool___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_bool("Dev1/phys0", "PhysChan.Enabled", True)
-
-    interpreter.set_physical_channel_property_bool.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Enabled", True
-    )
-
-
-def test___session_opened___set_physical_channel_property_bool_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_bool_array("Dev1/phys0", "PhysChan.Flags", [True, False])
-
-    interpreter.set_physical_channel_property_bool_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Flags", [True, False]
-    )
-
-
-def test___session_opened___set_physical_channel_property_double___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_double("Dev1/phys0", "PhysChan.Gain", 3.14)
-
-    interpreter.set_physical_channel_property_double.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Gain", 3.14
-    )
-
-
-def test___session_opened___set_physical_channel_property_double_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_double_array("Dev1/phys0", "PhysChan.Gains", [1.0, 2.0])
-
-    interpreter.set_physical_channel_property_double_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Gains", [1.0, 2.0]
-    )
-
-
-def test___session_opened___set_physical_channel_property_int32___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_int32("Dev1/phys0", "PhysChan.Index", 7)
-
-    interpreter.set_physical_channel_property_int32.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Index", 7
-    )
-
-
-def test___session_opened___set_physical_channel_property_int32_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_int32_array("Dev1/phys0", "PhysChan.Indices", [1, 2])
-
-    interpreter.set_physical_channel_property_int32_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Indices", [1, 2]
-    )
-
-
-def test___session_opened___set_physical_channel_property_int64___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_int64("Dev1/phys0", "PhysChan.Timestamp", 9999999999)
-
-    interpreter.set_physical_channel_property_int64.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Timestamp", 9999999999
-    )
-
-
-def test___session_opened___set_physical_channel_property_int64_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_int64_array("Dev1/phys0", "PhysChan.Timestamps", [100, 200])
-
-    interpreter.set_physical_channel_property_int64_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Timestamps", [100, 200]
-    )
-
-
-def test___session_opened___set_physical_channel_property_string___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_string("Dev1/phys0", "PhysChan.Label", "MyLabel")
-
-    interpreter.set_physical_channel_property_string.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Label", "MyLabel"
-    )
-
-
-def test___session_opened___set_physical_channel_property_string_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_string_array("Dev1/phys0", "PhysChan.Labels", ["x", "y"])
-
-    interpreter.set_physical_channel_property_string_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Labels", ["x", "y"]
-    )
-
-
-def test___session_opened___set_physical_channel_property_uint32___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_uint32("Dev1/phys0", "PhysChan.Count", 255)
-
-    interpreter.set_physical_channel_property_uint32.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Count", 255
-    )
-
-
-def test___session_opened___set_physical_channel_property_uint32_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_uint32_array("Dev1/phys0", "PhysChan.Counts", [10, 20])
-
-    interpreter.set_physical_channel_property_uint32_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.Counts", [10, 20]
-    )
-
-
-def test___session_opened___set_physical_channel_property_uint64___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_uint64("Dev1/phys0", "PhysChan.LargeCount", 18446744073709551615)
-
-    interpreter.set_physical_channel_property_uint64.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.LargeCount", 18446744073709551615
-    )
-
-
-def test___session_opened___set_physical_channel_property_uint64_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_physical_channel_property_uint64_array("Dev1/phys0", "PhysChan.LargeCounts", [111, 222])
-
-    interpreter.set_physical_channel_property_uint64_array.assert_called_once_with(
-        session_handle, "Dev1/phys0", "PhysChan.LargeCounts", [111, 222]
+    getattr(interpreter, method).assert_called_once_with(
+        session_handle, "Dev1/phys0", prop, value
     )
 
 
@@ -1189,208 +583,85 @@ def test___session_opened___commit_properties_generic___interpreter_called_with_
     )
 
 
-def test___session_opened___get_nvmem_area_property_bool___returns_value(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("get_nvmem_area_property_bool", "NVMem.IsWritable", True),
+        ("get_nvmem_area_property_bool_array", "NVMem.Flags", [True, False]),
+        ("get_nvmem_area_property_string", "NVMem.Name", "Area1"),
+        ("get_nvmem_area_property_string_array", "NVMem.Areas", ["Area1", "Area2"]),
+        ("get_nvmem_area_property_uint32", "NVMem.Size", 512),
+        ("get_nvmem_area_property_uint32_array", "NVMem.Counts", [10, 20, 30]),
+    ],
+)
+def test___session_opened___get_nvmem_area_property___returns_value(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
-    interpreter.get_nvmem_area_property_bool.return_value = True
+    getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = session.get_nvmem_area_property_bool("Area1", "NVMem.IsWritable")
+    result = getattr(session, method)("Area1", prop)
 
-    interpreter.get_nvmem_area_property_bool.assert_called_once_with(
-        session_handle, "Area1", "NVMem.IsWritable"
-    )
-    assert result is True
+    getattr(interpreter, method).assert_called_once_with(session_handle, "Area1", prop)
+    assert result == value
 
 
-def test___session_opened___get_nvmem_area_property_bool_array___returns_list(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("get_session_property_double", "Session.Timeout", 10.0),
+        ("get_session_property_string", "Session.DefaultDevices", "Dev1"),
+        ("get_session_property_string_array", "Session.Devices", ["Dev1", "Dev2"]),
+    ],
+)
+def test___session_opened___get_session_property___returns_value(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
-    interpreter.get_nvmem_area_property_bool_array.return_value = [True, False]
+    getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = session.get_nvmem_area_property_bool_array("Area1", "NVMem.Flags")
+    result = getattr(session, method)(prop)
 
-    interpreter.get_nvmem_area_property_bool_array.assert_called_once_with(
-        session_handle, "Area1", "NVMem.Flags"
-    )
-    assert result == [True, False]
+    getattr(interpreter, method).assert_called_once_with(session_handle, prop)
+    assert result == value
 
 
-def test___session_opened___get_nvmem_area_property_string___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_nvmem_area_property_string.return_value = "Area1"
-    session_handle = session._session_handle
-
-    result = session.get_nvmem_area_property_string("Area1", "NVMem.Name")
-
-    interpreter.get_nvmem_area_property_string.assert_called_once_with(
-        session_handle, "Area1", "NVMem.Name"
-    )
-    assert result == "Area1"
-
-
-def test___session_opened___get_nvmem_area_property_string_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_nvmem_area_property_string_array.return_value = ["Area1", "Area2"]
-    session_handle = session._session_handle
-
-    result = session.get_nvmem_area_property_string_array("Area1", "NVMem.Areas")
-
-    interpreter.get_nvmem_area_property_string_array.assert_called_once_with(
-        session_handle, "Area1", "NVMem.Areas"
-    )
-    assert result == ["Area1", "Area2"]
-
-
-def test___session_opened___get_nvmem_area_property_uint32___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_nvmem_area_property_uint32.return_value = 512
-    session_handle = session._session_handle
-
-    result = session.get_nvmem_area_property_uint32("Area1", "NVMem.Size")
-
-    interpreter.get_nvmem_area_property_uint32.assert_called_once_with(
-        session_handle, "Area1", "NVMem.Size"
-    )
-    assert result == 512
-
-
-def test___session_opened___get_nvmem_area_property_uint32_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_nvmem_area_property_uint32_array.return_value = [10, 20, 30]
-    session_handle = session._session_handle
-
-    result = session.get_nvmem_area_property_uint32_array("Area1", "NVMem.Counts")
-
-    interpreter.get_nvmem_area_property_uint32_array.assert_called_once_with(
-        session_handle, "Area1", "NVMem.Counts"
-    )
-    assert result == [10, 20, 30]
-
-
-def test___session_opened___get_session_property_double___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_session_property_double.return_value = 10.0
-    session_handle = session._session_handle
-
-    result = session.get_session_property_double("Session.Timeout")
-
-    interpreter.get_session_property_double.assert_called_once_with(
-        session_handle, "Session.Timeout"
-    )
-    assert result == 10.0
-
-
-def test___session_opened___get_session_property_string___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_session_property_string.return_value = "Dev1"
-    session_handle = session._session_handle
-
-    result = session.get_session_property_string("Session.DefaultDevices")
-
-    interpreter.get_session_property_string.assert_called_once_with(
-        session_handle, "Session.DefaultDevices"
-    )
-    assert result == "Dev1"
-
-
-def test___session_opened___get_session_property_string_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_session_property_string_array.return_value = ["Dev1", "Dev2"]
-    session_handle = session._session_handle
-
-    result = session.get_session_property_string_array("Session.Devices")
-
-    interpreter.get_session_property_string_array.assert_called_once_with(
-        session_handle, "Session.Devices"
-    )
-    assert result == ["Dev1", "Dev2"]
-
-
-def test___session_opened___set_session_property_double___interpreter_called_with_args(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("set_session_property_double", "Session.Timeout", 30.0),
+        ("set_session_property_string", "Session.DefaultDevices", "Dev1"),
+        ("set_session_property_string_array", "Session.Devices", ["Dev1", "Dev2"]),
+    ],
+)
+def test___session_opened___set_session_property___interpreter_called_with_args(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
     session_handle = session._session_handle
 
-    session.set_session_property_double("Session.Timeout", 30.0)
+    getattr(session, method)(prop, value)
 
-    interpreter.set_session_property_double.assert_called_once_with(
-        session_handle, "Session.Timeout", 30.0
-    )
+    getattr(interpreter, method).assert_called_once_with(session_handle, prop, value)
 
 
-def test___session_opened___set_session_property_string___interpreter_called_with_args(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("get_system_property_double", "System.Version", 1.5),
+        ("get_system_property_string_array", "System.Devices", ["Dev1", "Chassis1"]),
+        ("get_system_property_uint64", "System.Timestamp", 12345678),
+    ],
+)
+def test___session_opened___get_system_property___returns_value(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
+    getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    session.set_session_property_string("Session.DefaultDevices", "Dev1")
+    result = getattr(session, method)(prop)
 
-    interpreter.set_session_property_string.assert_called_once_with(
-        session_handle, "Session.DefaultDevices", "Dev1"
-    )
-
-
-def test___session_opened___set_session_property_string_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_session_property_string_array("Session.Devices", ["Dev1", "Dev2"])
-
-    interpreter.set_session_property_string_array.assert_called_once_with(
-        session_handle, "Session.Devices", ["Dev1", "Dev2"]
-    )
-
-
-def test___session_opened___get_system_property_double___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_system_property_double.return_value = 1.5
-    session_handle = session._session_handle
-
-    result = session.get_system_property_double("System.Version")
-
-    interpreter.get_system_property_double.assert_called_once_with(
-        session_handle, "System.Version"
-    )
-    assert result == 1.5
-
-
-def test___session_opened___get_system_property_string_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_system_property_string_array.return_value = ["Dev1", "Chassis1"]
-    session_handle = session._session_handle
-
-    result = session.get_system_property_string_array("System.Devices")
-
-    interpreter.get_system_property_string_array.assert_called_once_with(
-        session_handle, "System.Devices"
-    )
-    assert result == ["Dev1", "Chassis1"]
-
-
-def test___session_opened___get_system_property_uint64___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_system_property_uint64.return_value = 12345678
-    session_handle = session._session_handle
-
-    result = session.get_system_property_uint64("System.Timestamp")
-
-    interpreter.get_system_property_uint64.assert_called_once_with(
-        session_handle, "System.Timestamp"
-    )
-    assert result == 12345678
+    getattr(interpreter, method).assert_called_once_with(session_handle, prop)
+    assert result == value
 
 
 def test___session_opened___set_system_property_double___interpreter_called_with_args(
@@ -1405,367 +676,65 @@ def test___session_opened___set_system_property_double___interpreter_called_with
     )
 
 
-def test___session_opened___get_generic_property_bool___returns_value(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("get_generic_property_bool", "Dev.IsPresent", False),
+        ("get_generic_property_bool_array", "Dev.Flags", [True, False]),
+        ("get_generic_property_double", "Dev.Temperature", 3.14),
+        ("get_generic_property_double_array", "Dev.Temperatures", [1.0, 2.0]),
+        ("get_generic_property_int32", "Dev.NumSlots", 3),
+        ("get_generic_property_int32_array", "Dev.Indices", [1, 2, 3]),
+        ("get_generic_property_int64", "Dev.Timestamp", 9999999999),
+        ("get_generic_property_int64_array", "Dev.Timestamps", [100, 200]),
+        ("get_generic_property_string", "Dev.ProductName", "SLSC-99999"),
+        ("get_generic_property_string_array", "Dev.Modules", ["Mod1", "Mod2"]),
+        ("get_generic_property_uint32", "Dev.Count", 255),
+        ("get_generic_property_uint32_array", "Dev.Counts", [10, 20]),
+        ("get_generic_property_uint64", "Dev.LargeCount", 18446744073709551615),
+        ("get_generic_property_uint64_array", "Dev.LargeCounts", [111, 222]),
+    ],
+)
+def test___session_opened___get_generic_property___returns_value(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
-    interpreter.get_generic_property_bool.return_value = False
+    getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = session.get_generic_property_bool("Dev1", "Dev.IsPresent")
+    result = getattr(session, method)("Dev1", prop)
 
-    interpreter.get_generic_property_bool.assert_called_once_with(
-        session_handle, "Dev1", "Dev.IsPresent"
-    )
-    assert result is False
+    getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", prop)
+    assert result == value
 
 
-def test___session_opened___get_generic_property_bool_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_bool_array.return_value = [True, False]
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_bool_array("Dev1", "Dev.Flags")
-
-    interpreter.get_generic_property_bool_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Flags"
-    )
-    assert result == [True, False]
-
-
-def test___session_opened___get_generic_property_double___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_double.return_value = 3.14
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_double("Dev1", "Dev.Temperature")
-
-    interpreter.get_generic_property_double.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Temperature"
-    )
-    assert result == 3.14
-
-
-def test___session_opened___get_generic_property_double_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_double_array.return_value = [1.0, 2.0]
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_double_array("Dev1", "Dev.Temperatures")
-
-    interpreter.get_generic_property_double_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Temperatures"
-    )
-    assert result == [1.0, 2.0]
-
-
-def test___session_opened___get_generic_property_int32___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_int32.return_value = 3
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_int32("Dev1", "Dev.NumSlots")
-
-    interpreter.get_generic_property_int32.assert_called_once_with(
-        session_handle, "Dev1", "Dev.NumSlots"
-    )
-    assert result == 3
-
-
-def test___session_opened___get_generic_property_int32_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_int32_array.return_value = [1, 2, 3]
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_int32_array("Dev1", "Dev.Indices")
-
-    interpreter.get_generic_property_int32_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Indices"
-    )
-    assert result == [1, 2, 3]
-
-
-def test___session_opened___get_generic_property_int64___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_int64.return_value = 9999999999
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_int64("Dev1", "Dev.Timestamp")
-
-    interpreter.get_generic_property_int64.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timestamp"
-    )
-    assert result == 9999999999
-
-
-def test___session_opened___get_generic_property_int64_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_int64_array.return_value = [100, 200]
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_int64_array("Dev1", "Dev.Timestamps")
-
-    interpreter.get_generic_property_int64_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timestamps"
-    )
-    assert result == [100, 200]
-
-
-def test___session_opened___get_generic_property_string___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_string.return_value = "SLSC-99999"
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_string("Dev1", "Dev.ProductName")
-
-    interpreter.get_generic_property_string.assert_called_once_with(
-        session_handle, "Dev1", "Dev.ProductName"
-    )
-    assert result == "SLSC-99999"
-
-
-def test___session_opened___get_generic_property_string_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_string_array.return_value = ["Mod1", "Mod2"]
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_string_array("Dev1", "Dev.Modules")
-
-    interpreter.get_generic_property_string_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Modules"
-    )
-    assert result == ["Mod1", "Mod2"]
-
-
-def test___session_opened___get_generic_property_uint32___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_uint32.return_value = 255
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_uint32("Dev1", "Dev.Count")
-
-    interpreter.get_generic_property_uint32.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Count"
-    )
-    assert result == 255
-
-
-def test___session_opened___get_generic_property_uint32_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_uint32_array.return_value = [10, 20]
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_uint32_array("Dev1", "Dev.Counts")
-
-    interpreter.get_generic_property_uint32_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Counts"
-    )
-    assert result == [10, 20]
-
-
-def test___session_opened___get_generic_property_uint64___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_uint64.return_value = 18446744073709551615
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_uint64("Dev1", "Dev.LargeCount")
-
-    interpreter.get_generic_property_uint64.assert_called_once_with(
-        session_handle, "Dev1", "Dev.LargeCount"
-    )
-    assert result == 18446744073709551615
-
-
-def test___session_opened___get_generic_property_uint64_array___returns_list(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.get_generic_property_uint64_array.return_value = [111, 222]
-    session_handle = session._session_handle
-
-    result = session.get_generic_property_uint64_array("Dev1", "Dev.LargeCounts")
-
-    interpreter.get_generic_property_uint64_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.LargeCounts"
-    )
-    assert result == [111, 222]
-
-
-def test___session_opened___set_generic_property_bool___interpreter_called_with_args(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, prop, value",
+    [
+        ("set_generic_property_bool", "Dev.Enabled", True),
+        ("set_generic_property_bool_array", "Dev.Flags", [True, False]),
+        ("set_generic_property_double", "Dev.Temperature", 3.14),
+        ("set_generic_property_double_array", "Dev.Temperatures", [1.0, 2.0]),
+        ("set_generic_property_int32", "Dev.Index", 42),
+        ("set_generic_property_int32_array", "Dev.Indices", [1, 2, 3]),
+        ("set_generic_property_int64", "Dev.Timestamp", 9999999999),
+        ("set_generic_property_int64_array", "Dev.Timestamps", [100, 200]),
+        ("set_generic_property_string", "Dev.Name", "NewName"),
+        ("set_generic_property_string_array", "Dev.Labels", ["a", "b"]),
+        ("set_generic_property_uint32", "Dev.Count", 255),
+        ("set_generic_property_uint32_array", "Dev.Counts", [10, 20]),
+        ("set_generic_property_uint64", "Dev.LargeCount", 18446744073709551615),
+        ("set_generic_property_uint64_array", "Dev.LargeCounts", [111, 222]),
+    ],
+)
+def test___session_opened___set_generic_property___interpreter_called_with_args(
+    interpreter: Mock, session: Session, method: str, prop: str, value: object
 ) -> None:
     session_handle = session._session_handle
 
-    session.set_generic_property_bool("Dev1", "Dev.Enabled", True)
+    getattr(session, method)("Dev1", prop, value)
 
-    interpreter.set_generic_property_bool.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Enabled", True
-    )
-
-
-def test___session_opened___set_generic_property_bool_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_bool_array("Dev1", "Dev.Flags", [True, False])
-
-    interpreter.set_generic_property_bool_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Flags", [True, False]
-    )
-
-
-def test___session_opened___set_generic_property_double___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_double("Dev1", "Dev.Temperature", 3.14)
-
-    interpreter.set_generic_property_double.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Temperature", 3.14
-    )
-
-
-def test___session_opened___set_generic_property_double_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_double_array("Dev1", "Dev.Temperatures", [1.0, 2.0])
-
-    interpreter.set_generic_property_double_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Temperatures", [1.0, 2.0]
-    )
-
-
-def test___session_opened___set_generic_property_int32___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_int32("Dev1", "Dev.Index", 42)
-
-    interpreter.set_generic_property_int32.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Index", 42
-    )
-
-
-def test___session_opened___set_generic_property_int32_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_int32_array("Dev1", "Dev.Indices", [1, 2, 3])
-
-    interpreter.set_generic_property_int32_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Indices", [1, 2, 3]
-    )
-
-
-def test___session_opened___set_generic_property_int64___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_int64("Dev1", "Dev.Timestamp", 9999999999)
-
-    interpreter.set_generic_property_int64.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timestamp", 9999999999
-    )
-
-
-def test___session_opened___set_generic_property_int64_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_int64_array("Dev1", "Dev.Timestamps", [100, 200])
-
-    interpreter.set_generic_property_int64_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Timestamps", [100, 200]
-    )
-
-
-def test___session_opened___set_generic_property_string___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_string("Dev1", "Dev.Name", "NewName")
-
-    interpreter.set_generic_property_string.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Name", "NewName"
-    )
-
-
-def test___session_opened___set_generic_property_string_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_string_array("Dev1", "Dev.Labels", ["a", "b"])
-
-    interpreter.set_generic_property_string_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Labels", ["a", "b"]
-    )
-
-
-def test___session_opened___set_generic_property_uint32___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_uint32("Dev1", "Dev.Count", 255)
-
-    interpreter.set_generic_property_uint32.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Count", 255
-    )
-
-
-def test___session_opened___set_generic_property_uint32_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_uint32_array("Dev1", "Dev.Counts", [10, 20])
-
-    interpreter.set_generic_property_uint32_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.Counts", [10, 20]
-    )
-
-
-def test___session_opened___set_generic_property_uint64___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_uint64("Dev1", "Dev.LargeCount", 18446744073709551615)
-
-    interpreter.set_generic_property_uint64.assert_called_once_with(
-        session_handle, "Dev1", "Dev.LargeCount", 18446744073709551615
-    )
-
-
-def test___session_opened___set_generic_property_uint64_array___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.set_generic_property_uint64_array("Dev1", "Dev.LargeCounts", [111, 222])
-
-    interpreter.set_generic_property_uint64_array.assert_called_once_with(
-        session_handle, "Dev1", "Dev.LargeCounts", [111, 222]
+    getattr(interpreter, method).assert_called_once_with(
+        session_handle, "Dev1", prop, value
     )
 
 
@@ -1805,95 +774,45 @@ def test___session_opened___execute_generic_command___interpreter_called_with_ar
     )
 
 
-def test___session_opened___read_register_uint8___returns_value(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, address, value",
+    [
+        ("read_register_uint8", 0x00, 0xFF),
+        ("read_register_uint16", 0x02, 0xFFFF),
+        ("read_register_uint32", 0x04, 0xDEADBEEF),
+        ("read_register_uint64", 0x08, 0xDEADBEEFCAFEBABE),
+    ],
+)
+def test___session_opened___read_register___returns_value(
+    interpreter: Mock, session: Session, method: str, address: int, value: int
 ) -> None:
-    interpreter.read_register_uint8.return_value = 0xFF
+    getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = session.read_register_uint8("Dev1", 0x00)
+    result = getattr(session, method)("Dev1", address)
 
-    interpreter.read_register_uint8.assert_called_once_with(session_handle, "Dev1", 0x00)
-    assert result == 0xFF
-
-
-def test___session_opened___read_register_uint16___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.read_register_uint16.return_value = 0xFFFF
-    session_handle = session._session_handle
-
-    result = session.read_register_uint16("Dev1", 0x02)
-
-    interpreter.read_register_uint16.assert_called_once_with(session_handle, "Dev1", 0x02)
-    assert result == 0xFFFF
+    getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", address)
+    assert result == value
 
 
-def test___session_opened___read_register_uint32___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.read_register_uint32.return_value = 0xDEADBEEF
-    session_handle = session._session_handle
-
-    result = session.read_register_uint32("Dev1", 0x04)
-
-    interpreter.read_register_uint32.assert_called_once_with(session_handle, "Dev1", 0x04)
-    assert result == 0xDEADBEEF
-
-
-def test___session_opened___read_register_uint64___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.read_register_uint64.return_value = 0xDEADBEEFCAFEBABE
-    session_handle = session._session_handle
-
-    result = session.read_register_uint64("Dev1", 0x08)
-
-    interpreter.read_register_uint64.assert_called_once_with(session_handle, "Dev1", 0x08)
-    assert result == 0xDEADBEEFCAFEBABE
-
-
-def test___session_opened___write_register_uint8___interpreter_called_with_args(
-    interpreter: Mock, session: Session
+@pytest.mark.parametrize(
+    "method, address, value",
+    [
+        ("write_register_uint8", 0x00, 0xAB),
+        ("write_register_uint16", 0x02, 0xABCD),
+        ("write_register_uint32", 0x04, 0xDEADBEEF),
+        ("write_register_uint64", 0x08, 0xDEADBEEFCAFEBABE),
+    ],
+)
+def test___session_opened___write_register___interpreter_called_with_args(
+    interpreter: Mock, session: Session, method: str, address: int, value: int
 ) -> None:
     session_handle = session._session_handle
 
-    session.write_register_uint8("Dev1", 0x00, 0xAB)
+    getattr(session, method)("Dev1", address, value)
 
-    interpreter.write_register_uint8.assert_called_once_with(session_handle, "Dev1", 0x00, 0xAB)
-
-
-def test___session_opened___write_register_uint16___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.write_register_uint16("Dev1", 0x02, 0xABCD)
-
-    interpreter.write_register_uint16.assert_called_once_with(session_handle, "Dev1", 0x02, 0xABCD)
-
-
-def test___session_opened___write_register_uint32___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.write_register_uint32("Dev1", 0x04, 0xDEADBEEF)
-
-    interpreter.write_register_uint32.assert_called_once_with(
-        session_handle, "Dev1", 0x04, 0xDEADBEEF
-    )
-
-
-def test___session_opened___write_register_uint64___interpreter_called_with_args(
-    interpreter: Mock, session: Session
-) -> None:
-    session_handle = session._session_handle
-
-    session.write_register_uint64("Dev1", 0x08, 0xDEADBEEFCAFEBABE)
-
-    interpreter.write_register_uint64.assert_called_once_with(
-        session_handle, "Dev1", 0x08, 0xDEADBEEFCAFEBABE
+    getattr(interpreter, method).assert_called_once_with(
+        session_handle, "Dev1", address, value
     )
 
 

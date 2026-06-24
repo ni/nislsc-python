@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from nislsc import Property, Session
 
 
-def test___open_device_property___property_handle_set(
+def test___session_opened___open_device_property___property_handle_set(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -17,7 +17,7 @@ def test___open_device_property___property_handle_set(
         )
 
 
-def test___open_device_property___session_reference_stored(
+def test___session_opened___open_device_property___session_reference_stored(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -27,7 +27,7 @@ def test___open_device_property___session_reference_stored(
         assert prop._interpreter is session._interpreter
 
 
-def test___open_physical_channel_property___property_handle_set(
+def test___session_opened___open_physical_channel_property___property_handle_set(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_physical_channel_property.return_value = 601
@@ -41,7 +41,7 @@ def test___open_physical_channel_property___property_handle_set(
         )
 
 
-def test___open_driver_defined_property___property_handle_set(
+def test___session_opened___open_driver_defined_property___property_handle_set(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_driver_defined_property.return_value = 602
@@ -53,7 +53,7 @@ def test___open_driver_defined_property___property_handle_set(
         )
 
 
-def test___open_generic_property___property_handle_set(
+def test___session_opened___open_generic_property___property_handle_set(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_generic_property.return_value = 603
@@ -67,7 +67,7 @@ def test___open_generic_property___property_handle_set(
         )
 
 
-def test___close___close_property_called_with_handle(
+def test___session_opened___close___close_property_called_with_handle(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -79,7 +79,7 @@ def test___close___close_property_called_with_handle(
     assert prop._property_handle == 0
 
 
-def test___close_twice___close_property_called_once(
+def test___session_opened___close_twice___close___close_property_called_once(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -91,7 +91,7 @@ def test___close_twice___close_property_called_once(
     interpreter.close_property.assert_called_once_with(600)
 
 
-def test___context_manager___close_property_called_on_exit(
+def test___context_manager___close___close_property_called_on_exit(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -102,7 +102,7 @@ def test___context_manager___close_property_called_on_exit(
     interpreter.close_property.assert_called_once_with(600)
 
 
-def test___get_property_property_bool___returns_value(
+def test___property_opened___get_property_property_bool___returns_value(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -115,7 +115,7 @@ def test___get_property_property_bool___returns_value(
     assert result is True
 
 
-def test___get_property_property_int32___returns_value(
+def test___property_opened___get_property_property_int32___returns_value(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -128,7 +128,7 @@ def test___get_property_property_int32___returns_value(
     assert result == 3
 
 
-def test___get_property_property_int32_array___returns_list(
+def test___property_opened___get_property_property_int32_array___returns_list(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -143,7 +143,7 @@ def test___get_property_property_int32_array___returns_list(
     assert result == [1, 2, 3]
 
 
-def test___get_property_property_string___returns_value(
+def test___property_opened___get_property_property_string___returns_value(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
@@ -156,7 +156,7 @@ def test___get_property_property_string___returns_value(
     assert result == "Serial number of the device."
 
 
-def test___get_property_property_string_array___returns_list(
+def test___property_opened___get_property_property_string_array___returns_list(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600

@@ -15,14 +15,14 @@ def test___init___initialize_library_called_with_version(interpreter: Mock) -> N
         assert lib._interpreter._library_handle == 42
 
 
-def test___init_default_language___current_thread_locale(interpreter: Mock) -> None:
+def test___init___language_is_current_thread_locale(interpreter: Mock) -> None:
     expect_initialize_library(interpreter)
 
     with Library() as lib:
         assert lib.language == Language.CURRENT_THREAD_LOCALE
 
 
-def test___init_with_language___language_set_on_interpreter(interpreter: Mock) -> None:
+def test___language_provided___init___language_set_on_interpreter(interpreter: Mock) -> None:
     expect_initialize_library(interpreter)
 
     with Library(Language.ENGLISH) as lib:
@@ -30,7 +30,7 @@ def test___init_with_language___language_set_on_interpreter(interpreter: Mock) -
         assert lib._interpreter._language == Language.ENGLISH
 
 
-def test___close___finalize_library_called_with_handle(interpreter: Mock) -> None:
+def test___library_opened___close___finalize_library_called_with_handle(interpreter: Mock) -> None:
     expect_initialize_library(interpreter, 42)
     lib = Library()
 
@@ -40,7 +40,7 @@ def test___close___finalize_library_called_with_handle(interpreter: Mock) -> Non
     assert lib._interpreter._library_handle == 0
 
 
-def test___close_twice___finalize_library_called_once(interpreter: Mock) -> None:
+def test___library_opened___close_twice___close___finalize_library_called_once(interpreter: Mock) -> None:
     expect_initialize_library(interpreter, 42)
     lib = Library()
 
@@ -50,7 +50,7 @@ def test___close_twice___finalize_library_called_once(interpreter: Mock) -> None
     interpreter.finalize_library.assert_called_once_with(42)
 
 
-def test___context_manager___finalize_library_called_on_exit(interpreter: Mock) -> None:
+def test___context_manager___close___finalize_library_called_on_exit(interpreter: Mock) -> None:
     expect_initialize_library(interpreter, 42)
 
     with Library() as lib:
@@ -59,7 +59,7 @@ def test___context_manager___finalize_library_called_on_exit(interpreter: Mock) 
     interpreter.finalize_library.assert_called_once_with(42)
 
 
-def test___language_setter___updates_interpreter_language(interpreter: Mock) -> None:
+def test___library_opened___set_language___updates_interpreter_language(interpreter: Mock) -> None:
     expect_initialize_library(interpreter)
 
     with Library() as lib:
@@ -69,7 +69,7 @@ def test___language_setter___updates_interpreter_language(interpreter: Mock) -> 
         assert lib._interpreter._language == Language.JAPANESE
 
 
-def test___get_error_description___delegates_to_interpreter(interpreter: Mock) -> None:
+def test___library_opened___get_error_description___delegates_to_interpreter(interpreter: Mock) -> None:
     expect_initialize_library(interpreter, 1)
     interpreter.get_error_description.return_value = "Device not found."
 
@@ -80,7 +80,7 @@ def test___get_error_description___delegates_to_interpreter(interpreter: Mock) -
     assert result == "Device not found."
 
 
-def test___get_error_description_with_language___passes_language_to_interpreter(
+def test___language_provided___get_error_description___passes_language_to_interpreter(
     interpreter: Mock,
 ) -> None:
     expect_initialize_library(interpreter, 1)

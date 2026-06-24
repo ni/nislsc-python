@@ -77,6 +77,17 @@ def test___open_device_command_open___close_twice___close_command_called_once(
     interpreter.close_command.assert_called_once_with(500)
 
 
+def test___open_device_command_open___close_command___interpreter_close_command_called(
+    interpreter: Mock, session: Session
+) -> None:
+    interpreter.open_device_command.return_value = 500
+    cmd = Command.open_device_command(session, "Dev1", "Reset")
+
+    cmd.close_command()
+
+    interpreter.close_command.assert_called_once_with(500)
+
+
 def test___open_device_command_open___context_manager___close_command_called_on_exit(
     interpreter: Mock, session: Session
 ) -> None:

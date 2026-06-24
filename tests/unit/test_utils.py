@@ -2,7 +2,18 @@ from __future__ import annotations
 
 from unittest.mock import Mock
 
-from nislsc.utils import flatten_names, unflatten_names
+from nislsc.utils import flatten_names, get_library_version, unflatten_names
+
+
+def test___interpreter_available___get_library_version___delegates_to_interpreter(
+    interpreter: Mock,
+) -> None:
+    interpreter.get_library_version.return_value = 1
+
+    result = get_library_version()
+
+    interpreter.get_library_version.assert_called_once_with()
+    assert result == 1
 
 
 def test___flatten_names___delegates_to_interpreter(interpreter: Mock) -> None:

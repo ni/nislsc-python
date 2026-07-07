@@ -89,7 +89,7 @@ def test___slscwarning___known_warning_code___error_code_stored() -> None:
 
 
 def test___slscwarning___error_code_as_string___coerced_to_int() -> None:
-    w = SLSCWarning("Scaling timestamp outdated.", "250800")  # type: ignore[arg-type]
+    w = SLSCWarning("Scaling timestamp outdated.", "250800")
 
     assert w.error_code == 250800
     assert isinstance(w.error_code, int)

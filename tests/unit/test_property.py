@@ -58,9 +58,7 @@ def test___session_opened___open_generic_property___property_handle_set(
 ) -> None:
     interpreter.open_generic_property.return_value = 603
 
-    with Property.open_generic_property(
-        session, "$DefaultDevices", "Dev.SomeProp"
-    ) as prop:
+    with Property.open_generic_property(session, "$DefaultDevices", "Dev.SomeProp") as prop:
         assert prop._property_handle == 603
         interpreter.open_generic_property.assert_called_once_with(
             session._session_handle, "$DefaultDevices", "Dev.SomeProp"
@@ -137,9 +135,7 @@ def test___property_opened___get_property_property_int32_array___returns_list(
     with Property.open_device_property(session, "Dev1", "Dev.SomeProp") as prop:
         result = prop.get_property_property_int32_array("Prop.EnumValues")
 
-    interpreter.get_property_property_int32_array.assert_called_once_with(
-        600, "Prop.EnumValues"
-    )
+    interpreter.get_property_property_int32_array.assert_called_once_with(600, "Prop.EnumValues")
     assert result == [1, 2, 3]
 
 
@@ -160,12 +156,13 @@ def test___property_opened___get_property_property_string_array___returns_list(
     interpreter: Mock, session: Session
 ) -> None:
     interpreter.open_device_property.return_value = 600
-    interpreter.get_property_property_string_array.return_value = ["ReadOnly", "ReadWrite"]
+    interpreter.get_property_property_string_array.return_value = [
+        "ReadOnly",
+        "ReadWrite",
+    ]
 
     with Property.open_device_property(session, "Dev1", "Dev.SomeProp") as prop:
         result = prop.get_property_property_string_array("Prop.EnumStrings")
 
-    interpreter.get_property_property_string_array.assert_called_once_with(
-        600, "Prop.EnumStrings"
-    )
+    interpreter.get_property_property_string_array.assert_called_once_with(600, "Prop.EnumStrings")
     assert result == ["ReadOnly", "ReadWrite"]

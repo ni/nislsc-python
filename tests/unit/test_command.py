@@ -32,9 +32,7 @@ def test___session_with_physical_channel___open_physical_channel_command___comma
 ) -> None:
     interpreter.open_physical_channel_command.return_value = 501
 
-    with Command.open_physical_channel_command(
-        session, "Dev1/phys0", "SomeCmd"
-    ) as cmd:
+    with Command.open_physical_channel_command(session, "Dev1/phys0", "SomeCmd") as cmd:
         assert cmd._command_handle == 501
         interpreter.open_physical_channel_command.assert_called_once_with(
             session._session_handle, "Dev1/phys0", "SomeCmd"

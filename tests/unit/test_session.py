@@ -64,10 +64,15 @@ def test___library_provided___initialize_session_with_devices___interpreter_call
         library, "Dev1,Dev2", 5.0, ReservationAccess.READ_WRITE, "MyGroup", 10.0
     ):
         interpreter.initialize_session_with_devices.assert_called_once_with(
-            library_handle, "Dev1,Dev2", 5.0, ReservationAccess.READ_WRITE, "MyGroup", 10.0
+            library_handle,
+            "Dev1,Dev2",
+            5.0,
+            ReservationAccess.READ_WRITE,
+            "MyGroup",
+            10.0,
         )
 
-        
+
 def test___interpreter_raises_error___initialize_session_with_devices___slsc_error_propagated(
     interpreter: Mock, library: Library
 ) -> None:
@@ -273,7 +278,9 @@ def test___close_does_not_own_library___close___finalize_library_not_called(
     interpreter.finalize_library.assert_not_called()
 
 
-def test___session_opened___abort_session___interpreter_called(interpreter: Mock, session: Session) -> None:
+def test___session_opened___abort_session___interpreter_called(
+    interpreter: Mock, session: Session
+) -> None:
     session_handle = session._session_handle
 
     session.abort_session()
@@ -281,7 +288,9 @@ def test___session_opened___abort_session___interpreter_called(interpreter: Mock
     interpreter.abort_session.assert_called_once_with(session_handle)
 
 
-def test___session_opened___log_in___interpreter_called_with_args(interpreter: Mock, session: Session) -> None:
+def test___session_opened___log_in___interpreter_called_with_args(
+    interpreter: Mock, session: Session
+) -> None:
     session_handle = session._session_handle
 
     session.log_in("Chassis1", "admin", "secret", 10.0, False)
@@ -470,32 +479,105 @@ def test___session_opened___set_device_property___interpreter_called_with_args(
 
     getattr(session, method)("Dev1", prop, value)
 
-    getattr(interpreter, method).assert_called_once_with(
-        session_handle, "Dev1", prop, value
-    )
+    getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", prop, value)
 
 
 @pytest.mark.parametrize(
     "method, resource, prop, value",
     [
-        ("get_physical_channel_property_bool", "Dev1/phys0", "PhysChan.IsActive", False),
-        ("get_physical_channel_property_bool_array", "Dev1/phys0", "PhysChan.Flags", [True, False]),
-        ("get_physical_channel_property_double", "Dev1/phys0", "PhysChan.Gain", 3.14),
-        ("get_physical_channel_property_double_array", "Dev1/phys0", "PhysChan.Gains", [1.0, 2.0]),
-        ("get_physical_channel_property_int32", "Dev1/phys0", "PhysChan.Index", 4),
-        ("get_physical_channel_property_int32_array", "Dev1/phys0", "PhysChan.Indices", [1, 2, 3]),
-        ("get_physical_channel_property_int64", "Dev1/phys0", "PhysChan.Timestamp", 9999999999),
-        ("get_physical_channel_property_int64_array", "Dev1/phys0", "PhysChan.Timestamps", [100, 200]),
-        ("get_physical_channel_property_string", "Dev1/phys0", "PhysChan.Name", "load0"),
-        ("get_physical_channel_property_string_array", "Dev1", "PhysChan.PhysicalChannels", ["load0", "load1"]),
-        ("get_physical_channel_property_uint32", "Dev1/phys0", "PhysChan.Count", 255),
-        ("get_physical_channel_property_uint32_array", "Dev1/phys0", "PhysChan.Counts", [10, 20]),
-        ("get_physical_channel_property_uint64", "Dev1/phys0", "PhysChan.LargeCount", 18446744073709551615),
-        ("get_physical_channel_property_uint64_array", "Dev1/phys0", "PhysChan.LargeCounts", [111, 222]),
+        (
+            "get_physical_channel_property_bool",
+            "Dev1/phys0",
+            "PhysChan.IsActive",
+            False,
+        ),
+        (
+            "get_physical_channel_property_bool_array",
+            "Dev1/phys0",
+            "PhysChan.Flags",
+            [True, False],
+        ),
+        (
+            "get_physical_channel_property_double",
+            "Dev1/phys0",
+            "PhysChan.Gain",
+            3.14,
+        ),
+        (
+            "get_physical_channel_property_double_array",
+            "Dev1/phys0",
+            "PhysChan.Gains",
+            [1.0, 2.0],
+        ),
+        (
+            "get_physical_channel_property_int32",
+            "Dev1/phys0",
+            "PhysChan.Index",
+            4,
+        ),
+        (
+            "get_physical_channel_property_int32_array",
+            "Dev1/phys0",
+            "PhysChan.Indices",
+            [1, 2, 3],
+        ),
+        (
+            "get_physical_channel_property_int64",
+            "Dev1/phys0",
+            "PhysChan.Timestamp",
+            9999999999,
+        ),
+        (
+            "get_physical_channel_property_int64_array",
+            "Dev1/phys0",
+            "PhysChan.Timestamps",
+            [100, 200],
+        ),
+        (
+            "get_physical_channel_property_string",
+            "Dev1/phys0",
+            "PhysChan.Name",
+            "load0",
+        ),
+        (
+            "get_physical_channel_property_string_array",
+            "Dev1",
+            "PhysChan.PhysicalChannels",
+            ["load0", "load1"],
+        ),
+        (
+            "get_physical_channel_property_uint32",
+            "Dev1/phys0",
+            "PhysChan.Count",
+            255,
+        ),
+        (
+            "get_physical_channel_property_uint32_array",
+            "Dev1/phys0",
+            "PhysChan.Counts",
+            [10, 20],
+        ),
+        (
+            "get_physical_channel_property_uint64",
+            "Dev1/phys0",
+            "PhysChan.LargeCount",
+            18446744073709551615,
+        ),
+        (
+            "get_physical_channel_property_uint64_array",
+            "Dev1/phys0",
+            "PhysChan.LargeCounts",
+            [111, 222],
+        ),
     ],
 )
 def test___session_opened___get_physical_channel_property___returns_value(
-    interpreter: Mock, session: Session, method: str, resource: str, prop: str, value: object
+    interpreter: Mock,
+    session: Session,
+    method: str,
+    resource: str,
+    prop: str,
+    value: object,
 ) -> None:
     getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
@@ -509,20 +591,76 @@ def test___session_opened___get_physical_channel_property___returns_value(
 @pytest.mark.parametrize(
     "method, prop, value",
     [
-        ("set_physical_channel_property_bool", "PhysChan.Enabled", True),
-        ("set_physical_channel_property_bool_array", "PhysChan.Flags", [True, False]),
-        ("set_physical_channel_property_double", "PhysChan.Gain", 3.14),
-        ("set_physical_channel_property_double_array", "PhysChan.Gains", [1.0, 2.0]),
-        ("set_physical_channel_property_int32", "PhysChan.Index", 7),
-        ("set_physical_channel_property_int32_array", "PhysChan.Indices", [1, 2]),
-        ("set_physical_channel_property_int64", "PhysChan.Timestamp", 9999999999),
-        ("set_physical_channel_property_int64_array", "PhysChan.Timestamps", [100, 200]),
-        ("set_physical_channel_property_string", "PhysChan.Label", "MyLabel"),
-        ("set_physical_channel_property_string_array", "PhysChan.Labels", ["x", "y"]),
-        ("set_physical_channel_property_uint32", "PhysChan.Count", 255),
-        ("set_physical_channel_property_uint32_array", "PhysChan.Counts", [10, 20]),
-        ("set_physical_channel_property_uint64", "PhysChan.LargeCount", 18446744073709551615),
-        ("set_physical_channel_property_uint64_array", "PhysChan.LargeCounts", [111, 222]),
+        (
+            "set_physical_channel_property_bool",
+            "PhysChan.Enabled",
+            True,
+        ),
+        (
+            "set_physical_channel_property_bool_array",
+            "PhysChan.Flags",
+            [True, False],
+        ),
+        (
+            "set_physical_channel_property_double",
+            "PhysChan.Gain",
+            3.14,
+        ),
+        (
+            "set_physical_channel_property_double_array",
+            "PhysChan.Gains",
+            [1.0, 2.0],
+        ),
+        (
+            "set_physical_channel_property_int32",
+            "PhysChan.Index",
+            7,
+        ),
+        (
+            "set_physical_channel_property_int32_array",
+            "PhysChan.Indices",
+            [1, 2],
+        ),
+        (
+            "set_physical_channel_property_int64",
+            "PhysChan.Timestamp",
+            9999999999,
+        ),
+        (
+            "set_physical_channel_property_int64_array",
+            "PhysChan.Timestamps",
+            [100, 200],
+        ),
+        (
+            "set_physical_channel_property_string",
+            "PhysChan.Label",
+            "MyLabel",
+        ),
+        (
+            "set_physical_channel_property_string_array",
+            "PhysChan.Labels",
+            ["x", "y"],
+        ),
+        (
+            "set_physical_channel_property_uint32",
+            "PhysChan.Count",
+            255,
+        ),
+        (
+            "set_physical_channel_property_uint32_array",
+            "PhysChan.Counts",
+            [10, 20],
+        ),
+        (
+            "set_physical_channel_property_uint64",
+            "PhysChan.LargeCount",
+            18446744073709551615,
+        ),
+        (
+            "set_physical_channel_property_uint64_array",
+            "PhysChan.LargeCounts",
+            [111, 222],
+        ),
     ],
 )
 def test___session_opened___set_physical_channel_property___interpreter_called_with_args(
@@ -532,9 +670,7 @@ def test___session_opened___set_physical_channel_property___interpreter_called_w
 
     getattr(session, method)("Dev1/phys0", prop, value)
 
-    getattr(interpreter, method).assert_called_once_with(
-        session_handle, "Dev1/phys0", prop, value
-    )
+    getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1/phys0", prop, value)
 
 
 def test___session_opened___commit_properties_for_devices___interpreter_called_with_args(
@@ -544,9 +680,7 @@ def test___session_opened___commit_properties_for_devices___interpreter_called_w
 
     session.commit_properties_for_devices("Dev1")
 
-    interpreter.commit_properties_for_devices.assert_called_once_with(
-        session_handle, "Dev1"
-    )
+    interpreter.commit_properties_for_devices.assert_called_once_with(session_handle, "Dev1")
 
 
 def test___session_opened___commit_properties_for_physical_channels___interpreter_called_with_args(
@@ -578,9 +712,7 @@ def test___session_opened___commit_properties_generic___interpreter_called_with_
 
     session.commit_properties_generic("$DefaultDevices")
 
-    interpreter.commit_properties_generic.assert_called_once_with(
-        session_handle, "$DefaultDevices"
-    )
+    interpreter.commit_properties_generic.assert_called_once_with(session_handle, "$DefaultDevices")
 
 
 @pytest.mark.parametrize(
@@ -733,9 +865,7 @@ def test___session_opened___set_generic_property___interpreter_called_with_args(
 
     getattr(session, method)("Dev1", prop, value)
 
-    getattr(interpreter, method).assert_called_once_with(
-        session_handle, "Dev1", prop, value
-    )
+    getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", prop, value)
 
 
 def test___session_opened___execute_device_command___interpreter_called_with_args(
@@ -811,9 +941,7 @@ def test___session_opened___write_register___interpreter_called_with_args(
 
     getattr(session, method)("Dev1", address, value)
 
-    getattr(interpreter, method).assert_called_once_with(
-        session_handle, "Dev1", address, value
-    )
+    getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", address, value)
 
 
 def test___session_opened___get_nvmem_bytes___returns_value(
@@ -877,9 +1005,7 @@ def test___session_opened___commit_nvmem_generic___interpreter_called_with_args(
 
     session.commit_nvmem_generic("$DefaultDevices")
 
-    interpreter.commit_nvmem_generic.assert_called_once_with(
-        session_handle, "$DefaultDevices"
-    )
+    interpreter.commit_nvmem_generic.assert_called_once_with(session_handle, "$DefaultDevices")
 
 
 def test___session_opened___get_linear_scaling_parameters___returns_value(
@@ -890,9 +1016,7 @@ def test___session_opened___get_linear_scaling_parameters___returns_value(
 
     result = session.get_linear_scaling_parameters("Dev1/phys0")
 
-    interpreter.get_linear_scaling_parameters.assert_called_once_with(
-        session_handle, "Dev1/phys0"
-    )
+    interpreter.get_linear_scaling_parameters.assert_called_once_with(session_handle, "Dev1/phys0")
     assert result == (2.0, 0.5)
 
 
@@ -918,16 +1042,17 @@ def test___session_opened___get_table_scaling_parameters___returns_value(
 
     result = session.get_table_scaling_parameters("Dev1/phys0")
 
-    interpreter.get_table_scaling_parameters.assert_called_once_with(
-        session_handle, "Dev1/phys0"
-    )
+    interpreter.get_table_scaling_parameters.assert_called_once_with(session_handle, "Dev1/phys0")
     assert result == ([0.0, 1.0], [0.0, 10.0], 0)
 
 
 def test___session_opened___get_user_defined_scaling_parameters___returns_value(
     interpreter: Mock, session: Session
 ) -> None:
-    interpreter.get_user_defined_scaling_parameters.return_value = (["gain", "offset"], [2.0, 0.5])
+    interpreter.get_user_defined_scaling_parameters.return_value = (
+        ["gain", "offset"],
+        [2.0, 0.5],
+    )
     session_handle = session._session_handle
 
     result = session.get_user_defined_scaling_parameters("Dev1/phys0")
@@ -1022,9 +1147,7 @@ def test___session_opened___set_user_defined_scaling_equation___interpreter_call
 ) -> None:
     session_handle = session._session_handle
 
-    session.set_user_defined_scaling_equation(
-        "Dev1/phys0", "gain * x + offset", "SN001", "pass"
-    )
+    session.set_user_defined_scaling_equation("Dev1/phys0", "gain * x + offset", "SN001", "pass")
 
     interpreter.set_user_defined_scaling_equation.assert_called_once_with(
         session_handle, "Dev1/phys0", "gain * x + offset", "SN001", "pass"

@@ -16,7 +16,9 @@ def test___interpreter_available___get_library_version___delegates_to_interprete
     assert result == 1
 
 
-def test___flatten_names___delegates_to_interpreter(interpreter: Mock) -> None:
+def test___flatten_names___delegates_to_interpreter(
+    interpreter: Mock,
+) -> None:
     interpreter.flatten_names.return_value = "Mod1,Mod2,Chassis"
 
     result = flatten_names(["Mod1", "Mod2", "Chassis"])
@@ -32,13 +34,13 @@ def test___flatten_names___consecutive_physical_channels___collapses_to_range(
 
     result = flatten_names(["Mod1/load0", "Mod1/load1", "Mod1/load2"])
 
-    interpreter.flatten_names.assert_called_once_with(
-        ["Mod1/load0", "Mod1/load1", "Mod1/load2"]
-    )
+    interpreter.flatten_names.assert_called_once_with(["Mod1/load0", "Mod1/load1", "Mod1/load2"])
     assert result == "Mod1/load0:2"
 
 
-def test___flatten_names___single_name___returns_that_name(interpreter: Mock) -> None:
+def test___flatten_names___single_name___returns_that_name(
+    interpreter: Mock,
+) -> None:
     interpreter.flatten_names.return_value = "Dev1"
 
     result = flatten_names(["Dev1"])
@@ -47,7 +49,9 @@ def test___flatten_names___single_name___returns_that_name(interpreter: Mock) ->
     assert result == "Dev1"
 
 
-def test___unflatten_names___delegates_to_interpreter(interpreter: Mock) -> None:
+def test___unflatten_names___delegates_to_interpreter(
+    interpreter: Mock,
+) -> None:
     interpreter.unflatten_names.return_value = ["Mod1", "Mod2", "Chassis"]
 
     result = unflatten_names("Mod1,Mod2,Chassis")
@@ -56,7 +60,9 @@ def test___unflatten_names___delegates_to_interpreter(interpreter: Mock) -> None
     assert result == ["Mod1", "Mod2", "Chassis"]
 
 
-def test___unflatten_names___range_syntax___expands_to_list(interpreter: Mock) -> None:
+def test___unflatten_names___range_syntax___expands_to_list(
+    interpreter: Mock,
+) -> None:
     interpreter.unflatten_names.return_value = [
         "Mod1/load0",
         "Mod1/load1",
@@ -80,7 +86,9 @@ def test___unflatten_names___single_name___returns_single_element_list(
     assert result == ["Dev1"]
 
 
-def test___flatten_names___empty_list___returns_empty_string(interpreter: Mock) -> None:
+def test___flatten_names___empty_list___returns_empty_string(
+    interpreter: Mock,
+) -> None:
     interpreter.flatten_names.return_value = ""
 
     result = flatten_names([])
@@ -89,7 +97,9 @@ def test___flatten_names___empty_list___returns_empty_string(interpreter: Mock) 
     assert result == ""
 
 
-def test___unflatten_names___empty_string___returns_empty_list(interpreter: Mock) -> None:
+def test___unflatten_names___empty_string___returns_empty_list(
+    interpreter: Mock,
+) -> None:
     interpreter.unflatten_names.return_value = []
 
     result = unflatten_names("")

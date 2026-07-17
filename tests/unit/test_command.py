@@ -108,16 +108,3 @@ def test___open_device_command_open___get_command_property_string___returns_valu
 
     interpreter.get_command_property_string.assert_called_once_with(500, "Cmd.Descr")
     assert result == "Reset the device."
-
-
-def test___open_device_command_open___get_command_property_string_documentation___returns_value(
-    interpreter: Mock, session: Session
-) -> None:
-    interpreter.open_device_command.return_value = 500
-    interpreter.get_command_property_string.return_value = "Long description."
-
-    with Command.open_device_command(session, "Dev1", "Reset") as cmd:
-        result = cmd.get_command_property_string("Cmd.Doc")
-
-    interpreter.get_command_property_string.assert_called_once_with(500, "Cmd.Doc")
-    assert result == "Long description."

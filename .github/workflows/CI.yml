@@ -14,19 +14,20 @@ jobs:
   check_docs:
     name: Check docs
     uses: ./.github/workflows/check_docs.yml
-  # run_unit_tests:
-  #   name: Run unit tests
-  #   uses: ./.github/workflows/run_unit_tests.yml
-  #   needs: [build]
+  run_unit_tests:
+     name: Run unit tests
+     uses: ./.github/workflows/run_unit_tests.yml
+     needs: [build]
   # run_system_tests:
   #   name: Run system tests
   #   uses: ./.github/workflows/run_system_tests.yml
   #   needs: [build, run_unit_tests]
-  # report_test_results:
-  #   name: Report test results
-  #   uses: ./.github/workflows/report_test_results.yml
-  #   needs: [run_unit_tests, run_system_tests]
-  #   if: always()
-  #   permissions:
-  #     checks: write
-  #     pull-requests: write
+  report_test_results:
+     name: Report test results
+     uses: ./.github/workflows/report_test_results.yml
+     needs: [run_unit_tests]
+     if: always()
+     permissions:
+       contents: read
+       checks: write
+       pull-requests: write

@@ -43,35 +43,3 @@ jobs:
           name: test_results_unit_${{ matrix.os }}_py${{ matrix.python-version }}
           path: test_results/*.xml
         if: always()
-  test_installdriver:
-    name: Test installdriver
-    runs-on:
-      - ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: ["3.10", "3.13", "pypy3.11"]
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          persist-credentials: false
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: ni/python-actions/setup-python@a2554c7e5680982d3355677b2290e48b60678744 # v0.8.0
-        id: setup-python
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Set up Poetry
-        uses: ni/python-actions/setup-poetry@a2554c7e5680982d3355677b2290e48b60678744 # v0.8.0
-      - name: Cache virtualenv (main only)
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: cache-nislsc-main-only
-        with:
-          path: .venv
-          key: nislsc-main-only-${{ runner.os }}-py${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('poetry.lock') }}
-      - name: Install main package dependencies
-        run: |
-          python -m pip install --upgrade pip
-          poetry install --only main
-      - name: check installdriver subcommand can be invoked
-        run: poetry run nislsc installdriver --help

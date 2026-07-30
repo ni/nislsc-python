@@ -7,6 +7,10 @@ on:
       - 'releases/**'
   workflow_call:
   workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build
@@ -24,6 +28,7 @@ jobs:
     name: Checks succeeded
     needs: [build, check_docs, check_workflows]
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - run: exit 0
   run_unit_tests:

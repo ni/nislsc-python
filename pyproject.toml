@@ -36,6 +36,7 @@ packages = [{ include = "nislsc", from = "generated" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+typing_extensions = ">=4.0"
 
 
 [tool.poetry.group.codegen.dependencies]

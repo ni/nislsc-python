@@ -30,9 +30,6 @@ env:
       }
     }
 
-permissions:
-  contents: read
-  
 jobs:
   check_nislsc:
     name: Check nislsc

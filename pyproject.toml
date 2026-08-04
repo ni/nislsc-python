@@ -36,6 +36,7 @@ packages = [{ include = "nislsc", from = "generated" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+typing_extensions = ">=4.0"
 
 
 [tool.poetry.group.codegen.dependencies]
@@ -62,7 +63,11 @@ bandit = ">=1.8.6"
 
 
 [tool.poetry.group.test.dependencies]
-pytest = ">=8.3.4"
+# Pin Python 3.10 to pytest 8.3.4 so exceptiongroup is installed and exceptiongroup-related errors are avoided.
+pytest = [
+  { version = ">=8.3.4,<9", python = "<3.11" },
+  { version = ">=8.3.4",    python = ">=3.11" },
+]
 pytest-mock = ">=3.14"
 pytest-cov = ">=6"
 

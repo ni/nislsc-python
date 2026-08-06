@@ -67,7 +67,7 @@ class Session:
             self._owns_library = False
 
     @classmethod
-    def initialize_session_with_devices(cls, library: Library | None, device_names: str, reservation_access: ReservationAccess, reservation_group: str, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
+    def initialize_session_with_devices(cls, device_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
         """Initialize an SLSC session with one or multiple devices.
         
         The session opens network connections for devices. If reservationAccess
@@ -110,7 +110,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_with_nvmem_areas(cls, library: Library | None, nvmem_area_names: str, reservation_access: ReservationAccess, reservation_group: str, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
+    def initialize_session_with_nvmem_areas(cls, nvmem_area_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
         """Initialize an SLSC session with one or multiple NVMEM areas.
         
         The session opens network connections for NVMEM areas. If
@@ -155,7 +155,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_with_physical_channels(cls, library: Library | None, physical_channel_names: str, reservation_access: ReservationAccess, reservation_group: str, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
+    def initialize_session_with_physical_channels(cls, physical_channel_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
         """Initialize an SLSC session with one or multiple physical channels.
         
         The session opens network connections for devices that correspond to the
@@ -203,7 +203,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_without_resources(cls, library: Library | None) -> Self:
+    def initialize_session_without_resources(cls, library: Library | None = None) -> Self:
         """Initialize an SLSC session without specifying any resources or
         opening any network connections.
         

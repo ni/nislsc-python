@@ -31,7 +31,7 @@ def _select_interpreter() -> BaseInterpreter:
 % for function in functions:
 % if 'capi' in function['targets']:
 % if remove_all_class_functions(function):
-def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, None, True, False, False)])})${get_function_return_type(function)}:
+def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, None, True, False, False, True)])})${get_function_return_type(function)}:
 % for docstrings in generate_docstrings(function):
     ${docstrings}
 % endfor

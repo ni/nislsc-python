@@ -76,9 +76,9 @@ class Session:
 % if is_class_func(function, "Session") and function["name"] != "CloseSession":
 % if is_classmethod(function, "Session"):
     @classmethod
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_classmethod_parameter_list(function)])})${get_function_return_type(function, True)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_classmethod_parameter_list(function, True)])})${get_function_return_type(function, True)}:
 % else:
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session")])})${get_function_return_type(function, True)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session", True, False, True, True)])})${get_function_return_type(function, True)}:
 % endif:
 % if is_classmethod(function, "Session"):
 % for docstrings in generate_docstrings(function, "Session", True):

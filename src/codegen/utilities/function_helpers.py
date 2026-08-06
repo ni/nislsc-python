@@ -133,34 +133,90 @@ def get_ctypes_argtypes(function: dict) -> list[str]:
     return arg_list
 
 
-def get_classmethod_parameter_list(function: dict) -> list[str]:
+def get_classmethod_parameter_list(function: dict, include_defaults: bool = False) -> list[str]:
     """Generate the parameters for class methods."""
     param_list = []
     param_list.append("cls")
+    signature_params: list[tuple[str, bool]] = []
     if "capi" in function["targets"]:
         for parameter in function["params"]:
             if is_capi(parameter) and is_param_input(parameter) and "Size" not in parameter["name"]:
+                default_value = _format_default_value(parameter) if include_defaults else None
+                has_none_default = _is_none_default(parameter) if include_defaults else False
                 if parameter["dataType"] == "uint8[]":
-                    param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
+                    param_type = _type_with_none_default("bytes", has_none_default)
+                    param = f"{get_standardized_param_name(parameter)}s_data: {param_type}"
+                    if default_value is not None:
+                        param = f"{param} = {default_value}"
+                    signature_params.append((param, default_value is not None))
                 elif parameter["dataType"] == "enum":
-                    param_list.append(
-                        f"{get_standardized_param_name(parameter)}: {parameter['enumType']}"
+                    param_type = _type_with_none_default(parameter["enumType"], has_none_default)
+                    param = f"{get_standardized_param_name(parameter)}: {param_type}"
+                    if default_value is not None:
+                        param = f"{param} = {default_value}"
+                    signature_params.append(
+                        (param, default_value is not None)
                     )
                 elif parameter["dataType"] == "Library":
-                    param_list.append("library: Library | None")
+                    param_type = _type_with_none_default("Library | None", has_none_default)
+                    param = f"library: {param_type}"
+                    if default_value is not None:
+                        param = f"{param} = {default_value}"
+                    signature_params.append((param, default_value is not None))
                 elif parameter["dataType"] == "Session":
-                    param_list.append("session: Session")
+                    param_type = _type_with_none_default("Session", has_none_default)
+                    param = f"session: {param_type}"
+                    if default_value is not None:
+                        param = f"{param} = {default_value}"
+                    signature_params.append((param, default_value is not None))
                 else:
-                    param_list.append(
-                        f"{get_standardized_param_name(parameter)}: {PYTHON_DATATYPE_MAP.get(parameter['dataType'])}"
+                    param_type = _type_with_none_default(
+                        f"{PYTHON_DATATYPE_MAP.get(parameter['dataType'])}", has_none_default
+                    )
+                    param = (
+                        f"{get_standardized_param_name(parameter)}: {param_type}"
+                    )
+                    if default_value is not None:
+                        param = f"{param} = {default_value}"
+                    signature_params.append(
+                        (param, default_value is not None)
                     )
             elif (
                 is_capi(parameter)
                 and is_param_output(parameter)
                 and parameter["dataType"] == "uint8[]"
             ):
-                param_list.append(f"num_{get_standardized_param_name(parameter)}: int")
+                signature_params.append((f"num_{get_standardized_param_name(parameter)}: int", False))
+    param_list.extend(_reorder_signature_parameters(signature_params))
     return param_list
+
+
+def _format_default_value(parameter: dict) -> str | None:
+    """Convert metadata defaults to Python literals for generated signatures."""
+    if "default" not in parameter:
+        return None
+    return repr(parameter["default"])
+
+
+def _is_none_default(parameter: dict) -> bool:
+    """Check whether metadata explicitly sets a parameter default to None."""
+    return "default" in parameter and parameter["default"] is None
+
+
+def _type_with_none_default(type_hint: str, is_none_default: bool) -> str:
+    """Widen type hints for None defaults without duplicating optional markers."""
+    if not is_none_default:
+        return type_hint
+    if "None" in type_hint:
+        return type_hint
+    return f"{type_hint} | None"
+
+
+def _reorder_signature_parameters(parameters: list[tuple[str, bool]]) -> list[str]:
+    """Move all required parameters before defaulted ones while preserving relative order."""
+    required = [parameter for parameter, has_default in parameters if not has_default]
+    defaulted = [parameter for parameter, has_default in parameters if has_default]
+    return required + defaulted
 
 
 def get_function_parameter_list(
@@ -169,6 +225,7 @@ def get_function_parameter_list(
     typing: bool = True,
     is_language: bool = False,
     class_func: bool = True,
+    include_defaults: bool = False,
 ) -> list[str]:
     """Generate a list of function parameters for a Python API function.
 
@@ -183,6 +240,9 @@ def get_function_parameter_list(
             with a default value of Language.UNDEFINED.
         class_func: If True, indicates that the function is
             a class function.
+        include_defaults: If True, include parameter defaults
+            from metadata and reorder parameters so required
+            parameters appear before defaulted parameters.
 
     Returns:
         param_list: A list of parameter strings for the function definition.
@@ -190,6 +250,7 @@ def get_function_parameter_list(
     param_list = []
     if "capi" in function["targets"]:
         if typing:
+            signature_params: list[tuple[str, bool]] = []
             if class_func:
                 param_list.append("self")
             for parameter in function["params"]:
@@ -199,24 +260,37 @@ def get_function_parameter_list(
                     and "Size" not in parameter["name"]
                     and parameter["dataType"] != class_name
                 ):
+                    default_value = _format_default_value(parameter) if include_defaults else None
+                    has_none_default = _is_none_default(parameter) if include_defaults else False
                     if parameter["dataType"] == "uint8[]":
-                        param_list.append(f"{get_standardized_param_name(parameter)}s_data: bytes")
+                        param_type = _type_with_none_default("bytes", has_none_default)
+                        param = f"{get_standardized_param_name(parameter)}s_data: {param_type}"
+                        if default_value is not None:
+                            param = f"{param} = {default_value}"
+                        signature_params.append((param, default_value is not None))
                     elif parameter["name"] == "language" and is_language:
-                        param_list.append("language: Language = Language.UNDEFINED")
+                        signature_params.append(("language: Language = Language.UNDEFINED", True))
                     elif parameter["dataType"] == "enum":
-                        param_list.append(
-                            f"{get_standardized_param_name(parameter)}: {parameter['enumType']}"
-                        )
+                        param_type = _type_with_none_default(parameter["enumType"], has_none_default)
+                        param = f"{get_standardized_param_name(parameter)}: {param_type}"
+                        if default_value is not None:
+                            param = f"{param} = {default_value}"
+                        signature_params.append((param, default_value is not None))
                     else:
-                        param_list.append(
-                            f"{get_standardized_param_name(parameter)}: {PYTHON_DATATYPE_MAP.get(parameter['dataType'])}"
+                        param_type = _type_with_none_default(
+                            f"{PYTHON_DATATYPE_MAP.get(parameter['dataType'])}", has_none_default
                         )
+                        param = f"{get_standardized_param_name(parameter)}: {param_type}"
+                        if default_value is not None:
+                            param = f"{param} = {default_value}"
+                        signature_params.append((param, default_value is not None))
                 elif (
                     is_capi(parameter)
                     and is_param_output(parameter)
                     and parameter["dataType"] == "uint8[]"
                 ):
-                    param_list.append(f"num_{get_standardized_param_name(parameter)}: int")
+                    signature_params.append((f"num_{get_standardized_param_name(parameter)}: int", False))
+            param_list.extend(_reorder_signature_parameters(signature_params))
         else:
             for parameter in function["params"]:
                 if (

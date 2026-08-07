@@ -49,18 +49,13 @@ def get_command_and_property_tree(device_name: str) -> dict:
     Returns:
         Dictionary containing the command and property tree of the device.
     """
-    connection_timeout = 10.0
     reservation_access = ReservationAccess.READ_ONLY
     reservation_group = "admin"
-    reservation_timeout = 10.0
 
     with Session.initialize_session_with_devices(
-        None,
         device_name,
-        connection_timeout,
         reservation_access,
         reservation_group,
-        reservation_timeout,
     ) as session:
 
         data = {
@@ -70,18 +65,18 @@ def get_command_and_property_tree(device_name: str) -> dict:
         }
 
         device_commands = session.get_device_property_string_array(
-            device_name,
             DeviceProperty.COMMANDS,
+            device_name,
         )
 
         device_properties = session.get_device_property_string_array(
-            device_name,
             DeviceProperty.PROPERTIES,
+            device_name,
         )
 
         device_physical_channels = session.get_device_property_string_array(
-            device_name,
             DeviceProperty.PHYSICAL_CHANNELS,
+            device_name,
         )
 
         for physical_channel in device_physical_channels:
@@ -138,10 +133,10 @@ def get_command_and_property_tree(device_name: str) -> dict:
         for physical_channel in device_physical_channels:
 
             physical_channel_commands = session.get_physical_channel_property_string_array(
-                physical_channel, PhysicalChannelProperty.COMMANDS
+                PhysicalChannelProperty.COMMANDS, physical_channel
             )
             physical_channel_properties = session.get_physical_channel_property_string_array(
-                physical_channel, PhysicalChannelProperty.PROPERTIES
+                PhysicalChannelProperty.PROPERTIES, physical_channel
             )
 
             for physical_channel_command in physical_channel_commands:

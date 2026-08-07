@@ -24,7 +24,12 @@ def test___library_provided___initialize_session_with_devices___session_handle_i
     expect_initialize_session_with_devices(interpreter, 100)
 
     with Session.initialize_session_with_devices(
-        library, "Dev1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1",
+        ReservationAccess.NONE,
+        "",
+        library=library,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ) as session:
         assert session._session_handle == 100
         interpreter.initialize_session_with_devices.assert_called_once()
@@ -36,7 +41,12 @@ def test___library_provided___initialize_session_with_devices___owns_library_is_
     expect_initialize_session_with_devices(interpreter)
 
     with Session.initialize_session_with_devices(
-        library, "Dev1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1",
+        ReservationAccess.NONE,
+        "",
+        library=library,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ) as session:
         assert not session._owns_library
 
@@ -48,7 +58,12 @@ def test___no_library___initialize_session_with_devices___library_created_and_ow
     expect_initialize_session_with_devices(interpreter)
 
     with Session.initialize_session_with_devices(
-        None, "Dev1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1",
+        ReservationAccess.NONE,
+        "",
+        library=None,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ) as session:
         assert session._owns_library
         assert session._library is not None
@@ -61,7 +76,12 @@ def test___library_provided___initialize_session_with_devices___interpreter_call
     library_handle = library._interpreter._library_handle
 
     with Session.initialize_session_with_devices(
-        library, "Dev1,Dev2", 5.0, ReservationAccess.READ_WRITE, "MyGroup", 10.0
+        "Dev1,Dev2",
+        ReservationAccess.READ_WRITE,
+        "MyGroup",
+        library=library,
+        connection_timeout=5.0,
+        reservation_timeout=10.0,
     ):
         interpreter.initialize_session_with_devices.assert_called_once_with(
             library_handle,
@@ -82,7 +102,12 @@ def test___interpreter_raises_error___initialize_session_with_devices___slsc_err
 
     with pytest.raises(SLSCError) as exc_info:
         Session.initialize_session_with_devices(
-            library, "Dev1", -1.0, ReservationAccess.NONE, "", -1.0
+            "Dev1",
+            ReservationAccess.NONE,
+            "",
+            library=library,
+            connection_timeout=-1.0,
+            reservation_timeout=-1.0,
         )
 
     assert exc_info.value.error_code == -250806
@@ -153,7 +178,12 @@ def test___library_provided___initialize_session_with_nvmem_areas___session_hand
     expect_initialize_session_with_nvmem_areas(interpreter, 200)
 
     with Session.initialize_session_with_nvmem_areas(
-        library, "Area1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Area1",
+        ReservationAccess.NONE,
+        "",
+        library=library,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ) as session:
         assert session._session_handle == 200
         interpreter.initialize_session_with_nvmem_areas.assert_called_once()
@@ -166,7 +196,12 @@ def test___no_library___initialize_session_with_nvmem_areas___library_created_an
     expect_initialize_session_with_nvmem_areas(interpreter)
 
     with Session.initialize_session_with_nvmem_areas(
-        None, "Area1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Area1",
+        ReservationAccess.NONE,
+        "",
+        library=None,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ) as session:
         assert session._owns_library
 
@@ -177,7 +212,12 @@ def test___library_provided___initialize_session_with_physical_channels___sessio
     expect_initialize_session_with_physical_channels(interpreter, 300)
 
     with Session.initialize_session_with_physical_channels(
-        library, "Dev1/phys0", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1/phys0",
+        ReservationAccess.NONE,
+        "",
+        library=library,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ) as session:
         assert session._session_handle == 300
         interpreter.initialize_session_with_physical_channels.assert_called_once()
@@ -190,7 +230,12 @@ def test___no_library___initialize_session_with_physical_channels___library_crea
     expect_initialize_session_with_physical_channels(interpreter)
 
     with Session.initialize_session_with_physical_channels(
-        None, "Dev1/phys0", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1/phys0",
+        ReservationAccess.NONE,
+        "",
+        library=None,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ) as session:
         assert session._owns_library
 
@@ -200,7 +245,7 @@ def test___library_provided___initialize_session_without_resources___session_han
 ) -> None:
     expect_initialize_session_without_resources(interpreter, 400)
 
-    with Session.initialize_session_without_resources(library) as session:
+    with Session.initialize_session_without_resources(library=library) as session:
         assert session._session_handle == 400
         interpreter.initialize_session_without_resources.assert_called_once()
 
@@ -211,7 +256,7 @@ def test___no_library___initialize_session_without_resources___library_created_a
     expect_initialize_library(interpreter)
     expect_initialize_session_without_resources(interpreter)
 
-    with Session.initialize_session_without_resources(None) as session:
+    with Session.initialize_session_without_resources(library=None) as session:
         assert session._owns_library
 
 
@@ -243,7 +288,12 @@ def test___context_manager___close___close_session_called_on_exit(
     expect_initialize_session_with_devices(interpreter, 100)
 
     with Session.initialize_session_with_devices(
-        library, "Dev1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1",
+        ReservationAccess.NONE,
+        "",
+        library=library,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ):
         interpreter.close_session.assert_not_called()
 
@@ -257,7 +307,12 @@ def test___close_owns_library___close___finalize_library_also_called(
     expect_initialize_session_with_devices(interpreter, 100)
 
     session = Session.initialize_session_with_devices(
-        None, "Dev1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1",
+        ReservationAccess.NONE,
+        "",
+        library=None,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     )
     session.close()
 
@@ -270,7 +325,12 @@ def test___close_does_not_own_library___close___finalize_library_not_called(
 ) -> None:
     expect_initialize_session_with_devices(interpreter, 100)
     session = Session.initialize_session_with_devices(
-        library, "Dev1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1",
+        ReservationAccess.NONE,
+        "",
+        library=library,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     )
 
     session.close()
@@ -293,7 +353,7 @@ def test___session_opened___log_in___interpreter_called_with_args(
 ) -> None:
     session_handle = session._session_handle
 
-    session.log_in("Chassis1", "admin", "secret", 10.0, False)
+    session.log_in("Chassis1", "admin", "secret", False, 10.0)
 
     interpreter.log_in.assert_called_once_with(
         session_handle, "Chassis1", "admin", "secret", 10.0, False
@@ -349,7 +409,7 @@ def test___session_opened___reserve_devices___interpreter_called_with_args(
 ) -> None:
     session_handle = session._session_handle
 
-    session.reserve_devices("Dev1", ReservationAccess.READ_WRITE, "MyGroup", 30.0)
+    session.reserve_devices(ReservationAccess.READ_WRITE, "MyGroup", "Dev1", 30.0)
 
     interpreter.reserve_devices.assert_called_once_with(
         session_handle, "Dev1", ReservationAccess.READ_WRITE, "MyGroup", 30.0
@@ -447,7 +507,7 @@ def test___session_opened___get_device_property___returns_value(
     getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = getattr(session, method)("Dev1", prop)
+    result = getattr(session, method)(prop, "Dev1")
 
     getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", prop)
     assert result == value
@@ -477,7 +537,7 @@ def test___session_opened___set_device_property___interpreter_called_with_args(
 ) -> None:
     session_handle = session._session_handle
 
-    getattr(session, method)("Dev1", prop, value)
+    getattr(session, method)(prop, value, "Dev1")
 
     getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", prop, value)
 
@@ -582,7 +642,7 @@ def test___session_opened___get_physical_channel_property___returns_value(
     getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = getattr(session, method)(resource, prop)
+    result = getattr(session, method)(prop, resource)
 
     getattr(interpreter, method).assert_called_once_with(session_handle, resource, prop)
     assert result == value
@@ -668,7 +728,7 @@ def test___session_opened___set_physical_channel_property___interpreter_called_w
 ) -> None:
     session_handle = session._session_handle
 
-    getattr(session, method)("Dev1/phys0", prop, value)
+    getattr(session, method)(prop, value, "Dev1/phys0")
 
     getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1/phys0", prop, value)
 
@@ -732,7 +792,7 @@ def test___session_opened___get_nvmem_area_property___returns_value(
     getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = getattr(session, method)("Area1", prop)
+    result = getattr(session, method)(prop, "Area1")
 
     getattr(interpreter, method).assert_called_once_with(session_handle, "Area1", prop)
     assert result == value
@@ -873,7 +933,7 @@ def test___session_opened___execute_device_command___interpreter_called_with_arg
 ) -> None:
     session_handle = session._session_handle
 
-    session.execute_device_command("Dev1", "Reset", 10.0)
+    session.execute_device_command("Reset", 10.0, "Dev1")
 
     interpreter.execute_device_command.assert_called_once_with(
         session_handle, "Dev1", "Reset", 10.0
@@ -885,7 +945,7 @@ def test___session_opened___execute_physical_channel_command___interpreter_calle
 ) -> None:
     session_handle = session._session_handle
 
-    session.execute_physical_channel_command("Dev1/phys0", "Calibrate", 5.0)
+    session.execute_physical_channel_command("Calibrate", 5.0, "Dev1/phys0")
 
     interpreter.execute_physical_channel_command.assert_called_once_with(
         session_handle, "Dev1/phys0", "Calibrate", 5.0
@@ -919,7 +979,7 @@ def test___session_opened___read_register___returns_value(
     getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = getattr(session, method)("Dev1", address)
+    result = getattr(session, method)(address, "Dev1")
 
     getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", address)
     assert result == value
@@ -939,7 +999,7 @@ def test___session_opened___write_register___interpreter_called_with_args(
 ) -> None:
     session_handle = session._session_handle
 
-    getattr(session, method)("Dev1", address, value)
+    getattr(session, method)(address, value, "Dev1")
 
     getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", address, value)
 
@@ -950,7 +1010,7 @@ def test___session_opened___get_nvmem_bytes___returns_value(
     interpreter.get_nvmem_bytes.return_value = b"\x01\x02\x03"
     session_handle = session._session_handle
 
-    result = session.get_nvmem_bytes("Area1", 0, 3)
+    result = session.get_nvmem_bytes(0, 3, "Area1")
 
     interpreter.get_nvmem_bytes.assert_called_once_with(session_handle, "Area1", 0, 3)
     assert result == b"\x01\x02\x03"
@@ -961,7 +1021,7 @@ def test___session_opened___set_nvmem_bytes___interpreter_called_with_args(
 ) -> None:
     session_handle = session._session_handle
 
-    session.set_nvmem_bytes("Area1", 0, b"\x01\x02\x03", "SN001", "pass")
+    session.set_nvmem_bytes(0, b"\x01\x02\x03", "SN001", "pass", "Area1")
 
     interpreter.set_nvmem_bytes.assert_called_once_with(
         session_handle, "Area1", 0, b"\x01\x02\x03", "SN001", "pass"

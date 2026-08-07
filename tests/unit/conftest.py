@@ -57,6 +57,11 @@ def session(library: Library, interpreter: Mock) -> Generator[Session, None, Non
     """
     expect_initialize_session_with_devices(interpreter)
     with Session.initialize_session_with_devices(
-        library, "Dev1", -1.0, ReservationAccess.NONE, "", -1.0
+        "Dev1",
+        ReservationAccess.NONE,
+        "",
+        library=library,
+        connection_timeout=-1.0,
+        reservation_timeout=-1.0,
     ) as sess:
         yield sess

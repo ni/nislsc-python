@@ -193,7 +193,11 @@ def _format_default_value(parameter: dict) -> str | None:
     """Convert metadata defaults to Python literals for generated signatures."""
     if "default" not in parameter:
         return None
-    return repr(parameter["default"])
+    default = parameter["default"]
+
+    if isinstance(default, int) and parameter.get("dataType") in {"double", "TimeoutSeconds"}:
+        default = float(default)
+    return repr(default)
 
 
 def _is_none_default(parameter: dict) -> bool:

@@ -67,7 +67,7 @@ class Session:
             self._owns_library = False
 
     @classmethod
-    def initialize_session_with_devices(cls, device_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
+    def initialize_session_with_devices(cls, device_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_timeout: float = -1.0) -> Self:
         """Initialize an SLSC session with one or multiple devices.
         
         The session opens network connections for devices. If reservationAccess
@@ -110,7 +110,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_with_nvmem_areas(cls, nvmem_area_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
+    def initialize_session_with_nvmem_areas(cls, nvmem_area_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_timeout: float = -1.0) -> Self:
         """Initialize an SLSC session with one or multiple NVMEM areas.
         
         The session opens network connections for NVMEM areas. If
@@ -155,7 +155,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_with_physical_channels(cls, physical_channel_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1, reservation_timeout: float = -1) -> Self:
+    def initialize_session_with_physical_channels(cls, physical_channel_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_timeout: float = -1.0) -> Self:
         """Initialize an SLSC session with one or multiple physical channels.
         
         The session opens network connections for devices that correspond to the
@@ -239,7 +239,7 @@ class Session:
         """
         self._interpreter.abort_session(self._session_handle)
 
-    def log_in(self, chassis_name: str, username: str, password: str, save_credentials_to_disk: bool, connection_timeout: float = -1) -> None:
+    def log_in(self, chassis_name: str, username: str, password: str, save_credentials_to_disk: bool, connection_timeout: float = -1.0) -> None:
         """Attempt to connect and log in to the specified SLSC chassis.
         
         If successful, the username and password are cached on the local system
@@ -297,7 +297,7 @@ class Session:
         """
         self._interpreter.log_out(self._session_handle, chassis_name)
 
-    def connect_to_devices(self, device_names: str = '$DefaultDevices', connection_timeout: float = -1) -> None:
+    def connect_to_devices(self, device_names: str = '$DefaultDevices', connection_timeout: float = -1.0) -> None:
         """Open network connections for the specified device(s), sharing
         connections to the same SLSC chassis.
         
@@ -332,7 +332,7 @@ class Session:
         """
         self._interpreter.disconnect_from_devices(self._session_handle, device_names)
 
-    def connect_to_chassis_by_address(self, address: str, username: str, password: str, connection_timeout: float = -1) -> str:
+    def connect_to_chassis_by_address(self, address: str, username: str, password: str, connection_timeout: float = -1.0) -> str:
         """Open a network connection for a chassis by the specified IP address
         or hostname.
         
@@ -353,7 +353,7 @@ class Session:
         chassis_name = self._interpreter.connect_to_chassis_by_address(self._session_handle, address, username, password, connection_timeout)
         return chassis_name
 
-    def reserve_devices(self, reservation_access: ReservationAccess, reservation_group: str, device_names: str = '$DefaultDevices', reservation_timeout: float = -1) -> None:
+    def reserve_devices(self, reservation_access: ReservationAccess, reservation_group: str, device_names: str = '$DefaultDevices', reservation_timeout: float = -1.0) -> None:
         """Reserve the specified device(s), which prevents other sessions from
         accessing them.
         
@@ -425,7 +425,7 @@ class Session:
         """
         self._interpreter.rename_device(self._session_handle, device_name, new_device_name)
 
-    def update_system_configuration_file(self, chassis_name: str, connection_timeout: float = -1) -> None:
+    def update_system_configuration_file(self, chassis_name: str, connection_timeout: float = -1.0) -> None:
         """Update the information of the specified chassis and its modules in
         the local configuration file.
         
@@ -442,7 +442,7 @@ class Session:
         """
         self._interpreter.update_system_configuration_file(self._session_handle, chassis_name, connection_timeout)
 
-    def add_network_chassis(self, address: str, username: str, password: str, connection_timeout: float = -1) -> str:
+    def add_network_chassis(self, address: str, username: str, password: str, connection_timeout: float = -1.0) -> str:
         """Connect to the specified network chassis, adds the chassis and its
         modules to the system, and saves them to the local configuration file.
         

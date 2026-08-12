@@ -224,6 +224,7 @@ def _reorder_signature_parameters(parameters: list[tuple[str, bool]]) -> list[st
 def get_function_parameter_list(
     function: dict,
     class_name: str = None,
+    *,
     typing: bool = True,
     is_language: bool = False,
     class_func: bool = True,
@@ -369,27 +370,27 @@ def generate_function_call_in_class(function: dict, class_name: str) -> str:
         return_list.append("interpreter = library._interpreter")
         return_list.append("library_handle = library._interpreter._library_handle")
         return_list.append(
-            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, typing=False) or [])])})"
         )
     elif return_datatype == "CommandReference":
         return_list.append("session_handle = session._session_handle")
         return_list.append("interpreter = session._interpreter")
         return_list.append(
-            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, typing=False) or [])])})"
         )
     elif return_datatype == "PropertyReference":
         return_list.append("session_handle = session._session_handle")
         return_list.append("interpreter = session._interpreter")
         return_list.append(
-            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+            f"{return_var} = interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, typing=False) or [])])})"
         )
     elif return_datatype:
         return_list.append(
-            f"{return_var} = self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+            f"{return_var} = self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, typing=False) or [])])})"
         )
     else:
         return_list.append(
-            f"self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, False) or [])])})"
+            f"self._interpreter.{get_python_function_name(function)}({', '.join([param for param in (get_function_parameter_list(function, class_name, typing=False) or [])])})"
         )
     return return_list
 

@@ -24,6 +24,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      security-events: write
   checks_succeeded:
     name: Checks succeeded
     needs: [build, check_docs, check_workflows]

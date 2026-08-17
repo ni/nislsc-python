@@ -1214,7 +1214,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1223,6 +1223,7 @@
                 },
                 {
                     "dataType": "enum",
+                    "default": "read/write",
                     "dir": [
                         "in"
                     ],
@@ -1232,6 +1233,7 @@
                 },
                 {
                     "dataType": "string",
+                    "default": "",
                     "dir": [
                         "in"
                     ],
@@ -1240,7 +1242,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1315,7 +1317,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1324,6 +1326,7 @@
                 },
                 {
                     "dataType": "enum",
+                    "default": "read/write",
                     "dir": [
                         "in"
                     ],
@@ -1333,6 +1336,7 @@
                 },
                 {
                     "dataType": "string",
+                    "default": "",
                     "dir": [
                         "in"
                     ],
@@ -1341,7 +1345,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1417,7 +1421,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1426,6 +1430,7 @@
                 },
                 {
                     "dataType": "enum",
+                    "default": "read/write",
                     "dir": [
                         "in"
                     ],
@@ -1435,6 +1440,7 @@
                 },
                 {
                     "dataType": "string",
+                    "default": "",
                     "dir": [
                         "in"
                     ],
@@ -1443,7 +1449,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1729,7 +1735,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1803,7 +1809,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1885,7 +1891,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -1931,6 +1937,7 @@
                 },
                 {
                     "dataType": "enum",
+                    "default": "read/write",
                     "dir": [
                         "in"
                     ],
@@ -1940,6 +1947,7 @@
                 },
                 {
                     "dataType": "string",
+                    "default": "",
                     "dir": [
                         "in"
                     ],
@@ -1948,7 +1956,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -2080,7 +2088,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -2132,7 +2140,7 @@
                 },
                 {
                     "dataType": "TimeoutSeconds",
-                    "default": -1,
+                    "default": -1.0,
                     "dir": [
                         "in"
                     ],
@@ -2257,7 +2265,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2302,7 +2309,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2347,7 +2353,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2392,7 +2397,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2437,7 +2441,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2482,7 +2485,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2527,7 +2529,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2572,7 +2573,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2617,7 +2617,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2662,7 +2661,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2707,7 +2705,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2752,7 +2749,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2797,7 +2793,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2842,7 +2837,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2887,7 +2881,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2932,7 +2925,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -2977,7 +2969,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3022,7 +3013,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3067,7 +3057,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3112,7 +3101,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3157,7 +3145,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3202,7 +3189,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3247,7 +3233,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3292,7 +3277,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3337,7 +3321,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3382,7 +3365,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3427,7 +3409,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3472,7 +3453,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3517,7 +3497,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -3605,7 +3584,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -3651,7 +3629,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -3697,7 +3674,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -3743,7 +3719,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -3789,7 +3764,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -3835,7 +3809,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -3881,7 +3854,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -3927,7 +3899,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -3973,7 +3944,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4019,7 +3989,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4065,7 +4034,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4111,7 +4079,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4157,7 +4124,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4203,7 +4169,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4249,7 +4214,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4295,7 +4259,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4341,7 +4304,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4387,7 +4349,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4433,7 +4394,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4479,7 +4439,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4525,7 +4484,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4571,7 +4529,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4617,7 +4574,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4663,7 +4619,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4709,7 +4664,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4755,7 +4709,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4801,7 +4754,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4847,7 +4799,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -4893,7 +4844,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -5053,7 +5003,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -5098,7 +5047,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -5143,7 +5091,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -5188,7 +5135,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -5233,7 +5179,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -5278,7 +5223,6 @@
                 },
                 {
                     "dataType": "string",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -7573,7 +7517,6 @@
                 },
                 {
                     "dataType": "NvmemArea",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -7620,7 +7563,6 @@
                 },
                 {
                     "dataType": "NvmemArea",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -7691,7 +7633,6 @@
                 },
                 {
                     "dataType": "NvmemArea",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -9574,7 +9515,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -9622,7 +9562,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -9670,7 +9609,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -9718,7 +9656,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -9766,7 +9703,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -9814,7 +9750,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -9862,7 +9797,6 @@
                 },
                 {
                     "dataType": "NvmemArea",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -9910,7 +9844,6 @@
                 },
                 {
                     "dataType": "NvmemArea",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -9958,7 +9891,6 @@
                 },
                 {
                     "dataType": "NvmemArea",
-                    "default": "$DefaultNVMEMAreas",
                     "dir": [
                         "in"
                     ],
@@ -10007,7 +9939,6 @@
                 },
                 {
                     "dataType": "PhysChan",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -10056,7 +9987,6 @@
                 },
                 {
                     "dataType": "PhysChan",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],

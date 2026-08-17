@@ -67,7 +67,7 @@ class Session:
             self._owns_library = False
 
     @classmethod
-    def initialize_session_with_devices(cls, device_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_timeout: float = -1.0) -> Self:
+    def initialize_session_with_devices(cls, device_names: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_access: ReservationAccess = ReservationAccess.READ_WRITE, reservation_group: str = '', reservation_timeout: float = -1.0) -> Self:
         """Initialize an SLSC session with one or multiple devices.
         
         The session opens network connections for devices. If reservationAccess
@@ -110,7 +110,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_with_nvmem_areas(cls, nvmem_area_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_timeout: float = -1.0) -> Self:
+    def initialize_session_with_nvmem_areas(cls, nvmem_area_names: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_access: ReservationAccess = ReservationAccess.READ_WRITE, reservation_group: str = '', reservation_timeout: float = -1.0) -> Self:
         """Initialize an SLSC session with one or multiple NVMEM areas.
         
         The session opens network connections for NVMEM areas. If
@@ -155,7 +155,7 @@ class Session:
         return cls(library, session_handle, owns_library)
 
     @classmethod
-    def initialize_session_with_physical_channels(cls, physical_channel_names: str, reservation_access: ReservationAccess, reservation_group: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_timeout: float = -1.0) -> Self:
+    def initialize_session_with_physical_channels(cls, physical_channel_names: str, library: Library | None = None, connection_timeout: float = -1.0, reservation_access: ReservationAccess = ReservationAccess.READ_WRITE, reservation_group: str = '', reservation_timeout: float = -1.0) -> Self:
         """Initialize an SLSC session with one or multiple physical channels.
         
         The session opens network connections for devices that correspond to the
@@ -353,7 +353,7 @@ class Session:
         chassis_name = self._interpreter.connect_to_chassis_by_address(self._session_handle, address, username, password, connection_timeout)
         return chassis_name
 
-    def reserve_devices(self, reservation_access: ReservationAccess, reservation_group: str, device_names: str = '$DefaultDevices', reservation_timeout: float = -1.0) -> None:
+    def reserve_devices(self, device_names: str = '$DefaultDevices', reservation_access: ReservationAccess = ReservationAccess.READ_WRITE, reservation_group: str = '', reservation_timeout: float = -1.0) -> None:
         """Reserve the specified device(s), which prevents other sessions from
         accessing them.
         
@@ -478,7 +478,7 @@ class Session:
         """
         self._interpreter.remove_chassis(self._session_handle, chassis_name)
 
-    def get_device_property_bool(self, property_name: str, device_names: str = '$DefaultDevices') -> bool:
+    def get_device_property_bool(self, device_names: str, property_name: str) -> bool:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -497,7 +497,7 @@ class Session:
         property_value = self._interpreter.get_device_property_bool(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_bool_array(self, property_name: str, device_names: str = '$DefaultDevices') -> list[bool]:
+    def get_device_property_bool_array(self, device_names: str, property_name: str) -> list[bool]:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -516,7 +516,7 @@ class Session:
         property_value = self._interpreter.get_device_property_bool_array(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_double(self, property_name: str, device_names: str = '$DefaultDevices') -> float:
+    def get_device_property_double(self, device_names: str, property_name: str) -> float:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -535,7 +535,7 @@ class Session:
         property_value = self._interpreter.get_device_property_double(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_double_array(self, property_name: str, device_names: str = '$DefaultDevices') -> list[float]:
+    def get_device_property_double_array(self, device_names: str, property_name: str) -> list[float]:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -554,7 +554,7 @@ class Session:
         property_value = self._interpreter.get_device_property_double_array(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_int32(self, property_name: str, device_names: str = '$DefaultDevices') -> int:
+    def get_device_property_int32(self, device_names: str, property_name: str) -> int:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -573,7 +573,7 @@ class Session:
         property_value = self._interpreter.get_device_property_int32(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_int32_array(self, property_name: str, device_names: str = '$DefaultDevices') -> list[int]:
+    def get_device_property_int32_array(self, device_names: str, property_name: str) -> list[int]:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -592,7 +592,7 @@ class Session:
         property_value = self._interpreter.get_device_property_int32_array(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_int64(self, property_name: str, device_names: str = '$DefaultDevices') -> int:
+    def get_device_property_int64(self, device_names: str, property_name: str) -> int:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -611,7 +611,7 @@ class Session:
         property_value = self._interpreter.get_device_property_int64(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_int64_array(self, property_name: str, device_names: str = '$DefaultDevices') -> list[int]:
+    def get_device_property_int64_array(self, device_names: str, property_name: str) -> list[int]:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -630,7 +630,7 @@ class Session:
         property_value = self._interpreter.get_device_property_int64_array(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_string(self, property_name: str, device_names: str = '$DefaultDevices') -> str:
+    def get_device_property_string(self, device_names: str, property_name: str) -> str:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -649,7 +649,7 @@ class Session:
         property_value = self._interpreter.get_device_property_string(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_string_array(self, property_name: str, device_names: str = '$DefaultDevices') -> list[str]:
+    def get_device_property_string_array(self, device_names: str, property_name: str) -> list[str]:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -668,7 +668,7 @@ class Session:
         property_value = self._interpreter.get_device_property_string_array(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_uint32(self, property_name: str, device_names: str = '$DefaultDevices') -> int:
+    def get_device_property_uint32(self, device_names: str, property_name: str) -> int:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -687,7 +687,7 @@ class Session:
         property_value = self._interpreter.get_device_property_uint32(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_uint32_array(self, property_name: str, device_names: str = '$DefaultDevices') -> list[int]:
+    def get_device_property_uint32_array(self, device_names: str, property_name: str) -> list[int]:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -706,7 +706,7 @@ class Session:
         property_value = self._interpreter.get_device_property_uint32_array(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_uint64(self, property_name: str, device_names: str = '$DefaultDevices') -> int:
+    def get_device_property_uint64(self, device_names: str, property_name: str) -> int:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -725,7 +725,7 @@ class Session:
         property_value = self._interpreter.get_device_property_uint64(self._session_handle, device_names, property_name)
         return property_value
 
-    def get_device_property_uint64_array(self, property_name: str, device_names: str = '$DefaultDevices') -> list[int]:
+    def get_device_property_uint64_array(self, device_names: str, property_name: str) -> list[int]:
         """Get the value of the specified device property from one or more
         devices.
         
@@ -744,7 +744,7 @@ class Session:
         property_value = self._interpreter.get_device_property_uint64_array(self._session_handle, device_names, property_name)
         return property_value
 
-    def set_device_property_bool(self, property_name: str, property_value: bool, device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_bool(self, device_names: str, property_name: str, property_value: bool) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -764,7 +764,7 @@ class Session:
         """
         self._interpreter.set_device_property_bool(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_bool_array(self, property_name: str, property_value: list[bool], device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_bool_array(self, device_names: str, property_name: str, property_value: list[bool]) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -784,7 +784,7 @@ class Session:
         """
         self._interpreter.set_device_property_bool_array(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_double(self, property_name: str, property_value: float, device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_double(self, device_names: str, property_name: str, property_value: float) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -804,7 +804,7 @@ class Session:
         """
         self._interpreter.set_device_property_double(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_double_array(self, property_name: str, property_value: list[float], device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_double_array(self, device_names: str, property_name: str, property_value: list[float]) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -824,7 +824,7 @@ class Session:
         """
         self._interpreter.set_device_property_double_array(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_int32(self, property_name: str, property_value: int, device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_int32(self, device_names: str, property_name: str, property_value: int) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -844,7 +844,7 @@ class Session:
         """
         self._interpreter.set_device_property_int32(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_int32_array(self, property_name: str, property_value: list[int], device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_int32_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -864,7 +864,7 @@ class Session:
         """
         self._interpreter.set_device_property_int32_array(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_int64(self, property_name: str, property_value: int, device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_int64(self, device_names: str, property_name: str, property_value: int) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -884,7 +884,7 @@ class Session:
         """
         self._interpreter.set_device_property_int64(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_int64_array(self, property_name: str, property_value: list[int], device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_int64_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -904,7 +904,7 @@ class Session:
         """
         self._interpreter.set_device_property_int64_array(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_string(self, property_name: str, property_value: str, device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_string(self, device_names: str, property_name: str, property_value: str) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -924,7 +924,7 @@ class Session:
         """
         self._interpreter.set_device_property_string(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_string_array(self, property_name: str, property_value: list[str], device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_string_array(self, device_names: str, property_name: str, property_value: list[str]) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -944,7 +944,7 @@ class Session:
         """
         self._interpreter.set_device_property_string_array(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_uint32(self, property_name: str, property_value: int, device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_uint32(self, device_names: str, property_name: str, property_value: int) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -964,7 +964,7 @@ class Session:
         """
         self._interpreter.set_device_property_uint32(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_uint32_array(self, property_name: str, property_value: list[int], device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_uint32_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -984,7 +984,7 @@ class Session:
         """
         self._interpreter.set_device_property_uint32_array(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_uint64(self, property_name: str, property_value: int, device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_uint64(self, device_names: str, property_name: str, property_value: int) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -1004,7 +1004,7 @@ class Session:
         """
         self._interpreter.set_device_property_uint64(self._session_handle, device_names, property_name, property_value)
 
-    def set_device_property_uint64_array(self, property_name: str, property_value: list[int], device_names: str = '$DefaultDevices') -> None:
+    def set_device_property_uint64_array(self, device_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified device property to a new value for one or more
         devices.
         
@@ -1024,7 +1024,7 @@ class Session:
         """
         self._interpreter.set_device_property_uint64_array(self._session_handle, device_names, property_name, property_value)
 
-    def get_physical_channel_property_bool(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> bool:
+    def get_physical_channel_property_bool(self, physical_channel_names: str, property_name: str) -> bool:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1046,7 +1046,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_bool_array(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> list[bool]:
+    def get_physical_channel_property_bool_array(self, physical_channel_names: str, property_name: str) -> list[bool]:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1068,7 +1068,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_double(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> float:
+    def get_physical_channel_property_double(self, physical_channel_names: str, property_name: str) -> float:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1090,7 +1090,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_double(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_double_array(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> list[float]:
+    def get_physical_channel_property_double_array(self, physical_channel_names: str, property_name: str) -> list[float]:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1112,7 +1112,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_int32(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> int:
+    def get_physical_channel_property_int32(self, physical_channel_names: str, property_name: str) -> int:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1134,7 +1134,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_int32_array(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> list[int]:
+    def get_physical_channel_property_int32_array(self, physical_channel_names: str, property_name: str) -> list[int]:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1156,7 +1156,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_int64(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> int:
+    def get_physical_channel_property_int64(self, physical_channel_names: str, property_name: str) -> int:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1178,7 +1178,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_int64_array(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> list[int]:
+    def get_physical_channel_property_int64_array(self, physical_channel_names: str, property_name: str) -> list[int]:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1200,7 +1200,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_string(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> str:
+    def get_physical_channel_property_string(self, physical_channel_names: str, property_name: str) -> str:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1222,7 +1222,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_string(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_string_array(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> list[str]:
+    def get_physical_channel_property_string_array(self, physical_channel_names: str, property_name: str) -> list[str]:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1244,7 +1244,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_uint32(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> int:
+    def get_physical_channel_property_uint32(self, physical_channel_names: str, property_name: str) -> int:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1266,7 +1266,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_uint32_array(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> list[int]:
+    def get_physical_channel_property_uint32_array(self, physical_channel_names: str, property_name: str) -> list[int]:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1288,7 +1288,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_uint64(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> int:
+    def get_physical_channel_property_uint64(self, physical_channel_names: str, property_name: str) -> int:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1310,7 +1310,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def get_physical_channel_property_uint64_array(self, property_name: str, physical_channel_names: str = '$DefaultPhysChans') -> list[int]:
+    def get_physical_channel_property_uint64_array(self, physical_channel_names: str, property_name: str) -> list[int]:
         """Get the value of the specified physical channel property from one or
         more physical channels.
         
@@ -1332,7 +1332,7 @@ class Session:
         property_value = self._interpreter.get_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name)
         return property_value
 
-    def set_physical_channel_property_bool(self, property_name: str, property_value: bool, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_bool(self, physical_channel_names: str, property_name: str, property_value: bool) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1356,7 +1356,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_bool(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_bool_array(self, property_name: str, property_value: list[bool], physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_bool_array(self, physical_channel_names: str, property_name: str, property_value: list[bool]) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1380,7 +1380,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_bool_array(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_double(self, property_name: str, property_value: float, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_double(self, physical_channel_names: str, property_name: str, property_value: float) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1404,7 +1404,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_double(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_double_array(self, property_name: str, property_value: list[float], physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_double_array(self, physical_channel_names: str, property_name: str, property_value: list[float]) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1428,7 +1428,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_double_array(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_int32(self, property_name: str, property_value: int, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_int32(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1452,7 +1452,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_int32(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_int32_array(self, property_name: str, property_value: list[int], physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_int32_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1476,7 +1476,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_int32_array(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_int64(self, property_name: str, property_value: int, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_int64(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1500,7 +1500,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_int64(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_int64_array(self, property_name: str, property_value: list[int], physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_int64_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1524,7 +1524,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_int64_array(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_string(self, property_name: str, property_value: str, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_string(self, physical_channel_names: str, property_name: str, property_value: str) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1548,7 +1548,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_string(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_string_array(self, property_name: str, property_value: list[str], physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_string_array(self, physical_channel_names: str, property_name: str, property_value: list[str]) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1572,7 +1572,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_string_array(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_uint32(self, property_name: str, property_value: int, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_uint32(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1596,7 +1596,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_uint32(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_uint32_array(self, property_name: str, property_value: list[int], physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_uint32_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1620,7 +1620,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_uint32_array(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_uint64(self, property_name: str, property_value: int, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_uint64(self, physical_channel_names: str, property_name: str, property_value: int) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1644,7 +1644,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_uint64(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def set_physical_channel_property_uint64_array(self, property_name: str, property_value: list[int], physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def set_physical_channel_property_uint64_array(self, physical_channel_names: str, property_name: str, property_value: list[int]) -> None:
         """Set the specified physical channel property to a new value for one or
         more physical channels.
         
@@ -1724,7 +1724,7 @@ class Session:
         """
         self._interpreter.commit_properties_generic(self._session_handle, resources)
 
-    def get_nvmem_area_property_bool(self, property_name: str, nvmem_area_names: str = '$DefaultNVMEMAreas') -> bool:
+    def get_nvmem_area_property_bool(self, nvmem_area_names: str, property_name: str) -> bool:
         """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
@@ -1743,7 +1743,7 @@ class Session:
         property_value = self._interpreter.get_nvmem_area_property_bool(self._session_handle, nvmem_area_names, property_name)
         return property_value
 
-    def get_nvmem_area_property_bool_array(self, property_name: str, nvmem_area_names: str = '$DefaultNVMEMAreas') -> list[bool]:
+    def get_nvmem_area_property_bool_array(self, nvmem_area_names: str, property_name: str) -> list[bool]:
         """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
@@ -1762,7 +1762,7 @@ class Session:
         property_value = self._interpreter.get_nvmem_area_property_bool_array(self._session_handle, nvmem_area_names, property_name)
         return property_value
 
-    def get_nvmem_area_property_string(self, property_name: str, nvmem_area_names: str = '$DefaultNVMEMAreas') -> str:
+    def get_nvmem_area_property_string(self, nvmem_area_names: str, property_name: str) -> str:
         """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
@@ -1781,7 +1781,7 @@ class Session:
         property_value = self._interpreter.get_nvmem_area_property_string(self._session_handle, nvmem_area_names, property_name)
         return property_value
 
-    def get_nvmem_area_property_string_array(self, property_name: str, nvmem_area_names: str = '$DefaultNVMEMAreas') -> list[str]:
+    def get_nvmem_area_property_string_array(self, nvmem_area_names: str, property_name: str) -> list[str]:
         """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
@@ -1800,7 +1800,7 @@ class Session:
         property_value = self._interpreter.get_nvmem_area_property_string_array(self._session_handle, nvmem_area_names, property_name)
         return property_value
 
-    def get_nvmem_area_property_uint32(self, property_name: str, nvmem_area_names: str = '$DefaultNVMEMAreas') -> int:
+    def get_nvmem_area_property_uint32(self, nvmem_area_names: str, property_name: str) -> int:
         """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
@@ -1819,7 +1819,7 @@ class Session:
         property_value = self._interpreter.get_nvmem_area_property_uint32(self._session_handle, nvmem_area_names, property_name)
         return property_value
 
-    def get_nvmem_area_property_uint32_array(self, property_name: str, nvmem_area_names: str = '$DefaultNVMEMAreas') -> list[int]:
+    def get_nvmem_area_property_uint32_array(self, nvmem_area_names: str, property_name: str) -> list[int]:
         """Get the value of the specified NVMEM area property for one or more
         NVMEM areas.
         
@@ -2728,7 +2728,7 @@ class Session:
         """
         self._interpreter.write_register_uint64(self._session_handle, device_name, register_address, data)
 
-    def get_nvmem_bytes(self, nvmem_address: int, num_byte: int, nvmem_area: str = '$DefaultNVMEMAreas') -> bytes:
+    def get_nvmem_bytes(self, nvmem_area: str, nvmem_address: int, num_byte: int) -> bytes:
         """Get a range of bytes from an NVMEM area.
         
         Args:
@@ -2742,7 +2742,7 @@ class Session:
         byte = self._interpreter.get_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, num_byte)
         return byte
 
-    def set_nvmem_bytes(self, nvmem_address: int, bytes_data: bytes, serial_number: str, password: str, nvmem_area: str = '$DefaultNVMEMAreas') -> None:
+    def set_nvmem_bytes(self, nvmem_area: str, nvmem_address: int, bytes_data: bytes, serial_number: str, password: str) -> None:
         """Set a range of bytes to write to an NVMEM area.
         
         The data is cached in the session until the NVMEM area is committed. If

@@ -6,6 +6,7 @@ context of generating C API bindings for the NI-SLSC API.
 """
 
 from utilities.interpreter_helpers import (
+    convert_to_screaming_snake_case,
     get_param_datatype_in_ctypes,
     get_python_function_name,
     get_standardized_param_name,
@@ -195,6 +196,8 @@ def _format_default_value(parameter: dict) -> str | None:
         return None
     default = parameter["default"]
 
+    if parameter.get("dataType") == "enum" and isinstance(default, str):
+        return f"{parameter['enumType']}.{convert_to_screaming_snake_case(default)}"
     if isinstance(default, int) and parameter.get("dataType") in {"double", "TimeoutSeconds"}:
         default = float(default)
     return repr(default)

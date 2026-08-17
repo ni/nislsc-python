@@ -10,7 +10,7 @@ from pytest_mock import MockerFixture
 
 from nislsc import Library, Session
 from nislsc._base_interpreter import BaseInterpreter
-from nislsc.constants import Language, ReservationAccess
+from nislsc.constants import Language
 from tests.unit._session_utils import (
     expect_initialize_library,
     expect_initialize_session_with_devices,
@@ -58,10 +58,5 @@ def session(library: Library, interpreter: Mock) -> Generator[Session, None, Non
     expect_initialize_session_with_devices(interpreter)
     with Session.initialize_session_with_devices(
         "Dev1",
-        ReservationAccess.NONE,
-        "",
-        library=library,
-        connection_timeout=-1.0,
-        reservation_timeout=-1.0,
     ) as sess:
         yield sess

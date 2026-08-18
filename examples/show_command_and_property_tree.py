@@ -53,9 +53,9 @@ def get_command_and_property_tree(device_name: str) -> dict:
     reservation_group = "admin"
 
     with Session.initialize_session_with_devices(
-        device_name,
-        reservation_access,
-        reservation_group,
+        device_names=device_name,
+        reservation_access=reservation_access,
+        reservation_group=reservation_group,
     ) as session:
 
         data = {
@@ -65,18 +65,18 @@ def get_command_and_property_tree(device_name: str) -> dict:
         }
 
         device_commands = session.get_device_property_string_array(
-            DeviceProperty.COMMANDS,
             device_name,
+            DeviceProperty.COMMANDS,
         )
 
         device_properties = session.get_device_property_string_array(
-            DeviceProperty.PROPERTIES,
             device_name,
+            DeviceProperty.PROPERTIES,
         )
 
         device_physical_channels = session.get_device_property_string_array(
-            DeviceProperty.PHYSICAL_CHANNELS,
             device_name,
+            DeviceProperty.PHYSICAL_CHANNELS,
         )
 
         for physical_channel in device_physical_channels:
@@ -133,10 +133,10 @@ def get_command_and_property_tree(device_name: str) -> dict:
         for physical_channel in device_physical_channels:
 
             physical_channel_commands = session.get_physical_channel_property_string_array(
-                PhysicalChannelProperty.COMMANDS, physical_channel
+                physical_channel, PhysicalChannelProperty.COMMANDS
             )
             physical_channel_properties = session.get_physical_channel_property_string_array(
-                PhysicalChannelProperty.PROPERTIES, physical_channel
+                physical_channel, PhysicalChannelProperty.PROPERTIES
             )
 
             for physical_channel_command in physical_channel_commands:

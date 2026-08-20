@@ -17,6 +17,16 @@ from utilities.interpreter_helpers import (
 
 ARRAY_VAR = ["int64[]", "uint64[]", "int32[]", "uint32[]", "bool[]", "double[]"]
 
+RESOURCE_ALIAS_CONSTANTS = {
+    "$ConnectedDevices": "CONNECTED_DEVICES_ALIAS",
+    "$DefaultDevices": "DEFAULT_DEVICES_ALIAS",
+    "$DefaultNVMEMAreas": "DEFAULT_NVMEM_AREAS_ALIAS",
+    "$DefaultPhysChans": "DEFAULT_PHYS_CHANS_ALIAS",
+    "$ReservedDevices": "RESERVED_DEVICES_ALIAS",
+    "$Session": "SESSION_ALIAS",
+    "$System": "SYSTEM_ALIAS",
+}
+
 STRING_LIST = {
     "string": "ctypes.c_char_p",
     "Device": "ctypes.c_char_p",
@@ -196,11 +206,25 @@ def _format_default_value(parameter: dict) -> str | None:
         return None
     default = parameter["default"]
 
+    if default in RESOURCE_ALIAS_CONSTANTS:
+        return RESOURCE_ALIAS_CONSTANTS[default]
     if parameter.get("dataType") == "enum" and isinstance(default, str):
         return f"{parameter['enumType']}.{convert_to_screaming_snake_case(default)}"
     if isinstance(default, int) and parameter.get("dataType") in {"double", "TimeoutSeconds"}:
         default = float(default)
     return repr(default)
+
+
+def get_default_alias_constants(functions: list[dict]) -> list[str]:
+    """Get constant names used by resource-alias defaults in function metadata."""
+    return sorted(
+        {
+            RESOURCE_ALIAS_CONSTANTS[parameter["default"]]
+            for function in functions
+            for parameter in function["params"]
+            if parameter.get("default") in RESOURCE_ALIAS_CONSTANTS
+        }
+    )
 
 
 def _is_none_default(parameter: dict) -> bool:

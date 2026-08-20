@@ -10,7 +10,7 @@ from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.constants import ReservationAccess, TableScaleCoercion
+from nislsc.constants import ReservationAccess, TableScaleCoercion, DEFAULT_DEVICES_ALIAS, DEFAULT_NVMEM_AREAS_ALIAS, DEFAULT_PHYS_CHANS_ALIAS
 from nislsc.library import Library
 
 
@@ -297,7 +297,7 @@ class Session:
         """
         self._interpreter.log_out(self._session_handle, chassis_name)
 
-    def connect_to_devices(self, device_names: str = '$DefaultDevices', connection_timeout: float = -1.0) -> None:
+    def connect_to_devices(self, device_names: str = DEFAULT_DEVICES_ALIAS, connection_timeout: float = -1.0) -> None:
         """Open network connections for the specified device(s), sharing
         connections to the same SLSC chassis.
         
@@ -318,7 +318,7 @@ class Session:
         """
         self._interpreter.connect_to_devices(self._session_handle, device_names, connection_timeout)
 
-    def disconnect_from_devices(self, device_names: str = '$DefaultDevices') -> None:
+    def disconnect_from_devices(self, device_names: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Close network connections for the specified devices.
         
         When multiple devices share a network connection because they are in the
@@ -353,7 +353,7 @@ class Session:
         chassis_name = self._interpreter.connect_to_chassis_by_address(self._session_handle, address, username, password, connection_timeout)
         return chassis_name
 
-    def reserve_devices(self, device_names: str = '$DefaultDevices', reservation_access: ReservationAccess = ReservationAccess.READ_WRITE, reservation_group: str = '', reservation_timeout: float = -1.0) -> None:
+    def reserve_devices(self, device_names: str = DEFAULT_DEVICES_ALIAS, reservation_access: ReservationAccess = ReservationAccess.READ_WRITE, reservation_group: str = '', reservation_timeout: float = -1.0) -> None:
         """Reserve the specified device(s), which prevents other sessions from
         accessing them.
         
@@ -379,7 +379,7 @@ class Session:
         """
         self._interpreter.reserve_devices(self._session_handle, device_names, reservation_access, reservation_group, reservation_timeout)
 
-    def unreserve_devices(self, device_names: str = '$DefaultDevices') -> None:
+    def unreserve_devices(self, device_names: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Unreserve the specified device(s), allowing other sessions to access
         them.
         
@@ -390,7 +390,7 @@ class Session:
         """
         self._interpreter.unreserve_devices(self._session_handle, device_names)
 
-    def reset_devices(self, device_names: str = '$DefaultDevices') -> None:
+    def reset_devices(self, device_names: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Reset the specified device(s) to the default state.
         
         This function sends the specified devices a hardware reset signal,
@@ -1668,7 +1668,7 @@ class Session:
         """
         self._interpreter.set_physical_channel_property_uint64_array(self._session_handle, physical_channel_names, property_name, property_value)
 
-    def commit_properties_for_devices(self, device_names: str = '$DefaultDevices') -> None:
+    def commit_properties_for_devices(self, device_names: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Commit all device or physical channels properties with pending
         changes to hardware for the specified device(s) and the physical
         channels that they contain.
@@ -1683,7 +1683,7 @@ class Session:
         """
         self._interpreter.commit_properties_for_devices(self._session_handle, device_names)
 
-    def commit_properties_for_physical_channels(self, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def commit_properties_for_physical_channels(self, physical_channel_names: str = DEFAULT_PHYS_CHANS_ALIAS) -> None:
         """Commit all physical channel properties with pending changes to
         hardware for the specified physical channel(s).
         
@@ -2514,7 +2514,7 @@ class Session:
         """
         self._interpreter.set_generic_property_uint64_array(self._session_handle, resources, property_name, property_value)
 
-    def execute_device_command(self, command_name: str, timeout: float, device_names: str = '$DefaultDevices') -> None:
+    def execute_device_command(self, command_name: str, timeout: float, device_names: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Execute the specified device command on one or more devices.
         
         Commands define how user applications initiate actions or coordinated
@@ -2538,7 +2538,7 @@ class Session:
         """
         self._interpreter.execute_device_command(self._session_handle, device_names, command_name, timeout)
 
-    def execute_physical_channel_command(self, command_name: str, timeout: float, physical_channel_names: str = '$DefaultPhysChans') -> None:
+    def execute_physical_channel_command(self, command_name: str, timeout: float, physical_channel_names: str = DEFAULT_PHYS_CHANS_ALIAS) -> None:
         """Execute the specified physical channel command on one or more
         physical channels.
         
@@ -2588,7 +2588,7 @@ class Session:
         """
         self._interpreter.execute_generic_command(self._session_handle, resources, command_name, timeout)
 
-    def read_register_uint8(self, register_address: int, device_name: str = '$DefaultDevices') -> int:
+    def read_register_uint8(self, register_address: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> int:
         """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
@@ -2607,7 +2607,7 @@ class Session:
         data = self._interpreter.read_register_uint8(self._session_handle, device_name, register_address)
         return data
 
-    def read_register_uint16(self, register_address: int, device_name: str = '$DefaultDevices') -> int:
+    def read_register_uint16(self, register_address: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> int:
         """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
@@ -2626,7 +2626,7 @@ class Session:
         data = self._interpreter.read_register_uint16(self._session_handle, device_name, register_address)
         return data
 
-    def read_register_uint32(self, register_address: int, device_name: str = '$DefaultDevices') -> int:
+    def read_register_uint32(self, register_address: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> int:
         """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
@@ -2645,7 +2645,7 @@ class Session:
         data = self._interpreter.read_register_uint32(self._session_handle, device_name, register_address)
         return data
 
-    def read_register_uint64(self, register_address: int, device_name: str = '$DefaultDevices') -> int:
+    def read_register_uint64(self, register_address: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> int:
         """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
@@ -2664,7 +2664,7 @@ class Session:
         data = self._interpreter.read_register_uint64(self._session_handle, device_name, register_address)
         return data
 
-    def write_register_uint8(self, register_address: int, data: int, device_name: str = '$DefaultDevices') -> None:
+    def write_register_uint8(self, register_address: int, data: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
@@ -2680,7 +2680,7 @@ class Session:
         """
         self._interpreter.write_register_uint8(self._session_handle, device_name, register_address, data)
 
-    def write_register_uint16(self, register_address: int, data: int, device_name: str = '$DefaultDevices') -> None:
+    def write_register_uint16(self, register_address: int, data: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
@@ -2696,7 +2696,7 @@ class Session:
         """
         self._interpreter.write_register_uint16(self._session_handle, device_name, register_address, data)
 
-    def write_register_uint32(self, register_address: int, data: int, device_name: str = '$DefaultDevices') -> None:
+    def write_register_uint32(self, register_address: int, data: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
@@ -2712,7 +2712,7 @@ class Session:
         """
         self._interpreter.write_register_uint32(self._session_handle, device_name, register_address, data)
 
-    def write_register_uint64(self, register_address: int, data: int, device_name: str = '$DefaultDevices') -> None:
+    def write_register_uint64(self, register_address: int, data: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
@@ -2764,7 +2764,7 @@ class Session:
         """
         self._interpreter.set_nvmem_bytes(self._session_handle, nvmem_area, nvmem_address, bytes_data, serial_number, password)
 
-    def commit_nvmem_areas(self, nvmem_area_names: str = '$DefaultNVMEMAreas') -> None:
+    def commit_nvmem_areas(self, nvmem_area_names: str = DEFAULT_NVMEM_AREAS_ALIAS) -> None:
         """Commit pending changes to hardware for the specified NVMEM area(s).
         
         Args:
@@ -2774,7 +2774,7 @@ class Session:
         """
         self._interpreter.commit_nvmem_areas(self._session_handle, nvmem_area_names)
 
-    def commit_nvmem_for_devices(self, device_names: str = '$DefaultDevices') -> None:
+    def commit_nvmem_for_devices(self, device_names: str = DEFAULT_DEVICES_ALIAS) -> None:
         """Commit pending changes to hardware for all NVMEM areas on the
         specified device(s).
         

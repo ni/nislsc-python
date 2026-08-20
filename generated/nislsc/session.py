@@ -2514,7 +2514,7 @@ class Session:
         """
         self._interpreter.set_generic_property_uint64_array(self._session_handle, resources, property_name, property_value)
 
-    def execute_device_command(self, command_name: str, timeout: float, device_names: str = DEFAULT_DEVICES_ALIAS) -> None:
+    def execute_device_command(self, device_names: str, command_name: str, timeout: float) -> None:
         """Execute the specified device command on one or more devices.
         
         Commands define how user applications initiate actions or coordinated
@@ -2538,7 +2538,7 @@ class Session:
         """
         self._interpreter.execute_device_command(self._session_handle, device_names, command_name, timeout)
 
-    def execute_physical_channel_command(self, command_name: str, timeout: float, physical_channel_names: str = DEFAULT_PHYS_CHANS_ALIAS) -> None:
+    def execute_physical_channel_command(self, physical_channel_names: str, command_name: str, timeout: float) -> None:
         """Execute the specified physical channel command on one or more
         physical channels.
         
@@ -2588,7 +2588,7 @@ class Session:
         """
         self._interpreter.execute_generic_command(self._session_handle, resources, command_name, timeout)
 
-    def read_register_uint8(self, register_address: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> int:
+    def read_register_uint8(self, device_name: str, register_address: int) -> int:
         """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
@@ -2607,7 +2607,7 @@ class Session:
         data = self._interpreter.read_register_uint8(self._session_handle, device_name, register_address)
         return data
 
-    def read_register_uint16(self, register_address: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> int:
+    def read_register_uint16(self, device_name: str, register_address: int) -> int:
         """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
@@ -2626,7 +2626,7 @@ class Session:
         data = self._interpreter.read_register_uint16(self._session_handle, device_name, register_address)
         return data
 
-    def read_register_uint32(self, register_address: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> int:
+    def read_register_uint32(self, device_name: str, register_address: int) -> int:
         """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
@@ -2645,7 +2645,7 @@ class Session:
         data = self._interpreter.read_register_uint32(self._session_handle, device_name, register_address)
         return data
 
-    def read_register_uint64(self, register_address: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> int:
+    def read_register_uint64(self, device_name: str, register_address: int) -> int:
         """Read the specified register.
         
         To read a single bitfield, consider using properties instead.
@@ -2664,7 +2664,7 @@ class Session:
         data = self._interpreter.read_register_uint64(self._session_handle, device_name, register_address)
         return data
 
-    def write_register_uint8(self, register_address: int, data: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> None:
+    def write_register_uint8(self, device_name: str, register_address: int, data: int) -> None:
         """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
@@ -2680,7 +2680,7 @@ class Session:
         """
         self._interpreter.write_register_uint8(self._session_handle, device_name, register_address, data)
 
-    def write_register_uint16(self, register_address: int, data: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> None:
+    def write_register_uint16(self, device_name: str, register_address: int, data: int) -> None:
         """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
@@ -2696,7 +2696,7 @@ class Session:
         """
         self._interpreter.write_register_uint16(self._session_handle, device_name, register_address, data)
 
-    def write_register_uint32(self, register_address: int, data: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> None:
+    def write_register_uint32(self, device_name: str, register_address: int, data: int) -> None:
         """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.
@@ -2712,7 +2712,7 @@ class Session:
         """
         self._interpreter.write_register_uint32(self._session_handle, device_name, register_address, data)
 
-    def write_register_uint64(self, register_address: int, data: int, device_name: str = DEFAULT_DEVICES_ALIAS) -> None:
+    def write_register_uint64(self, device_name: str, register_address: int, data: int) -> None:
         """Write data to the specified register.
         
         To write a single bitfield, consider using properties instead.

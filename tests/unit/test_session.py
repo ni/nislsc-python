@@ -895,7 +895,7 @@ def test___session_opened___execute_device_command___interpreter_called_with_arg
 ) -> None:
     session_handle = session._session_handle
 
-    session.execute_device_command("Reset", 10.0, "Dev1")
+    session.execute_device_command("Dev1", "Reset", 10.0)
 
     interpreter.execute_device_command.assert_called_once_with(
         session_handle, "Dev1", "Reset", 10.0
@@ -907,7 +907,7 @@ def test___session_opened___execute_physical_channel_command___interpreter_calle
 ) -> None:
     session_handle = session._session_handle
 
-    session.execute_physical_channel_command("Calibrate", 5.0, "Dev1/phys0")
+    session.execute_physical_channel_command("Dev1/phys0", "Calibrate", 5.0)
 
     interpreter.execute_physical_channel_command.assert_called_once_with(
         session_handle, "Dev1/phys0", "Calibrate", 5.0
@@ -941,7 +941,7 @@ def test___session_opened___read_register___returns_value(
     getattr(interpreter, method).return_value = value
     session_handle = session._session_handle
 
-    result = getattr(session, method)(address, "Dev1")
+    result = getattr(session, method)("Dev1", address)
 
     getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", address)
     assert result == value
@@ -961,7 +961,7 @@ def test___session_opened___write_register___interpreter_called_with_args(
 ) -> None:
     session_handle = session._session_handle
 
-    getattr(session, method)(address, value, "Dev1")
+    getattr(session, method)("Dev1", address, value)
 
     getattr(interpreter, method).assert_called_once_with(session_handle, "Dev1", address, value)
 

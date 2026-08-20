@@ -7014,7 +7014,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -7060,7 +7059,6 @@
                 },
                 {
                     "dataType": "PhysChan",
-                    "default": "$DefaultPhysChans",
                     "dir": [
                         "in"
                     ],
@@ -7149,7 +7147,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -7195,7 +7192,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -7241,7 +7237,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -7287,7 +7282,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -7333,7 +7327,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -7379,7 +7372,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -7425,7 +7417,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],
@@ -7471,7 +7462,6 @@
                 },
                 {
                     "dataType": "Device",
-                    "default": "$DefaultDevices",
                     "dir": [
                         "in"
                     ],

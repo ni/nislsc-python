@@ -24,7 +24,7 @@ def main(device_names: str) -> None:
         with Session.initialize_session_with_devices(
             device_names=device_names,
         ) as session:
-            session.reset_devices(device_names)
+            session.reset_devices()
             print(f"Reset command sent to device(s) {device_names}")
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

@@ -23,12 +23,10 @@ def main(chassis_name: str) -> None:
     try:
         physical_channel_names = f"{chassis_name}/BatteryVoltageSensor"
         reservation_access = ReservationAccess.READ_ONLY
-        reservation_group = "admin"
 
         with Session.initialize_session_with_physical_channels(
             physical_channel_names=physical_channel_names,
             reservation_access=reservation_access,
-            reservation_group=reservation_group,
         ) as session:
             sensor_lower_critical = session.get_physical_channel_property_double(
                 property_name="SensorLowerCritical",

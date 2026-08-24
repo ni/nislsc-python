@@ -3,7 +3,7 @@
 import click
 
 from nislsc import Session
-from nislsc.constants import ReservationAccess
+from nislsc.constants import DEFAULT_PHYS_CHANS_ALIAS, ReservationAccess
 
 
 @click.command()
@@ -29,16 +29,16 @@ def main(chassis_name: str) -> None:
             reservation_access=reservation_access,
         ) as session:
             sensor_lower_critical = session.get_physical_channel_property_double(
+                physical_channel_names=DEFAULT_PHYS_CHANS_ALIAS,
                 property_name="SensorLowerCritical",
-                physical_channel_names=physical_channel_names,
             )
             sensor_reading = session.get_physical_channel_property_double(
+                physical_channel_names=DEFAULT_PHYS_CHANS_ALIAS,
                 property_name="SensorReading",
-                physical_channel_names=physical_channel_names,
             )
             health_state = session.get_physical_channel_property_string(
+                physical_channel_names=DEFAULT_PHYS_CHANS_ALIAS,
                 property_name="HealthState",
-                physical_channel_names=physical_channel_names,
             )
             needs_replacement = sensor_reading < sensor_lower_critical
 

@@ -50,12 +50,10 @@ def get_command_and_property_tree(device_name: str) -> dict:
         Dictionary containing the command and property tree of the device.
     """
     reservation_access = ReservationAccess.READ_ONLY
-    reservation_group = "admin"
 
     with Session.initialize_session_with_devices(
         device_names=device_name,
         reservation_access=reservation_access,
-        reservation_group=reservation_group,
     ) as session:
 
         data = {

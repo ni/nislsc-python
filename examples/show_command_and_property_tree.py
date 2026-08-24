@@ -9,6 +9,7 @@ from nislsc import Command, Property, Session
 from nislsc.constants import (
     CommandProperty,
     DataType,
+    DEFAULT_DEVICES_ALIAS,
     DeviceProperty,
     PhysicalChannelProperty,
     PropertyAccess,
@@ -63,17 +64,17 @@ def get_command_and_property_tree(device_name: str) -> dict:
         }
 
         device_commands = session.get_device_property_string_array(
-            device_name,
+            DEFAULT_DEVICES_ALIAS,
             DeviceProperty.COMMANDS,
         )
 
         device_properties = session.get_device_property_string_array(
-            device_name,
+            DEFAULT_DEVICES_ALIAS,
             DeviceProperty.PROPERTIES,
         )
 
         device_physical_channels = session.get_device_property_string_array(
-            device_name,
+            DEFAULT_DEVICES_ALIAS,
             DeviceProperty.PHYSICAL_CHANNELS,
         )
 

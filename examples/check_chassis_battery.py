@@ -3,7 +3,7 @@
 import click
 
 from nislsc import Session
-from nislsc.constants import ReservationAccess
+from nislsc.constants import DEFAULT_PHYS_CHANS_ALIAS, ReservationAccess
 
 
 @click.command()
@@ -22,29 +22,22 @@ def main(chassis_name: str) -> None:
     """  # noqa: D301
     try:
         physical_channel_names = f"{chassis_name}/BatteryVoltageSensor"
-        connection_timeout = 10.0
         reservation_access = ReservationAccess.READ_ONLY
-        reservation_group = "admin"
-        reservation_timeout = 10.0
 
         with Session.initialize_session_with_physical_channels(
-            None,
             physical_channel_names=physical_channel_names,
-            connection_timeout=connection_timeout,
             reservation_access=reservation_access,
-            reservation_group=reservation_group,
-            reservation_timeout=reservation_timeout,
         ) as session:
             sensor_lower_critical = session.get_physical_channel_property_double(
-                physical_channel_names=physical_channel_names,
+                physical_channel_names=DEFAULT_PHYS_CHANS_ALIAS,
                 property_name="SensorLowerCritical",
             )
             sensor_reading = session.get_physical_channel_property_double(
-                physical_channel_names=physical_channel_names,
+                physical_channel_names=DEFAULT_PHYS_CHANS_ALIAS,
                 property_name="SensorReading",
             )
             health_state = session.get_physical_channel_property_string(
-                physical_channel_names=physical_channel_names,
+                physical_channel_names=DEFAULT_PHYS_CHANS_ALIAS,
                 property_name="HealthState",
             )
             needs_replacement = sensor_reading < sensor_lower_critical

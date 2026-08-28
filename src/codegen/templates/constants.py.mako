@@ -59,6 +59,26 @@ except ImportError:
         class StrEnum(str, Enum):
             """StrEnum fallback for Python versions < 3.11."""
 
+CONNECTED_DEVICES_ALIAS = "$ConnectedDevices"
+"""A resource alias representing the session's connected devices."""
+
+DEFAULT_DEVICES_ALIAS = "$DefaultDevices"
+"""A resource alias representing the session's default devices."""
+
+DEFAULT_NVMEM_AREAS_ALIAS = "$DefaultNVMEMAreas"
+"""A resource alias representing the session's default NVMEM areas."""
+
+DEFAULT_PHYS_CHANS_ALIAS = "$DefaultPhysChans"
+"""A resource alias representing the session's default physical channels."""
+
+RESERVED_DEVICES_ALIAS = "$ReservedDevices"
+"""A resource alias representing the session's reserved devices."""
+
+SESSION_ALIAS = "$Session"
+"""A resource alias for accessing session properties."""
+
+SYSTEM_ALIAS = "$System"
+"""A resource alias for accessing system properties."""
 % for enum in enums:
 % if "capi" in enum["targets"]:
 

@@ -85,7 +85,7 @@ class Library:
 % for function in functions:
 % if 'capi' in function['targets']:
 % if is_class_func(function, "Library") and function["name"] != "FinalizeLibrary" and function["name"] != "GetExtendedErrorInfo":
-    def ${get_python_function_name(function, True)}(${", ".join([param for param in get_function_parameter_list(function, "Library", True, True)])})${get_function_return_type(function)}:
+    def ${get_python_function_name(function, True)}(${", ".join([param for param in get_function_parameter_list(function, "Library", is_language=True, include_defaults=True)])})${get_function_return_type(function)}:
 % for docstrings in generate_docstrings(function, "Library"):
         ${docstrings}
 % endfor

@@ -71,9 +71,9 @@ class Property:
 % if is_class_func(function, "PropertyReference") and function["name"] != "CloseProperty":
 % if is_classmethod(function, "PropertyReference"):
     @classmethod
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_classmethod_parameter_list(function)])})${get_function_return_type(function, True)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_classmethod_parameter_list(function, include_defaults=True)])})${get_function_return_type(function, True)}:
 % else:
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "PropertyReference")])})${get_function_return_type(function, True)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "PropertyReference", include_defaults=True)])})${get_function_return_type(function, True)}:
 % endif:
 % if is_classmethod(function, "PropertyReference"):
 % for docstrings in generate_docstrings(function, "PropertyReference", True):

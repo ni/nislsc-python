@@ -3,7 +3,6 @@
 import click
 
 from nislsc import Session
-from nislsc.constants import ReservationAccess
 
 
 @click.command()
@@ -22,20 +21,10 @@ def main(device_names: str) -> None:
         reset_device SLSC-12001-XXXXXXXX-Mod1,SLSC-12001-XXXXXXXX-Mod2
     """  # noqa: D301
     try:
-        connection_timeout = 10.0
-        reservation_access = ReservationAccess.READ_ONLY
-        reservation_group = "admin"
-        reservation_timeout = 10.0
-
         with Session.initialize_session_with_devices(
-            None,
             device_names=device_names,
-            connection_timeout=connection_timeout,
-            reservation_access=reservation_access,
-            reservation_group=reservation_group,
-            reservation_timeout=reservation_timeout,
         ) as session:
-            session.reset_devices(device_names)
+            session.reset_devices()
             print(f"Reset command sent to device(s) {device_names}")
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

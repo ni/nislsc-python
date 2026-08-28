@@ -9,6 +9,7 @@ from nislsc import Command, Property, Session
 from nislsc.constants import (
     CommandProperty,
     DataType,
+    DEFAULT_DEVICES_ALIAS,
     DeviceProperty,
     PhysicalChannelProperty,
     PropertyAccess,
@@ -49,18 +50,11 @@ def get_command_and_property_tree(device_name: str) -> dict:
     Returns:
         Dictionary containing the command and property tree of the device.
     """
-    connection_timeout = 10.0
     reservation_access = ReservationAccess.READ_ONLY
-    reservation_group = "admin"
-    reservation_timeout = 10.0
 
     with Session.initialize_session_with_devices(
-        None,
-        device_name,
-        connection_timeout,
-        reservation_access,
-        reservation_group,
-        reservation_timeout,
+        device_names=device_name,
+        reservation_access=reservation_access,
     ) as session:
 
         data = {
@@ -70,17 +64,17 @@ def get_command_and_property_tree(device_name: str) -> dict:
         }
 
         device_commands = session.get_device_property_string_array(
-            device_name,
+            DEFAULT_DEVICES_ALIAS,
             DeviceProperty.COMMANDS,
         )
 
         device_properties = session.get_device_property_string_array(
-            device_name,
+            DEFAULT_DEVICES_ALIAS,
             DeviceProperty.PROPERTIES,
         )
 
         device_physical_channels = session.get_device_property_string_array(
-            device_name,
+            DEFAULT_DEVICES_ALIAS,
             DeviceProperty.PHYSICAL_CHANNELS,
         )
 

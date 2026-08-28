@@ -1,5 +1,5 @@
 <%!
-from utilities.function_helpers import get_function_parameter_list, get_function_return_type, is_creating_handle, is_class_func, is_classmethod, get_classmethod_parameter_list, generate_return_in_class, generate_function_call_in_class
+from utilities.function_helpers import get_default_alias_constants, get_function_parameter_list, get_function_return_type, is_creating_handle, is_class_func, is_classmethod, get_classmethod_parameter_list, generate_return_in_class, generate_function_call_in_class
 from utilities.interpreter_helpers import get_python_function_name, is_capi, is_param_input, is_param_output
 from utilities.docstrings_helpers import generate_docstrings
 %>\
@@ -15,7 +15,7 @@ from types import TracebackType
 
 from typing_extensions import Self
 
-from nislsc.constants import ReservationAccess, TableScaleCoercion
+from nislsc.constants import ${", ".join(["ReservationAccess", "TableScaleCoercion", *get_default_alias_constants(functions)])}
 from nislsc.library import Library
 
 
@@ -76,9 +76,9 @@ class Session:
 % if is_class_func(function, "Session") and function["name"] != "CloseSession":
 % if is_classmethod(function, "Session"):
     @classmethod
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_classmethod_parameter_list(function)])})${get_function_return_type(function, True)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_classmethod_parameter_list(function, include_defaults=True)])})${get_function_return_type(function, True)}:
 % else:
-    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session")])})${get_function_return_type(function, True)}:
+    def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function, "Session", include_defaults=True)])})${get_function_return_type(function, True)}:
 % endif:
 % if is_classmethod(function, "Session"):
 % for docstrings in generate_docstrings(function, "Session", True):

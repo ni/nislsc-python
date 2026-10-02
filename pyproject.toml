@@ -54,7 +54,7 @@ optional = true
 # The latest Sphinx requires a recent Python version.
 Sphinx = { version = ">=8.2", python = "^3.11" }
 sphinx-rtd-theme = { version = ">=1.0.0", python = "^3.11" }
-sphinx-autoapi = { version = ">=1.8.4", python = "^3.11" }
+sphinx-autoapi = { version = ">=3.1", python = "^3.11" }
 m2r2 = { version = ">=0.3.2", python = "^3.11" }
 toml = { version = ">=0.10.2", python = "^3.11" }
 

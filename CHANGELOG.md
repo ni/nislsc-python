@@ -6,6 +6,7 @@
 ## 0.3.0
 * ### What's Changed
     * Upgrade to Poetry 2.x and migrate `pyproject.toml` format.
+    * Removed support for Python 3.9 and 3.10.
 
 * ### Resolved Issues
     * ...

@@ -25,7 +25,7 @@ This package requires the NI-SLSC C API, which was introduced in NI-SLSC 20.0.
 
 ### Python Version Support
 
-**nislsc** supports CPython 3.9+ and PyPy3.
+**nislsc** supports CPython 3.11+ and PyPy3.
 
 ## Installation
 

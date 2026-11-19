@@ -1578,7 +1578,6 @@ class LibraryInterpreter(BaseInterpreter):
         return property_value_c.value
 
     def get_system_property_string_array(self, session_handle: int, property_name: str) -> list[str]:
-        """Retrieve strings with at most five calls to accommodate buffer growth."""
         session_handle_c = ctypes.c_void_p(session_handle)
         property_name_bytes = property_name.encode('utf-8')
         property_value_ptr = ctypes.POINTER(ctypes.c_char_p)()
@@ -1597,7 +1596,7 @@ class LibraryInterpreter(BaseInterpreter):
                 buffer_size,
                 ctypes.byref(required_buffer_size),
             )
-            if status != SLSCErrors.BUFFER_TOO_SMALL.value:
+            if status != SLSCErrors.BUFFER_TOO_SMALL.value or required_buffer_size.value <= 0:
                 break
             if attempt < max_attempts - 1:
                 buffer_size = required_buffer_size.value

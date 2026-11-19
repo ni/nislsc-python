@@ -663,7 +663,7 @@ def generate_string_array_retry(function: dict) -> list[str]:
     lines.extend(
         [
             "    )",
-            "    if status != SLSCErrors.BUFFER_TOO_SMALL.value:",
+            "    if status != SLSCErrors.BUFFER_TOO_SMALL.value or required_buffer_size.value <= 0:",
             "        break",
             "    if attempt < max_attempts - 1:",
             "        buffer_size = required_buffer_size.value",

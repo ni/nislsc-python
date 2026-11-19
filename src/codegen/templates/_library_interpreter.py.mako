@@ -44,9 +44,6 @@ class LibraryInterpreter(BaseInterpreter):
 % for function in functions:
 % if "capi" in function["targets"]:
     def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function)])})${get_function_return_type(function)}:
-% if function["name"] == "GetSystemPropertyStringArray":
-        """Retrieve strings with at most five calls to accommodate buffer growth."""
-% endif
 % for line in generate_variable_declaration(function):
         ${line}
 % endfor

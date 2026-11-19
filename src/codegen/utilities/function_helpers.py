@@ -7,6 +7,7 @@ context of generating C API bindings for the NI-SLSC API.
 
 from utilities.interpreter_helpers import (
     convert_to_screaming_snake_case,
+    get_capi_function_name,
     get_param_datatype_in_ctypes,
     get_python_function_name,
     get_standardized_param_name,
@@ -597,8 +598,8 @@ def generate_additional_variable_declaration(function: dict) -> list[str]:
     return decl_list
 
 
-def generate_function_call_for_result(function: dict) -> list[str]:
-    """Generate the function call for getting results."""
+def generate_function_call_for_result(function: dict, *, retry_buffer: bool = False) -> list[str]:
+    """Generate result-call arguments, optionally reporting string-array buffer growth."""
     var_list = []
     for parameter in function["params"]:
         if is_capi(parameter) and is_param_output(parameter):
@@ -607,8 +608,8 @@ def generate_function_call_for_result(function: dict) -> list[str]:
                     var_list.append(f"ctypes.byref({get_standardized_param_name(parameter)}_ptr)")
                     var_list.append(f"ctypes.byref(num_{get_standardized_param_name(parameter)})")
                     var_list.append("buffer")
-                    var_list.append("required_buffer_size.value")
-                    var_list.append("None")
+                    var_list.append("buffer_size" if retry_buffer else "required_buffer_size.value")
+                    var_list.append("ctypes.byref(required_buffer_size)" if retry_buffer else "None")
                 elif parameter["dataType"] in ARRAY_VAR:
                     var_list.append(f"{get_standardized_param_name(parameter)}_c")
                     var_list.append(f"{get_standardized_param_name(parameter)}_actual_size.value")
@@ -644,6 +645,34 @@ def generate_function_call_for_result(function: dict) -> list[str]:
                     var_list.append(f"{get_standardized_param_name(parameter)}_c")
 
     return var_list
+
+
+def generate_string_array_retry(function: dict) -> list[str]:
+    """Generate at most five native calls, resizing a string-array buffer as needed."""
+    lines = [
+        "buffer = None",
+        "buffer_size = 0",
+        "max_attempts = 5",
+        "for attempt in range(max_attempts):",
+        f"    status = lib.niSLSC_{get_capi_function_name(function)}(",
+    ]
+    lines.extend(
+        f"        {argument},"
+        for argument in generate_function_call_for_result(function, retry_buffer=True)
+    )
+    lines.extend(
+        [
+            "    )",
+            "    if status != SLSCErrors.BUFFER_TOO_SMALL.value:",
+            "        break",
+            "    if attempt < max_attempts - 1:",
+            "        buffer_size = required_buffer_size.value",
+        ]
+    )
+    lines.extend(
+        f"        {line}" for line in generate_additional_variable_declaration(function)
+    )
+    return lines
 
 
 def is_size_unknown(function: dict) -> bool:

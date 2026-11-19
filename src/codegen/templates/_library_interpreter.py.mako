@@ -1,6 +1,6 @@
 <%!
 from utilities.interpreter_helpers import get_python_function_name, get_capi_function_name, get_standardized_param_name
-from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_conditional_for_validation
+from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_conditional_for_validation, generate_string_array_retry
 %>\
 """Provide ctypes-based SLSC library implementation.
 
@@ -15,6 +15,7 @@ import warnings
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.constants import Language, ReservationAccess, TableScaleCoercion
 from nislsc.error import SLSCError, SLSCWarning
+from nislsc.error_codes import SLSCErrors
 
 
 lib = ctypes.CDLL("nislsc.dll")
@@ -43,10 +44,18 @@ class LibraryInterpreter(BaseInterpreter):
 % for function in functions:
 % if "capi" in function["targets"]:
     def ${get_python_function_name(function)}(${", ".join([param for param in get_function_parameter_list(function)])})${get_function_return_type(function)}:
+% if function["name"] == "GetSystemPropertyStringArray":
+        """Retrieve strings with at most five calls to accommodate buffer growth."""
+% endif
 % for line in generate_variable_declaration(function):
         ${line}
 % endfor
-% if is_size_unknown(function):
+% if function["name"] == "GetSystemPropertyStringArray":
+% for line in generate_string_array_retry(function):
+        ${line}
+% endfor
+        self._check_for_error(status)
+% elif is_size_unknown(function):
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_size(function))})
         if ${generate_conditional_for_validation(function)}:
 % if function["name"] == "GetExtendedErrorInfo":

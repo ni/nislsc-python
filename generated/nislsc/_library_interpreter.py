@@ -11,6 +11,7 @@ import warnings
 from nislsc._base_interpreter import BaseInterpreter
 from nislsc.constants import Language, ReservationAccess, TableScaleCoercion
 from nislsc.error import SLSCError, SLSCWarning
+from nislsc.error_codes import SLSCErrors
 
 
 lib = ctypes.CDLL("nislsc.dll")
@@ -1577,16 +1578,30 @@ class LibraryInterpreter(BaseInterpreter):
         return property_value_c.value
 
     def get_system_property_string_array(self, session_handle: int, property_name: str) -> list[str]:
+        """Retrieve strings with at most five calls to accommodate buffer growth."""
         session_handle_c = ctypes.c_void_p(session_handle)
         property_name_bytes = property_name.encode('utf-8')
         property_value_ptr = ctypes.POINTER(ctypes.c_char_p)()
         num_property_value = ctypes.c_size_t()
         required_buffer_size = ctypes.c_size_t()
-        status = lib.niSLSC_GetSystemPropertyStringArray(session_handle_c, property_name_bytes, ctypes.byref(property_value_ptr), ctypes.byref(num_property_value), None, 0, ctypes.byref(required_buffer_size))
-        if required_buffer_size.value <= 0:
-            self._check_for_error(status)
-        buffer = ctypes.create_string_buffer(required_buffer_size.value)
-        status = lib.niSLSC_GetSystemPropertyStringArray(session_handle_c, property_name_bytes, ctypes.byref(property_value_ptr), ctypes.byref(num_property_value), buffer, required_buffer_size.value, None)
+        buffer = None
+        buffer_size = 0
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            status = lib.niSLSC_GetSystemPropertyStringArray(
+                session_handle_c,
+                property_name_bytes,
+                ctypes.byref(property_value_ptr),
+                ctypes.byref(num_property_value),
+                buffer,
+                buffer_size,
+                ctypes.byref(required_buffer_size),
+            )
+            if status != SLSCErrors.BUFFER_TOO_SMALL.value:
+                break
+            if attempt < max_attempts - 1:
+                buffer_size = required_buffer_size.value
+                buffer = ctypes.create_string_buffer(required_buffer_size.value)
         self._check_for_error(status)
         property_value_array = []
         for i in range(num_property_value.value):

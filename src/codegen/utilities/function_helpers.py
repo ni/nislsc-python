@@ -599,7 +599,7 @@ def generate_additional_variable_declaration(function: dict) -> list[str]:
 
 
 def generate_function_call_for_result(function: dict, *, retry_buffer: bool = False) -> list[str]:
-    """Generate result-call arguments, optionally reporting string-array buffer growth."""
+    """Generate result-call arguments, optionally reporting string buffer growth."""
     var_list = []
     for parameter in function["params"]:
         if is_capi(parameter) and is_param_output(parameter):
@@ -613,15 +613,27 @@ def generate_function_call_for_result(function: dict, *, retry_buffer: bool = Fa
                 elif parameter["dataType"] in ARRAY_VAR:
                     var_list.append(f"{get_standardized_param_name(parameter)}_c")
                     var_list.append(f"{get_standardized_param_name(parameter)}_actual_size.value")
-                    var_list.append("None")
+                    var_list.append(
+                        f"ctypes.byref({get_standardized_param_name(parameter)}_actual_size)"
+                        if retry_buffer
+                        else "None"
+                    )
                 elif parameter["dataType"] == "uint8[]":
                     var_list.append(f"{get_standardized_param_name(parameter)}_array")
                     var_list.append(f"num_{get_standardized_param_name(parameter)}")
             else:
                 if parameter["dataType"] in STRING_LIST:
                     var_list.append("buffer")
-                    var_list.append(f"{get_standardized_param_name(parameter)}_actual_size.value")
-                    var_list.append("None")
+                    var_list.append(
+                        "buffer_size"
+                        if retry_buffer
+                        else f"{get_standardized_param_name(parameter)}_actual_size.value"
+                    )
+                    var_list.append(
+                        f"ctypes.byref({get_standardized_param_name(parameter)}_actual_size)"
+                        if retry_buffer
+                        else "None"
+                    )
                 else:
                     var_list.append(f"ctypes.byref({get_standardized_param_name(parameter)}_c)")
 
@@ -647,13 +659,38 @@ def generate_function_call_for_result(function: dict, *, retry_buffer: bool = Fa
     return var_list
 
 
-def generate_string_array_retry(function: dict) -> list[str]:
-    """Generate at most five native calls, resizing a string-array buffer as needed."""
-    lines = [
-        "buffer = None",
+def has_string_output(function: dict) -> bool:
+    """Check whether a C API function returns a string or string array."""
+    return any(
+        is_capi(parameter)
+        and is_param_output(parameter)
+        and (parameter["dataType"] in STRING_LIST or parameter["dataType"] == "string[]")
+        for parameter in function["params"]
+    )
+
+
+def generate_string_buffer_retry(function: dict) -> list[str]:
+    """Generate native calls that resize string buffers until they fit."""
+    size_variables = [
+        (
+            "required_buffer_size"
+            if parameter["dataType"] == "string[]"
+            else f"{get_standardized_param_name(parameter)}_actual_size"
+        )
+        for parameter in function["params"]
+        if is_capi(parameter)
+        and is_param_output(parameter)
+        and (
+            parameter["dataType"] in STRING_LIST
+            or parameter["dataType"] == "string[]"
+            or parameter["dataType"] in ARRAY_VAR
+        )
+    ]
+    size_variable = size_variables[0]
+    invalid_sizes = " or ".join(f"{variable}.value <= 0" for variable in size_variables)
+    lines = generate_additional_variable_declaration(function) + [
         "buffer_size = 0",
-        "max_attempts = 5",
-        "for attempt in range(max_attempts):",
+        "while True:",
         f"    status = lib.niSLSC_{get_capi_function_name(function)}(",
     ]
     lines.extend(
@@ -663,15 +700,12 @@ def generate_string_array_retry(function: dict) -> list[str]:
     lines.extend(
         [
             "    )",
-            "    if status != SLSCErrors.BUFFER_TOO_SMALL.value or required_buffer_size.value <= 0:",
+            f"    if status != SLSCErrors.BUFFER_TOO_SMALL.value or {invalid_sizes}:",
             "        break",
-            "    if attempt < max_attempts - 1:",
-            "        buffer_size = required_buffer_size.value",
+            f"    buffer_size = {size_variable}.value",
         ]
     )
-    lines.extend(
-        f"        {line}" for line in generate_additional_variable_declaration(function)
-    )
+    lines.extend(f"    {line}" for line in generate_additional_variable_declaration(function))
     return lines
 
 

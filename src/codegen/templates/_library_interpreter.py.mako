@@ -1,6 +1,6 @@
 <%!
 from utilities.interpreter_helpers import get_python_function_name, get_capi_function_name, get_standardized_param_name
-from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_conditional_for_validation, generate_string_array_retry
+from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_conditional_for_validation, has_string_output, generate_string_buffer_retry
 %>\
 """Provide ctypes-based SLSC library implementation.
 
@@ -47,12 +47,13 @@ class LibraryInterpreter(BaseInterpreter):
 % for line in generate_variable_declaration(function):
         ${line}
 % endfor
-% if function["name"] == "GetSystemPropertyStringArray":
-% for line in generate_string_array_retry(function):
+% if is_size_unknown(function):
+% if function["name"] not in ("GetExtendedErrorInfo", "GetErrorDescription") and has_string_output(function):
+% for line in generate_string_buffer_retry(function):
         ${line}
 % endfor
         self._check_for_error(status)
-% elif is_size_unknown(function):
+% else:
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_size(function))})
         if ${generate_conditional_for_validation(function)}:
 % if function["name"] == "GetExtendedErrorInfo":
@@ -75,6 +76,7 @@ class LibraryInterpreter(BaseInterpreter):
             self._check_for_error(status)
 % else:
         self._check_for_error(status)
+% endif
 % endif
 % else:
         status = lib.niSLSC_${get_capi_function_name(function)}(${", ".join(generate_function_call_for_result(function))})

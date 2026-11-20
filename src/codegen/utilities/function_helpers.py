@@ -609,7 +609,9 @@ def generate_function_call_for_result(function: dict, *, retry_buffer: bool = Fa
                     var_list.append(f"ctypes.byref(num_{get_standardized_param_name(parameter)})")
                     var_list.append("buffer")
                     var_list.append("buffer_size" if retry_buffer else "required_buffer_size.value")
-                    var_list.append("ctypes.byref(required_buffer_size)" if retry_buffer else "None")
+                    var_list.append(
+                        "ctypes.byref(required_buffer_size)" if retry_buffer else "None"
+                    )
                 elif parameter["dataType"] in ARRAY_VAR:
                     var_list.append(f"{get_standardized_param_name(parameter)}_c")
                     var_list.append(f"{get_standardized_param_name(parameter)}_actual_size.value")

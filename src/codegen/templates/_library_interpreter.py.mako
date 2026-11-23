@@ -1,6 +1,6 @@
 <%!
 from utilities.interpreter_helpers import get_python_function_name, get_capi_function_name, get_standardized_param_name
-from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_conditional_for_validation, has_string_output, generate_string_buffer_retry
+from utilities.function_helpers import get_function_parameter_list, generate_function_call_for_size, is_size_unknown, generate_additional_variable_declaration, generate_function_call_for_result, generate_result_parser, generate_return_parameter, generate_variable_declaration, get_ctypes_argtypes, get_function_return_type, generate_conditional_for_validation, has_string_output, generate_string_buffer_retry, generate_single_call_string_buffer, SINGLE_CALL_STRING_OUTPUT_FUNCTIONS
 %>\
 """Provide ctypes-based SLSC library implementation.
 
@@ -48,7 +48,12 @@ class LibraryInterpreter(BaseInterpreter):
         ${line}
 % endfor
 % if is_size_unknown(function):
-% if function["name"] not in ("GetExtendedErrorInfo", "GetErrorDescription") and has_string_output(function):
+% if function["name"] in SINGLE_CALL_STRING_OUTPUT_FUNCTIONS:
+% for line in generate_single_call_string_buffer(function):
+        ${line}
+% endfor
+        self._check_for_error(status)
+% elif function["name"] not in ("GetExtendedErrorInfo", "GetErrorDescription") and has_string_output(function):
 % for line in generate_string_buffer_retry(function):
         ${line}
 % endfor

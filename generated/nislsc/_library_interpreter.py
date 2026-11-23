@@ -739,23 +739,18 @@ class LibraryInterpreter(BaseInterpreter):
         password_bytes = password.encode('utf-8')
         connection_timeout_c = ctypes.c_double(connection_timeout)
         chassis_name_actual_size = ctypes.c_size_t()
-        buffer = ctypes.create_string_buffer(chassis_name_actual_size.value)
-        buffer_size = 0
-        while True:
-            status = lib.niSLSC_ConnectToChassisByAddress(
-                session_handle_c,
-                address_bytes,
-                username_bytes,
-                password_bytes,
-                connection_timeout_c,
-                buffer,
-                buffer_size,
-                ctypes.byref(chassis_name_actual_size),
-            )
-            if status != SLSCErrors.BUFFER_TOO_SMALL.value or chassis_name_actual_size.value <= 0:
-                break
-            buffer_size = chassis_name_actual_size.value
-            buffer = ctypes.create_string_buffer(chassis_name_actual_size.value)
+        buffer_size = 4096
+        buffer = ctypes.create_string_buffer(buffer_size)
+        status = lib.niSLSC_ConnectToChassisByAddress(
+            session_handle_c,
+            address_bytes,
+            username_bytes,
+            password_bytes,
+            connection_timeout_c,
+            buffer,
+            buffer_size,
+            ctypes.byref(chassis_name_actual_size),
+        )
         self._check_for_error(status)
         chassis_name_value = buffer.value.decode('utf-8')
         return chassis_name_value
@@ -807,23 +802,18 @@ class LibraryInterpreter(BaseInterpreter):
         password_bytes = password.encode('utf-8')
         connection_timeout_c = ctypes.c_double(connection_timeout)
         chassis_name_actual_size = ctypes.c_size_t()
-        buffer = ctypes.create_string_buffer(chassis_name_actual_size.value)
-        buffer_size = 0
-        while True:
-            status = lib.niSLSC_AddNetworkChassis(
-                session_handle_c,
-                address_bytes,
-                username_bytes,
-                password_bytes,
-                connection_timeout_c,
-                buffer,
-                buffer_size,
-                ctypes.byref(chassis_name_actual_size),
-            )
-            if status != SLSCErrors.BUFFER_TOO_SMALL.value or chassis_name_actual_size.value <= 0:
-                break
-            buffer_size = chassis_name_actual_size.value
-            buffer = ctypes.create_string_buffer(chassis_name_actual_size.value)
+        buffer_size = 4096
+        buffer = ctypes.create_string_buffer(buffer_size)
+        status = lib.niSLSC_AddNetworkChassis(
+            session_handle_c,
+            address_bytes,
+            username_bytes,
+            password_bytes,
+            connection_timeout_c,
+            buffer,
+            buffer_size,
+            ctypes.byref(chassis_name_actual_size),
+        )
         self._check_for_error(status)
         chassis_name_value = buffer.value.decode('utf-8')
         return chassis_name_value

@@ -37,6 +37,12 @@ STRING_LIST = {
     "Command": "ctypes.c_char_p",
 }
 
+SINGLE_CALL_STRING_OUTPUT_FUNCTIONS = {
+    "ConnectToChassisByAddress",
+    "AddNetworkChassis",
+}
+SINGLE_CALL_STRING_BUFFER_SIZE = 4096
+
 PYTHON_DATATYPE_MAP = {
     "uint8": "int",
     "uint16": "int",
@@ -708,6 +714,21 @@ def generate_string_buffer_retry(function: dict) -> list[str]:
         ]
     )
     lines.extend(f"    {line}" for line in generate_additional_variable_declaration(function))
+    return lines
+
+
+def generate_single_call_string_buffer(function: dict) -> list[str]:
+    """Generate one native call with a generously sized string output buffer."""
+    lines = [
+        f"buffer_size = {SINGLE_CALL_STRING_BUFFER_SIZE}",
+        "buffer = ctypes.create_string_buffer(buffer_size)",
+        f"status = lib.niSLSC_{get_capi_function_name(function)}(",
+    ]
+    lines.extend(
+        f"    {argument},"
+        for argument in generate_function_call_for_result(function, retry_buffer=True)
+    )
+    lines.append(")")
     return lines
 
 
